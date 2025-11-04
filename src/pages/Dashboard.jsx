@@ -1,0 +1,464 @@
+
+import React from "react";
+import { base44 } from "@/api/base44Client";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { TrendingUp, TrendingDown, DollarSign, CreditCard, Wallet, ArrowRight, Loader2 } from "lucide-react";
+import { Link } from "react-router-dom";
+import { createPageUrl } from "@/utils";
+import { startOfMonth, endOfMonth, subMonths, format } from "date-fns";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import TrialBadge from "../components/chat/TrialBadge";
+import QuickEditItem from "../components/dashboard/QuickEditItem";
+import toast from "react-hot-toast"; // Assuming react-hot-toast for toast notifications
+
+export default function Dashboard() {
+  const queryClient = useQueryClient();
+
+  const { data: user, isLoading: userLoading } = useQuery({
+    queryKey: ['user'],
+    queryFn: async () => {
+      const isAuth = await base44.auth.isAuthenticated();
+      if (!isAuth) {
+        base44.auth.redirectToLogin();
+        return null;
+      }
+      return await base44.auth.me();
+    },
+  });
+
+  const { data: profile } = useQuery({
+    queryKey: ['userProfile'],
+    queryFn: async () => {
+      if (!user) return null;
+      const profiles = await base44.entities.UserProfile.filter({ created_by: user.email });
+      return profiles[0];
+    },
+    enabled: !!user,
+  });
+
+  const { data: projects } = useQuery({
+    queryKey: ['projects'],
+    queryFn: async () => {
+      if (!user) return [];
+      const allProjects = await base44.entities.Project.filter({ created_by: user.email }, '-created_date');
+      const allIncome = await base44.entities.IncomeItem.filter({ created_by: user.email });
+      const allExpenses = await base44.entities.ExpenseItem.filter({ created_by: user.email });
+      
+      return allProjects.map(project => {
+        const projectIncome = allIncome
+          .filter(item => item.projectId === project.id)
+          .reduce((sum, item) => sum + (item.amount || 0), 0);
+        
+        const projectExpenses = allExpenses
+          .filter(item => item.projectId === project.id)
+          .reduce((sum, item) => sum + (item.amount || 0), 0);
+        
+        return {
+          ...project,
+          totalIncome: projectIncome,
+          totalExpense: projectExpenses,
+        };
+      });
+    },
+    initialData: [],
+    enabled: !!user,
+  });
+
+  const { data: incomeItems } = useQuery({
+    queryKey: ['incomeItems'],
+    queryFn: () => base44.entities.IncomeItem.filter({ created_by: user.email }, '-date'),
+    initialData: [],
+    enabled: !!user,
+  });
+
+  const { data: expenseItems } = useQuery({
+    queryKey: ['expenseItems'],
+    queryFn: () => base44.entities.ExpenseItem.filter({ created_by: user.email }, '-date'),
+    initialData: [],
+    enabled: !!user,
+  });
+
+  const formatCurrency = (amount) => {
+    if (!profile) return `$${amount.toFixed(2)}`;
+    return new Intl.NumberFormat(profile.locale || 'en-US', {
+      style: 'currency',
+      currency: profile.currency || 'USD',
+    }).format(amount);
+  };
+
+  // Add update mutations
+  const updateIncomeMutation = useMutation({
+    mutationFn: ({ id, data }) => base44.entities.IncomeItem.update(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['incomeItems']);
+      queryClient.invalidateQueries(['projects']);
+      toast.success("Updated!");
+    },
+  });
+
+  const updateExpenseMutation = useMutation({
+    mutationFn: ({ id, data }) => base44.entities.ExpenseItem.update(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['expenseItems']);
+      queryClient.invalidateQueries(['projects']);
+      toast.success("Updated!");
+    },
+  });
+
+  const deleteIncomeMutation = useMutation({
+    mutationFn: (id) => base44.entities.IncomeItem.delete(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['incomeItems']);
+      queryClient.invalidateQueries(['projects']);
+      toast.success("Deleted!");
+    },
+  });
+
+  const deleteExpenseMutation = useMutation({
+    mutationFn: (id) => base44.entities.ExpenseItem.delete(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['expenseItems']);
+      queryClient.invalidateQueries(['projects']);
+      toast.success("Deleted!");
+    },
+  });
+
+  const convertMutation = useMutation({
+    mutationFn: async ({ id, fromType, toType, data }) => {
+      // Delete from old type
+      if (fromType === 'income') {
+        await base44.entities.IncomeItem.delete(id);
+        return await base44.entities.ExpenseItem.create(data);
+      } else {
+        await base44.entities.ExpenseItem.delete(id);
+        return await base44.entities.IncomeItem.create(data);
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(['incomeItems']);
+      queryClient.invalidateQueries(['expenseItems']);
+      queryClient.invalidateQueries(['projects']);
+      toast.success("Converted!");
+    },
+  });
+
+  const handleUpdateIncome = async (id, data) => {
+    await updateIncomeMutation.mutateAsync({ id, data });
+  };
+
+  const handleUpdateExpense = async (id, data) => {
+    await updateExpenseMutation.mutateAsync({ id, data });
+  };
+
+  const handleDeleteIncome = async (id) => {
+    await deleteIncomeMutation.mutateAsync(id);
+  };
+
+  const handleDeleteExpense = async (id) => {
+    await deleteExpenseMutation.mutateAsync(id);
+  };
+
+  const handleConvertIncome = async (id) => {
+    const item = incomeItems.find(i => i.id === id);
+    if (!item) {
+      toast.error("Item not found for conversion.");
+      return;
+    }
+    
+    const newData = {
+      projectId: item.projectId,
+      amount: item.amount,
+      date: item.date,
+      category: 'other', // Default category for converted items
+      vendor: item.notes || '', // Using notes as vendor for income to expense
+      notes: item.notes || '',
+      created_by: user.email, // Ensure created_by is passed
+    };
+    
+    await convertMutation.mutateAsync({ id, fromType: 'income', toType: 'expense', data: newData });
+  };
+
+  const handleConvertExpense = async (id) => {
+    const item = expenseItems.find(i => i.id === id);
+    if (!item) {
+      toast.error("Item not found for conversion.");
+      return;
+    }
+    
+    const newData = {
+      projectId: item.projectId,
+      amount: item.amount,
+      date: item.date,
+      category: 'other', // Default category for converted items
+      notes: item.notes || item.vendor || '', // Using notes/vendor as notes for expense to income
+      created_by: user.email, // Ensure created_by is passed
+    };
+    
+    await convertMutation.mutateAsync({ id, fromType: 'expense', toType: 'income', data: newData });
+  };
+
+  // Calculate MTD stats
+  const monthStart = startOfMonth(new Date());
+  const monthEnd = endOfMonth(new Date());
+  
+  const mtdIncome = incomeItems
+    .filter(item => {
+      const itemDate = new Date(item.date);
+      return itemDate >= monthStart && itemDate <= monthEnd;
+    })
+    .reduce((sum, item) => sum + (item.amount || 0), 0);
+
+  const mtdExpenses = expenseItems
+    .filter(item => {
+      const itemDate = new Date(item.date);
+      return itemDate >= monthStart && itemDate <= monthEnd;
+    })
+    .reduce((sum, item) => sum + (item.amount || 0), 0);
+
+  const mtdProfit = mtdIncome - mtdExpenses;
+
+  // Calculate 6-month chart data
+  const chartData = [];
+  for (let i = 5; i >= 0; i--) {
+    const monthDate = subMonths(new Date(), i);
+    const monthStartDate = startOfMonth(monthDate);
+    const monthEndDate = endOfMonth(monthDate);
+    
+    const income = incomeItems
+      .filter(item => {
+        const itemDate = new Date(item.date);
+        return itemDate >= monthStartDate && itemDate <= monthEndDate;
+      })
+      .reduce((sum, item) => sum + (item.amount || 0), 0);
+
+    const expenses = expenseItems
+      .filter(item => {
+        const itemDate = new Date(item.date);
+        return itemDate >= monthStartDate && itemDate <= monthEndDate;
+      })
+      .reduce((sum, item) => sum + (item.amount || 0), 0);
+
+    chartData.push({
+      month: format(monthDate, 'MMM'),
+      income,
+      expenses,
+      profit: income - expenses,
+    });
+  }
+
+  // Top projects by profit
+  const topProjects = projects
+    .map(p => ({
+      ...p,
+      profit: (p.totalIncome || 0) - (p.totalExpense || 0),
+      margin: p.totalIncome > 0 ? (((p.totalIncome - p.totalExpense) / p.totalIncome) * 100).toFixed(1) : 0
+    }))
+    .sort((a, b) => b.profit - a.profit)
+    .slice(0, 5);
+
+  const hasData = incomeItems.length > 0 || expenseItems.length > 0;
+
+  const recentActivity = [...incomeItems.map(item => ({ ...item, type: 'income', title: item.notes || `Income #${item.id}` })),
+                          ...expenseItems.map(item => ({ ...item, type: 'expense', title: item.notes || item.vendor || `Expense #${item.id}` }))]
+                          .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+
+  if (userLoading) {
+    return (
+      <div className="h-screen flex items-center justify-center" style={{ backgroundColor: profile?.darkMode ? '#0f0f0f' : '#f9fafb' }}>
+        <Loader2 className="w-8 h-8 animate-spin text-[#22A699]" />
+      </div>
+    );
+  }
+
+  if (!hasData) {
+    return (
+      <div className="p-6 md:p-8 pb-24 md:pb-8 min-h-screen" style={{ backgroundColor: profile?.darkMode ? '#0f0f0f' : '#f9fafb' }}>
+        <div className="max-w-6xl mx-auto">
+          <div className="flex items-center justify-between mb-8">
+            <h1 className="text-3xl font-bold" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>Dashboard</h1>
+            <TrialBadge profile={profile} />
+          </div>
+          <Card style={{ backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff', border: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}` }}>
+            <CardContent className="flex flex-col items-center justify-center py-16">
+              <div className="w-16 h-16 rounded-full flex items-center justify-center mb-4" style={{ backgroundColor: profile?.darkMode ? '#374151' : '#f3f4f6' }}>
+                <BarChart className="w-8 h-8" style={{ color: profile?.darkMode ? '#6b7280' : '#9ca3af' }} />
+              </div>
+              <h3 className="text-lg font-semibold mb-2" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>No data yet</h3>
+              <p className="mb-4" style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>Log income or expenses in Chat to see your dashboard</p>
+              <Link to={createPageUrl("Chat")}>
+                <Button className="bg-[#22A699] hover:bg-[#1d8d82] text-white">Go to Chat</Button>
+              </Link>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="p-6 md:p-8 pb-24 md:pb-8 min-h-screen" style={{ backgroundColor: profile?.darkMode ? '#0f0f0f' : '#f9fafb' }}>
+      <div className="max-w-6xl mx-auto">
+        <div className="flex items-center justify-between mb-8">
+          <h1 className="text-3xl font-bold" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>Dashboard</h1>
+          <TrialBadge profile={profile} />
+        </div>
+
+        {/* KPI Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <Card style={{ backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff', border: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}` }}>
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium" style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>Profit This Month</CardTitle>
+              <Wallet className="w-4 h-4 text-gray-400" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>{formatCurrency(mtdProfit)}</div>
+              <div className={`flex items-center gap-1 text-sm mt-1`} style={{ color: mtdProfit >= 0 ? '#22A699' : '#ef4444' }}>
+                {mtdProfit >= 0 ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
+                {mtdProfit >= 0 ? 'Positive' : 'Negative'}
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card style={{ backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff', border: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}` }}>
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium" style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>Income This Month</CardTitle>
+              <DollarSign className="w-4 h-4 text-gray-400" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>{formatCurrency(mtdIncome)}</div>
+              <p className="text-sm mt-1" style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>
+                {incomeItems.filter(item => {
+                  const itemDate = new Date(item.date);
+                  return itemDate >= monthStart && itemDate <= monthEnd;
+                }).length} transactions
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card style={{ backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff', border: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}` }}>
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium" style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>Expenses This Month</CardTitle>
+              <CreditCard className="w-4 h-4 text-gray-400" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>{formatCurrency(mtdExpenses)}</div>
+              <p className="text-sm mt-1" style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>
+                {expenseItems.filter(item => {
+                  const itemDate = new Date(item.date);
+                  return itemDate >= monthStart && itemDate <= monthEnd;
+                }).length} transactions
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* 6-Month Chart */}
+        <Card className="mb-8" style={{ backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff', border: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}` }}>
+          <CardHeader>
+            <CardTitle style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>6-Month Overview</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={chartData}>
+                <CartesianGrid strokeDasharray="3 3" stroke={profile?.darkMode ? '#374151' : '#e5e5e5'} />
+                <XAxis dataKey="month" stroke={profile?.darkMode ? '#9ca3af' : '#6b7280'} />
+                <YAxis stroke={profile?.darkMode ? '#9ca3af' : '#6b7280'} />
+                <Tooltip 
+                  formatter={(value) => formatCurrency(value)}
+                  contentStyle={{ 
+                    backgroundColor: profile?.darkMode ? '#1f2937' : '#fff', 
+                    border: `1px solid ${profile?.darkMode ? '#374151' : '#e5e5e5'}`,
+                    color: profile?.darkMode ? '#fff' : '#000'
+                  }}
+                />
+                <Bar dataKey="income" fill="#22A699" />
+                <Bar dataKey="expenses" fill="#ef4444" />
+              </BarChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+
+        {/* Recent Activity with Quick Edit */}
+        <Card className="mb-8" style={{ backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff', border: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}` }}>
+          <CardHeader>
+            <CardTitle style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>
+              Recent Activity
+              <span className="text-sm font-normal ml-2" style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>
+                Quick edit, move, or convert any item
+              </span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {recentActivity.length === 0 ? (
+                <p className="text-center py-8" style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>
+                  No activity yet. Start by chatting with Ledgera AI!
+                </p>
+              ) : (
+                recentActivity.slice(0, 10).map((item) => (
+                  <QuickEditItem
+                    key={`${item.type}-${item.id}`}
+                    item={item}
+                    type={item.type}
+                    projects={projects}
+                    onUpdate={item.type === 'income' ? handleUpdateIncome : handleUpdateExpense}
+                    onDelete={item.type === 'income' ? handleDeleteIncome : handleDeleteExpense}
+                    onConvert={item.type === 'income' ? handleConvertIncome : handleConvertExpense}
+                    formatCurrency={formatCurrency}
+                    profile={profile}
+                    isSaving={updateIncomeMutation.isLoading || updateExpenseMutation.isLoading || deleteIncomeMutation.isLoading || deleteExpenseMutation.isLoading || convertMutation.isLoading}
+                  />
+                ))
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Top Projects */}
+        {topProjects.length > 0 && (
+          <Card style={{ backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff', border: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}` }}>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>Top Projects</CardTitle>
+              <Link to={createPageUrl("Projects")}>
+                <Button variant="ghost" size="sm" className="gap-2" style={{ color: profile?.darkMode ? '#d1d5db' : '#374151' }}>
+                  View all <ArrowRight className="w-4 h-4" />
+                </Button>
+              </Link>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {topProjects.map((project) => (
+                  <Link key={project.id} to={createPageUrl(`ProjectDetail?id=${project.id}`)}>
+                    <div className="flex items-center justify-between p-4 rounded-lg transition-colors" style={{
+                      border: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}`,
+                      backgroundColor: profile?.darkMode ? 'transparent' : '#ffffff'
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = profile?.darkMode ? '#374151' : '#f9fafb'}
+                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = profile?.darkMode ? 'transparent' : '#ffffff'}
+                    >
+                      <div>
+                        <h4 className="font-medium" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>{project.title}</h4>
+                        <p className="text-sm" style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>
+                          {formatCurrency(project.totalIncome)} income • {formatCurrency(project.totalExpense)} expenses
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <div className="font-semibold" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>{formatCurrency(project.profit)}</div>
+                        <div className="text-sm" style={{ color: project.margin >= 0 ? '#22A699' : '#ef4444' }}>
+                          {project.margin}% margin
+                        </div>
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+      </div>
+    </div>
+  );
+}

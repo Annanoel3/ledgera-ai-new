@@ -1,0 +1,688 @@
+
+import { createClientFromRequest } from 'npm:@base44/sdk@0.7.1';
+import OpenAI from 'npm:openai@4.73.1';
+
+const openai = new OpenAI({ apiKey: Deno.env.get("OPENAI_API_KEY") });
+
+// Define all available tools/functions for the AI
+const tools = [
+    {
+        type: "function",
+        function: {
+            name: "create_project",
+            description: "Creates a new project for tracking income and expenses",
+            parameters: {
+                type: "object",
+                properties: {
+                    title: { type: "string", description: "The project name or business name" },
+                    status: { type: "string", enum: ["planned", "active", "complete"], description: "Project status", default: "active" },
+                    startDate: { type: "string", description: "Project start date in YYYY-MM-DD format" },
+                    notes: { type: "string", description: "Additional notes about the project" }
+                },
+                required: ["title"]
+            }
+        }
+    },
+    {
+        type: "function",
+        function: {
+            name: "update_project",
+            description: "Updates an existing project's details",
+            parameters: {
+                type: "object",
+                properties: {
+                    projectId: { type: "string", description: "The ID of the project to update" },
+                    title: { type: "string", description: "New project title" },
+                    status: { type: "string", enum: ["planned", "active", "complete"], description: "New project status" },
+                    notes: { type: "string", description: "Updated notes" }
+                },
+                required: ["projectId"]
+            }
+        }
+    },
+    {
+        type: "function",
+        function: {
+            name: "get_projects",
+            description: "Retrieves all projects for the user. Use this to check what projects exist before creating income/expenses.",
+            parameters: {
+                type: "object",
+                properties: {},
+                required: []
+            }
+        }
+    },
+    {
+        type: "function",
+        function: {
+            name: "create_income",
+            description: "Records a new income transaction",
+            parameters: {
+                type: "object",
+                properties: {
+                    projectId: { type: "string", description: "The project this income belongs to" },
+                    amount: { type: "number", description: "Income amount" },
+                    date: { type: "string", description: "Date in YYYY-MM-DD format" },
+                    category: { type: "string", description: "Income category" },
+                    method: { type: "string", description: "Payment method (e.g., cash, check, credit card)" },
+                    notes: { type: "string", description: "Additional details" }
+                },
+                required: ["projectId", "amount", "date"]
+            }
+        }
+    },
+    {
+        type: "function",
+        function: {
+            name: "update_income",
+            description: "Updates an existing income item",
+            parameters: {
+                type: "object",
+                properties: {
+                    incomeId: { type: "string", description: "The ID of the income item to update" },
+                    projectId: { type: "string", description: "New project ID if moving" },
+                    amount: { type: "number", description: "Updated amount" },
+                    date: { type: "string", description: "Updated date in YYYY-MM-DD format" },
+                    category: { type: "string", description: "Updated category" },
+                    method: { type: "string", description: "Updated payment method" },
+                    notes: { type: "string", description: "Updated notes" }
+                },
+                required: ["incomeId"]
+            }
+        }
+    },
+    {
+        type: "function",
+        function: {
+            name: "get_income",
+            description: "Retrieves income items, optionally filtered by project",
+            parameters: {
+                type: "object",
+                properties: {
+                    projectId: { type: "string", description: "Filter by specific project ID" }
+                },
+                required: []
+            }
+        }
+    },
+    {
+        type: "function",
+        function: {
+            name: "create_expense",
+            description: "Records a new expense transaction. Intelligently categorize based on description (supplies, travel, homeOffice, equipment, marketing, professional, utilities, education, insurance, other)",
+            parameters: {
+                type: "object",
+                properties: {
+                    projectId: { type: "string", description: "The project this expense belongs to" },
+                    amount: { type: "number", description: "Expense amount" },
+                    date: { type: "string", description: "Date in YYYY-MM-DD format" },
+                    category: { type: "string", enum: ["supplies", "travel", "homeOffice", "equipment", "marketing", "professional", "utilities", "education", "insurance", "other"], description: "Expense category for tax purposes" },
+                    vendor: { type: "string", description: "Vendor or merchant name" },
+                    notes: { type: "string", description: "Additional details" }
+                },
+                required: ["projectId", "amount", "date"]
+            }
+        }
+    },
+    {
+        type: "function",
+        function: {
+            name: "update_expense",
+            description: "Updates an existing expense item. Use this to recategorize expenses or move them between projects.",
+            parameters: {
+                type: "object",
+                properties: {
+                    expenseId: { type: "string", description: "The ID of the expense item to update" },
+                    projectId: { type: "string", description: "New project ID if moving" },
+                    amount: { type: "number", description: "Updated amount" },
+                    date: { type: "string", description: "Updated date in YYYY-MM-DD format" },
+                    category: { type: "string", enum: ["supplies", "travel", "homeOffice", "equipment", "marketing", "professional", "utilities", "education", "insurance", "other"], description: "Updated category" },
+                    vendor: { type: "string", description: "Updated vendor" },
+                    notes: { type: "string", description: "Updated notes" }
+                },
+                required: ["expenseId"]
+            }
+        }
+    },
+    {
+        type: "function",
+        function: {
+            name: "get_expenses",
+            description: "Retrieves expense items, optionally filtered by project",
+            parameters: {
+                type: "object",
+                properties: {
+                    projectId: { type: "string", description: "Filter by specific project ID" }
+                },
+                required: []
+            }
+        }
+    },
+    {
+        type: "function",
+        function: {
+            name: "update_user_profile",
+            description: "Updates the user's profile with professions or other settings",
+            parameters: {
+                type: "object",
+                properties: {
+                    professions: { type: "array", items: { type: "string" }, description: "List of user's professions or business types" }
+                },
+                required: []
+            }
+        }
+    },
+    {
+        type: "function",
+        function: {
+            name: "get_user_profile",
+            description: "Retrieves the user's profile including professions and settings",
+            parameters: {
+                type: "object",
+                properties: {},
+                required: []
+            }
+        }
+    },
+    {
+        type: "function",
+        function: {
+            name: "schedule_check_in",
+            description: "Schedules a future check-in notification for after an event or on a specific date",
+            parameters: {
+                type: "object",
+                properties: {
+                    type: {
+                        type: "string",
+                        enum: ["after_event", "weekly"],
+                        description: "Type of check-in to schedule"
+                    },
+                    scheduledFor: {
+                        type: "string",
+                        description: "When to send the notification in YYYY-MM-DD format or ISO date-time"
+                    },
+                    eventName: {
+                        type: "string",
+                        description: "Name of the event (required for after_event type)"
+                    },
+                    projectId: {
+                        type: "string",
+                        description: "Associated project ID"
+                    }
+                },
+                required: ["type", "scheduledFor"]
+            }
+        }
+    }
+];
+
+// Helper to clean messages before sending to OpenAI
+function cleanMessagesForOpenAI(messages) {
+    return messages.map(msg => {
+        const cleaned = { ...msg };
+        
+        // Remove empty tool_calls arrays
+        if (cleaned.tool_calls && Array.isArray(cleaned.tool_calls) && cleaned.tool_calls.length === 0) {
+            delete cleaned.tool_calls;
+        }
+        
+        // Remove empty content strings for tool messages, or set a default
+        if (cleaned.role === 'tool' && !cleaned.content) {
+            cleaned.content = 'Function executed successfully';
+        }
+        
+        return cleaned;
+    });
+}
+
+// Execute a tool call
+async function executeTool(toolName, args, base44, userEmail) {
+    console.log(`Executing tool: ${toolName}`, args);
+    
+    try {
+        switch (toolName) {
+            case "create_project": {
+                const project = await base44.entities.Project.create({
+                    title: args.title,
+                    status: args.status || "active",
+                    startDate: args.startDate || new Date().toISOString().split('T')[0],
+                    notes: args.notes || "",
+                    totalIncome: 0,
+                    totalExpense: 0,
+                    created_by: userEmail
+                });
+                return { success: true, project };
+            }
+            
+            case "update_project": {
+                const updateData = {};
+                if (args.title) updateData.title = args.title;
+                if (args.status) updateData.status = args.status;
+                if (args.notes) updateData.notes = args.notes;
+                
+                const updated = await base44.entities.Project.update(args.projectId, updateData);
+                return { success: true, project: updated };
+            }
+            
+            case "get_projects": {
+                const projects = await base44.entities.Project.filter({ created_by: userEmail }, '-created_date');
+                
+                // Calculate totals for each project
+                const allIncome = await base44.entities.IncomeItem.filter({ created_by: userEmail });
+                const allExpenses = await base44.entities.ExpenseItem.filter({ created_by: userEmail });
+                
+                const projectsWithTotals = projects.map(project => {
+                    const projectIncome = allIncome
+                        .filter(item => item.projectId === project.id)
+                        .reduce((sum, item) => sum + (item.amount || 0), 0);
+                    
+                    const projectExpenses = allExpenses
+                        .filter(item => item.projectId === project.id)
+                        .reduce((sum, item) => sum + (item.amount || 0), 0);
+                    
+                    return {
+                        id: project.id,
+                        title: project.title,
+                        status: project.status,
+                        totalIncome: projectIncome,
+                        totalExpense: projectExpenses,
+                        profit: projectIncome - projectExpenses,
+                        startDate: project.startDate,
+                        notes: project.notes
+                    };
+                });
+                
+                return { success: true, projects: projectsWithTotals };
+            }
+            
+            case "create_income": {
+                const income = await base44.entities.IncomeItem.create({
+                    projectId: args.projectId,
+                    amount: args.amount,
+                    date: args.date,
+                    category: args.category || "other",
+                    method: args.method || "",
+                    notes: args.notes || "",
+                    created_by: userEmail
+                });
+                
+                // Update project totals
+                await updateProjectTotals(base44, args.projectId, userEmail);
+                
+                return { success: true, income };
+            }
+            
+            case "update_income": {
+                const updateData = {};
+                if (args.projectId) updateData.projectId = args.projectId;
+                if (args.amount !== undefined) updateData.amount = args.amount;
+                if (args.date) updateData.date = args.date;
+                if (args.category) updateData.category = args.category;
+                if (args.method) updateData.method = args.method;
+                if (args.notes !== undefined) updateData.notes = args.notes;
+                
+                // Get the old income to know which project to update
+                const oldIncome = await base44.entities.IncomeItem.filter({ id: args.incomeId });
+                const oldProjectId = oldIncome[0]?.projectId;
+                
+                const updated = await base44.entities.IncomeItem.update(args.incomeId, updateData);
+                
+                // Update totals for both old and new projects if projectId changed
+                if (oldProjectId) {
+                    await updateProjectTotals(base44, oldProjectId, userEmail);
+                }
+                if (args.projectId && args.projectId !== oldProjectId) {
+                    await updateProjectTotals(base44, args.projectId, userEmail);
+                }
+                
+                return { success: true, income: updated };
+            }
+            
+            case "get_income": {
+                const filter = { created_by: userEmail };
+                if (args.projectId) filter.projectId = args.projectId;
+                
+                const income = await base44.entities.IncomeItem.filter(filter, '-date');
+                return { success: true, income };
+            }
+            
+            case "create_expense": {
+                const expense = await base44.entities.ExpenseItem.create({
+                    projectId: args.projectId,
+                    amount: args.amount,
+                    date: args.date,
+                    category: args.category || "other",
+                    vendor: args.vendor || "",
+                    notes: args.notes || "",
+                    created_by: userEmail
+                });
+                
+                // Update project totals
+                await updateProjectTotals(base44, args.projectId, userEmail);
+                
+                return { success: true, expense };
+            }
+            
+            case "update_expense": {
+                const updateData = {};
+                if (args.projectId) updateData.projectId = args.projectId;
+                if (args.amount !== undefined) updateData.amount = args.amount;
+                if (args.date) updateData.date = args.date;
+                if (args.category) updateData.category = args.category;
+                if (args.vendor) updateData.vendor = args.vendor;
+                if (args.notes !== undefined) updateData.notes = args.notes;
+                
+                // Get the old expense to know which project to update
+                const oldExpense = await base44.entities.ExpenseItem.filter({ id: args.expenseId });
+                const oldProjectId = oldExpense[0]?.projectId;
+                
+                const updated = await base44.entities.ExpenseItem.update(args.expenseId, updateData);
+                
+                // Update totals for both old and new projects if projectId changed
+                if (oldProjectId) {
+                    await updateProjectTotals(base44, oldProjectId, userEmail);
+                }
+                if (args.projectId && args.projectId !== oldProjectId) {
+                    await updateProjectTotals(base44, args.projectId, userEmail);
+                }
+                
+                return { success: true, expense: updated };
+            }
+            
+            case "get_expenses": {
+                const filter = { created_by: userEmail };
+                if (args.projectId) filter.projectId = args.projectId;
+                
+                const expenses = await base44.entities.ExpenseItem.filter(filter, '-date');
+                return { success: true, expenses };
+            }
+            
+            case "update_user_profile": {
+                const profiles = await base44.entities.UserProfile.filter({ created_by: userEmail });
+                if (profiles.length === 0) {
+                    // Create profile if it doesn't exist
+                    const newProfile = await base44.entities.UserProfile.create({
+                        professions: args.professions || [],
+                        currency: "USD",
+                        locale: "en-US",
+                        subscribed: false,
+                        trialStart: new Date().toISOString(),
+                        darkMode: false,
+                        funMode: false,
+                        created_by: userEmail
+                    });
+                    return { success: true, profile: newProfile };
+                } else {
+                    const updateData = {};
+                    if (args.professions) updateData.professions = args.professions;
+                    
+                    const updated = await base44.entities.UserProfile.update(profiles[0].id, updateData);
+                    return { success: true, profile: updated };
+                }
+            }
+            
+            case "get_user_profile": {
+                const profiles = await base44.entities.UserProfile.filter({ created_by: userEmail });
+                if (profiles.length === 0) {
+                    return { success: true, profile: null };
+                }
+                return { success: true, profile: profiles[0] };
+            }
+
+            case "schedule_check_in": {
+                const checkIn = await base44.entities.ScheduledCheckIn.create({
+                    userEmail: userEmail,
+                    type: args.type,
+                    scheduledFor: args.scheduledFor,
+                    eventName: args.eventName || "",
+                    projectId: args.projectId || "",
+                    sent: false,
+                    created_by: userEmail
+                });
+                return { success: true, checkIn };
+            }
+            
+            default:
+                return { success: false, error: `Unknown tool: ${toolName}` };
+        }
+    } catch (error) {
+        console.error(`Error executing tool ${toolName}:`, error);
+        return { success: false, error: error.message };
+    }
+}
+
+// Helper function to update project totals
+async function updateProjectTotals(base44, projectId, userEmail) {
+    try {
+        const allIncome = await base44.entities.IncomeItem.filter({ projectId, created_by: userEmail });
+        const allExpenses = await base44.entities.ExpenseItem.filter({ projectId, created_by: userEmail });
+        
+        const totalIncome = allIncome.reduce((sum, item) => sum + (item.amount || 0), 0);
+        const totalExpense = allExpenses.reduce((sum, item) => sum + (item.amount || 0), 0);
+        
+        await base44.entities.Project.update(projectId, {
+            totalIncome,
+            totalExpense
+        });
+    } catch (error) {
+        console.error('Error updating project totals:', error);
+    }
+}
+
+Deno.serve(async (req) => {
+    try {
+        const base44 = createClientFromRequest(req);
+        const user = await base44.auth.me();
+
+        if (!user) {
+            console.error('No authenticated user found');
+            return Response.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
+        console.log('Processing chat for user:', user.email);
+
+        const body = await req.json();
+        const { message, conversationId } = body;
+
+        console.log('Request body:', { message, conversationId });
+
+        if (!message) {
+            return Response.json({ error: 'Message is required' }, { status: 400 });
+        }
+
+        let conversation;
+        let messages = [];
+
+        // Load or create conversation
+        if (conversationId) {
+            console.log('Loading existing conversation:', conversationId);
+            const conversations = await base44.entities.Conversation.filter({ id: conversationId });
+            if (conversations.length > 0) {
+                conversation = conversations[0];
+                messages = conversation.messages || [];
+                console.log('Loaded conversation with', messages.length, 'messages');
+            } else {
+                console.log('Conversation not found, creating new one');
+                conversation = null;
+            }
+        }
+
+        if (!conversation) {
+            console.log('Creating new conversation');
+            conversation = await base44.entities.Conversation.create({
+                userEmail: user.email,
+                messages: [],
+                name: message.substring(0, 50),
+                createdAt: new Date().toISOString()
+            });
+            messages = [];
+            console.log('Created conversation:', conversation.id);
+        }
+
+        // Add user message
+        messages.push({
+            role: 'user',
+            content: message
+        });
+
+        // Get user profile for context
+        const profiles = await base44.entities.UserProfile.filter({ created_by: user.email });
+        const profile = profiles[0];
+
+        // Build system instructions (static, not from database)
+        let instructions = `You are Ledgera AI, a personal CPA and financial advisor. Only greet on first message if conversation is empty. Skip intro for returning users.
+
+IMPORTANT - FIRST MESSAGE LOGIC:
+- Check if UserProfile has professions array with items
+- Check if user has any existing Projects
+- If EITHER exists, DO NOT ask what they do - they've already told you! Just greet them warmly and ask how you can help today.
+- ONLY ask 'what do you do for work?' if UserProfile.professions is empty AND they have zero Projects.
+
+If funMode is true in UserProfile, be conversational and friendly like talking to a friend about money - throw in a bad money pun or dad joke occasionally. Keep it light and relatable while still being helpful.
+
+When user tells you what they do for work (ONLY if you didn't already know):
+1. IMMEDIATELY create a Project with that business name
+2. Update their UserProfile with the profession
+3. Confirm with a message
+
+CRITICAL - INCOME VS EXPENSE DETECTION:
+When user mentions money coming IN or money they RECEIVED or EARNED:
+- Payment received, client paid, got paid, earned, invoice paid, sold items, made a sale, revenue = INCOME
+- Use create_income function
+
+When user mentions money going OUT or money they SPENT or PAID:
+- Bought supplies, paid for, spent on, purchased, expense, cost = EXPENSE
+- Use create_expense function
+
+Pay close attention to the context. If user says 'I got $500' that's INCOME. If they say 'I spent $500 on supplies' that's EXPENSE.
+
+For INCOME: Ask when, amount, what for. Auto-assign to project. Create and confirm. You can UPDATE income items but NEVER delete them.
+
+For EXPENSES: Ask when, amount, category, vendor. Auto-assign to project. Create and confirm. You can UPDATE expense items but NEVER delete them.
+
+CRITICAL: You do NOT have permission to delete any financial records. Users must delete through the UI if needed.
+
+SMART EXPENSE CATEGORIZATION: When creating expenses, intelligently assign them to the most appropriate tax category based on the description and vendor.
+
+RECATEGORIZING EXPENSES: When user asks to change category or move expenses, you can UPDATE the ExpenseItem with a new category.
+
+For PROJECTS: Always create a project when user tells you their business. Create additional projects when requested. Track profitability.
+
+CRITICAL FOR FINANCIAL CALCULATIONS:
+When calculating totals, profit, or any financial metrics, ALWAYS use Project.totalIncome and Project.totalExpense fields directly. NEVER sum up individual items. These fields are pre-calculated and guaranteed accurate.
+
+For REPORTS: Summarize financials using Project totals. Calculate margins, ROI, and profit/loss from those totals.
+
+MOVING ITEMS: You can update expense and income items to change their projectId to move them between projects.
+
+FILE UPLOADS: When you see information about file processing in the message, acknowledge what was done.
+
+SCHEDULING CHECK-INS:
+- When user mentions an upcoming event (gig, wedding, photoshoot, etc.), ASK if they want a reminder to log income/expenses after it's done
+- If yes, use schedule_check_in with type="after_event" and scheduledFor set to the day AFTER the event
+- When setting up weekly check-ins, use schedule_check_in with type="weekly" and scheduledFor set to their preferred day/time
+
+Be conversational, ask clarifying questions, and offer proactive advice.
+
+TAX PREPARATION: Proactively help users categorize expenses correctly for tax purposes.`;
+        
+        // Add profile context if available
+        if (profile) {
+            instructions += `\n\nUser's currency: ${profile.currency || 'USD'}`;
+            instructions += `\nUser's locale: ${profile.locale || 'en-US'}`;
+            if (profile.professions && profile.professions.length > 0) {
+                instructions += `\nUser's professions: ${profile.professions.join(', ')}`;
+            }
+            if (profile.funMode) {
+                instructions += "\nFun mode is ENABLED - be playful and use money puns!";
+            }
+            if (profile.darkMode) {
+                instructions += "\nUser prefers dark mode.";
+            }
+        }
+
+        // Clean messages before sending to OpenAI
+        const cleanedMessages = cleanMessagesForOpenAI(messages);
+
+        console.log('Calling OpenAI with', cleanedMessages.length, 'messages');
+
+        // Call OpenAI
+        let completion = await openai.chat.completions.create({
+            model: "gpt-4o",
+            messages: [
+                { role: "system", content: instructions },
+                ...cleanedMessages
+            ],
+            tools: tools,
+            tool_choice: "auto"
+        });
+
+        console.log('OpenAI response received');
+
+        let responseMessage = completion.choices[0].message;
+        messages.push(responseMessage);
+
+        // Handle tool calls
+        while (responseMessage.tool_calls && responseMessage.tool_calls.length > 0) {
+            console.log('Processing', responseMessage.tool_calls.length, 'tool calls');
+            
+            for (const toolCall of responseMessage.tool_calls) {
+                const functionName = toolCall.function.name;
+                const functionArgs = JSON.parse(toolCall.function.arguments);
+                
+                console.log(`Executing tool: ${functionName}`, functionArgs);
+                
+                const toolResult = await executeTool(functionName, functionArgs, base44, user.email);
+                
+                console.log(`Tool result for ${functionName}:`, toolResult);
+                
+                messages.push({
+                    role: "tool",
+                    tool_call_id: toolCall.id,
+                    name: functionName,
+                    content: JSON.stringify(toolResult)
+                });
+            }
+
+            // Clean messages again before next OpenAI call
+            const cleanedMessagesForNextCall = cleanMessagesForOpenAI(messages);
+
+            // Get next response
+            completion = await openai.chat.completions.create({
+                model: "gpt-4o",
+                messages: [
+                    { role: "system", content: instructions },
+                    ...cleanedMessagesForNextCall
+                ],
+                tools: tools,
+                tool_choice: "auto"
+            });
+
+            responseMessage = completion.choices[0].message;
+            messages.push(responseMessage);
+        }
+
+        // Update conversation
+        await base44.entities.Conversation.update(conversation.id, {
+            messages: messages,
+            name: conversation.name || message.substring(0, 50)
+        });
+
+        console.log('Conversation updated successfully');
+
+        return Response.json({
+            success: true,
+            conversationId: conversation.id,
+            response: responseMessage.content
+        });
+
+    } catch (error) {
+        console.error('Error in processChat:', error);
+        console.error('Error stack:', error.stack);
+        
+        return Response.json({ 
+            error: error.message || 'Internal server error',
+            details: error.stack
+        }, { status: 500 });
+    }
+});

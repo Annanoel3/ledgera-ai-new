@@ -1,0 +1,150 @@
+import { createClientFromRequest } from 'npm:@base44/sdk@0.7.1';
+
+const CRON_SECRET = Deno.env.get('CRON_SECRET');
+
+Deno.serve(async (req) => {
+  try {
+    if (req.method !== 'POST') {
+      return Response.json({ error: 'Method not allowed' }, { status: 405 });
+    }
+
+    const url = new URL(req.url);
+    const providedSecret = req.headers.get('X-Secret') || url.searchParams.get('secret') || '';
+    
+    if (!CRON_SECRET || providedSecret !== CRON_SECRET) {
+      return Response.json({ success: false, error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const base44 = createClientFromRequest(req);
+
+    const now = Date.now();
+    const cutoff = now + 5 * 60 * 1000; // 5 minute window
+
+    console.log('[cronCheckIns] Getting all users...');
+    const allUsers = await base44.asServiceRole.entities.User.list();
+    console.log('[cronCheckIns] Found', allUsers.length, 'users');
+
+    let totalScanned = 0;
+    let ok = 0, fail = 0;
+
+    // CRITICAL: Iterate through users FIRST, like cronWeeklyRecap does
+    for (const user of allUsers) {
+      try {
+        // Check if user has notifications enabled in profile
+        const profiles = await base44.asServiceRole.entities.UserProfile.filter({
+          created_by: user.email
+        });
+        const profile = profiles[0];
+        
+        // Skip if user opted out
+        if (profile?.notificationsEnabled === false) {
+          continue;
+        }
+
+        // Use EXACT same pattern as cronWeeklyRecap (which works!)
+        const checkIns = await base44.asServiceRole.entities.ScheduledCheckIn.filter({
+          userEmail: user.email,
+          sent: false
+        }, '-scheduledFor', 100); // Add sort param like weekly recap does
+
+        console.log('[cronCheckIns] Found', checkIns.length, 'pending check-ins for', user.email);
+
+        totalScanned += checkIns.length;
+
+        for (const checkIn of checkIns) {
+          const scheduledTime = new Date(checkIn.scheduledFor).getTime();
+          
+          if (scheduledTime && scheduledTime <= cutoff) {
+            console.log('[cronCheckIns] Sending check-in to', user.email, ':', checkIn.type);
+
+            // Build message based on type and user's profession
+            let title = '';
+            let body = '';
+            let prompt = '';
+
+            if (checkIn.type === 'after_event') {
+              title = '📋 Event Follow-Up';
+              body = `How did ${checkIn.eventName || 'your event'} go?`;
+              prompt = `Hi! How did ${checkIn.eventName || 'your event'} go? I'd love to help you record any income from the event and any expenses you incurred. Just let me know the details!`;
+            } else if (checkIn.type === 'weekly') {
+              title = '📅 Weekly Check-In';
+              body = 'Time for your weekly financial check-in!';
+              
+              // Customize based on profession
+              const professions = profile?.professions || [];
+              const hasEvents = professions.some(p => 
+                p.toLowerCase().includes('musician') ||
+                p.toLowerCase().includes('performer') ||
+                p.toLowerCase().includes('photographer') ||
+                p.toLowerCase().includes('videographer') ||
+                p.toLowerCase().includes('dj') ||
+                p.toLowerCase().includes('violinist') ||
+                p.toLowerCase().includes('event')
+              );
+
+              if (hasEvents) {
+                prompt = `Hey! Time for our weekly check-in. Let's catch up:\n\n1. Was there anything from this past week we need to update? Any income or expenses?\n\n2. Do you have any upcoming events? If so, tell me about them and when they are, and I'll remind you to log the income/expenses after they happen.`;
+              } else {
+                prompt = `Hey! Time for our weekly check-in. Let's catch up:\n\n1. How did this past week go? Any income or expenses we need to record?\n\n2. What projects or work do you have coming up this week? I can help you track them and remind you to log everything.`;
+              }
+            }
+
+            // Create a new conversation with the prompt as the first message
+            try {
+              const conversation = await base44.asServiceRole.entities.Conversation.create({
+                userEmail: user.email,
+                messages: [
+                  {
+                    role: 'assistant',
+                    content: prompt
+                  }
+                ],
+                name: checkIn.type === 'weekly' ? 'Weekly Check-In' : `${checkIn.eventName} Follow-Up`,
+                createdAt: new Date().toISOString()
+              });
+
+              // Send push notification
+              const r = await base44.asServiceRole.functions.invoke('notifySend', {
+                toUserId: user.email,
+                title: title,
+                body: body,
+                screen: '/Chat',
+              });
+
+              if (r?.data?.success || conversation) {
+                // Mark as sent
+                await base44.asServiceRole.entities.ScheduledCheckIn.update(checkIn.id, {
+                  sent: true,
+                  sentAt: new Date().toISOString()
+                });
+
+                ok++;
+                console.log('[cronCheckIns] ✓ Sent successfully');
+              } else {
+                console.error('[cronCheckIns] Failed:', r?.data);
+                fail++;
+              }
+            } catch (chatError) {
+              console.error('[cronCheckIns] Error creating conversation:', chatError);
+              fail++;
+            }
+          }
+        }
+      } catch (userError) {
+        console.error('[cronCheckIns] Error for user', user.email, ':', userError);
+      }
+    }
+
+    return Response.json({
+      success: true,
+      users: allUsers.length,
+      scanned: totalScanned,
+      sent: ok,
+      errors: fail,
+      at: new Date().toISOString(),
+    });
+  } catch (err) {
+    console.error('[cronCheckIns] Fatal:', err);
+    return Response.json({ success: false, error: String(err) }, { status: 500 });
+  }
+});
