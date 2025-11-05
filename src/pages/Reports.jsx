@@ -34,7 +34,23 @@ export default function Reports() {
   const [selectedProjectId, setSelectedProjectId] = useState("all");
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [categoryExpenses, setCategoryExpenses] = useState([]);
+  const [easterEggOpen, setEasterEggOpen] = useState(false);
+  const [gifIndex, setGifIndex] = useState(0);
   const queryClient = useQueryClient();
+
+  const funnyGifs = [
+    "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdHJ3NWM3aGo4OWF2M2d0MG5hYmQ4dHp5dGh3MG5hYmQ4dHp5dGh3MG5hYmQ4dHp5dGh3MG5hYmQ4dHp5dGh3MG5hYmQ4dHp5dGh3MG5hYmQ4dHp5dGh3MG5hYmQ4dHp5dGh3MG5hYmQ4dHp5dGh3MG5hYmQ4dHp5dGh3MG5hYmQ4dHp5/67ThRZlYBvibtdF9JH/giphy.gif", // Great job celebration
+    "https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif", // Money raining
+    "https://media.giphy.com/media/LdOyjZ7io5Msw/giphy.gif", // Make it rain
+    "https://media.giphy.com/media/3oKIPa2TdahY8LAAxy/giphy.gif", // Scrooge McDuck swimming in money
+    "https://media.giphy.com/media/xT0xeJpnrWC4XWblEk/giphy.gif", // Arrested Development "I've made a huge mistake"
+    "https://media.giphy.com/media/l3vRgiN4fSg8rkJy0/giphy.gif", // Wolf of Wall Street chest pound
+  ];
+
+  const handleEasterEggClick = () => {
+    setEasterEggOpen(true);
+    setGifIndex((prev) => (prev + 1) % funnyGifs.length);
+  };
 
   const { data: user, isLoading: userLoading } = useQuery({
     queryKey: ['user'],
@@ -502,6 +518,17 @@ export default function Reports() {
           </div>
         </div>
 
+        {/* Easter Egg Button */}
+        <div className="flex justify-end mb-2">
+          <button
+            onClick={handleEasterEggClick}
+            className="text-xs opacity-30 hover:opacity-60 transition-opacity"
+            style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}
+          >
+            👀 don't click this
+          </button>
+        </div>
+
         <Tabs defaultValue="income" onValueChange={setActiveTab}>
           <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 gap-2 mb-16" style={{ backgroundColor: 'transparent', border: 'none' }}>
             <TabsTrigger 
@@ -942,6 +969,31 @@ export default function Reports() {
         </Tabs>
       </div>
 
+      {/* Easter Egg Dialog */}
+      <Dialog open={easterEggOpen} onOpenChange={setEasterEggOpen}>
+        <DialogContent className="max-w-lg" style={{
+          backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff',
+          border: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}`
+        }}>
+          <DialogHeader>
+            <DialogTitle style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>
+              🎉 You Found It!
+            </DialogTitle>
+          </DialogHeader>
+          <div className="flex flex-col items-center justify-center py-6">
+            <img 
+              src={funnyGifs[gifIndex]} 
+              alt="Celebration"
+              className="w-full max-w-md rounded-lg mb-4"
+            />
+            <p className="text-center text-sm" style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>
+              Click again for more financial wisdom 😎
+            </p>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Category Expenses Dialog */}
       <Dialog open={selectedCategory !== null} onOpenChange={() => setSelectedCategory(null)}>
         <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto" style={{
           backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff',
