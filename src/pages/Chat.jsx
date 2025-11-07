@@ -395,7 +395,8 @@ export default function Chat() {
       }
     },
     enabled: !!user,
-    staleTime: 60 * 1000,
+    staleTime: 0, // Always fetch fresh data
+    refetchOnMount: 'always', // Always refetch when component mounts
     initialData: [],
   });
 
