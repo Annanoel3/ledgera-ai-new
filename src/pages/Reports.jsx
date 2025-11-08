@@ -24,6 +24,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { exportFinancialData } from "@/functions/exportFinancialData";
 
 export default function Reports() {
   const initialYear = new Date().getFullYear().toString();
@@ -39,7 +40,7 @@ export default function Reports() {
   const queryClient = useQueryClient();
 
   const funnyGifs = [
-    "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdHJ3NWM3aGo4OWF2M2d0MG5hYmQ4dHp5dGh3MG5hYmQ4dHp5dGh3MG5hYmQ4dHp5dGh3MG5hYmQ4dHp5dGh3MG5hYmQ4dHp5dGh3MG5hYmQ4dHp5dGh3MG5hYmQ4dHp5dGh3MG5hYmQ4dHp5dGh3MG5hYmQ4dHp5dGh3MG5hYmQ4dHp5/67ThRZlYBvibtdF9JH/giphy.gif", // Great job celebration
+    "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdHJ3NWM3aGo4OWF2M2d0MG5hYmQ4dHp5dGh3MG5hYmQ4dHp5dGh3MG5hYmQ4dHp5dGh3MG5hYmQ4dHp5dGh3MG5hYmQ4dHp5dGh3MG5hYmQ4dHp5dGh3MG5hYmQ4dHp5dGh3MG5hYmQ4dHp5dGh3MG5hYmQ4dHp5/67ThRZlYBvibtdF9JH/giphy.gif", // Great job celebration
     "https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif", // Money raining
     "https://media.giphy.com/media/LdOyjZ7io5Msw/giphy.gif", // Make it rain
     "https://media.giphy.com/media/3oKIPa2TdahY8LAAxy/giphy.gif", // Scrooge McDuck swimming in money
@@ -396,7 +397,7 @@ export default function Reports() {
     try {
       toast.info("Generating comprehensive PDF report...");
       
-      const response = await base44.functions.invoke('exportFinancialData', {
+      const response = await exportFinancialData({
         projects: projects,
         income: allYearIncomeItems,
         expenses: allYearExpenseItems,
@@ -913,7 +914,7 @@ export default function Reports() {
                               {categoryLabels[key]}
                             </TableCell>
                             <TableCell className="text-right" style={{ color: profile?.darkMode ? '#e0e7ed' : '#374151' }}>{formatCurrency(data.amount)}</TableCell>
-                            <TableCell className="text-right text-sm" style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>
+                            <TableCell className="text-right text-sm" style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }>
                               {data.expenses.length}
                             </TableCell>
                             <TableCell className="text-right">

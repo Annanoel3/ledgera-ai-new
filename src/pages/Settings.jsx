@@ -15,6 +15,7 @@ import { differenceInDays, format } from "date-fns";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import toast from 'react-hot-toast';
+import { exportFinancialData } from "@/functions/exportFinancialData";
 
 const currencies = ["USD", "EUR", "GBP", "CAD", "AUD"];
 const locales = ["en-US", "en-GB", "fr-FR", "de-DE", "es-ES"];
@@ -205,7 +206,7 @@ export default function Settings() {
     try {
       toast.info("Generating comprehensive PDF report...");
       
-      const response = await base44.functions.invoke('exportFinancialData', {
+      const response = await exportFinancialData({
         projects: allProjects,
         income: allIncome,
         expenses: allExpenses,

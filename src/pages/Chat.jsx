@@ -7,8 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Send, Mic, Loader2, Square, Paperclip, X, FileText, Plus, MessageSquare, Trash2, Info } from "lucide-react";
 import MessageBubble from "../components/chat/MessageBubble";
 import { toast } from "sonner";
-import { format }
-  from "date-fns";
+import { format } from "date-fns";
 import {
   Dialog,
   DialogContent,
@@ -17,6 +16,9 @@ import {
 } from "@/components/ui/dialog";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
+import { processFinancialData } from "@/functions/processFinancialData";
+import { processChat } from "@/functions/processChat";
+import { speechToText } from "@/functions/speechToText";
 
 // Move component definitions OUTSIDE to prevent re-mounting on every render
 const ChatHeader = ({ profile, showChatList, setShowChatList, handleNewChat, setShowCapabilities }) => (
@@ -484,7 +486,7 @@ export default function Chat() {
 
       let processingSummaryMessage = "";
       try {
-        const response = await base44.functions.invoke('processFinancialData', {
+        const response = await processFinancialData({
           action: 'processFiles',
           data: {
             files,
@@ -568,7 +570,7 @@ export default function Chat() {
 
       setSendingMessage(true);
       try {
-        const response = await base44.functions.invoke('processChat', {
+        const response = await processChat({
           message: finalMessage,
           conversationId: conversationId || null
         });
@@ -595,7 +597,7 @@ export default function Chat() {
 
       setSendingMessage(true);
       try {
-        const response = await base44.functions.invoke('processChat', {
+        const response = await processChat({
           message: message,
           conversationId: conversationId || null
         });
@@ -643,7 +645,7 @@ export default function Chat() {
           const file = new File([blob], 'recording.webm', { type: 'audio/webm' });
           const uploadResponse = await base44.integrations.Core.UploadFile({ file });
 
-          const response = await base44.functions.invoke('speechToText', { file_url: uploadResponse.file_url });
+          const response = await speechToText({ file_url: uploadResponse.file_url });
 
           if (response.data.text) {
             toast.success("Transcription complete!");
