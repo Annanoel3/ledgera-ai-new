@@ -1,7 +1,6 @@
-
 import React, { useState } from "react";
 import { base44 } from "@/api/base44Client";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tantml:function_calls>
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -40,12 +39,12 @@ export default function Reports() {
   const queryClient = useQueryClient();
 
   const funnyGifs = [
-    "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdHJ3NWM3aGo4OWF2M2d0MG5hYmQ4dHp5dGh3MG5hYmQ4dHp5dGh3MG5hYmQ4dHp5dGh3MG5hYmQ4dHp5dGh3MG5hYmQ4dHp5dGh3MG5hYmQ4dHp5dGh3MG5hYmQ4dHp5dGh3MG5hYmQ4dHp5dGh3MG5hYmQ4dHp5/67ThRZlYBvibtdF9JH/giphy.gif", // Great job celebration
-    "https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif", // Money raining
-    "https://media.giphy.com/media/LdOyjZ7io5Msw/giphy.gif", // Make it rain
-    "https://media.giphy.com/media/3oKIPa2TdahY8LAAxy/giphy.gif", // Scrooge McDuck swimming in money
-    "https://media.giphy.com/media/xT0xeJpnrWC4XWblEk/giphy.gif", // Arrested Development "I've made a huge mistake"
-    "https://media.giphy.com/media/l3vRgiN4fSg8rkJy0/giphy.gif", // Wolf of Wall Street chest pound
+    "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdHJ3NWM3aGo4OWF2M2d0MG5hYmQ4dHp5dGh3MG5hYmQ4dHp5dGh3MG5hYmQ4dHp5dGh3MG5hYmQ4dHp5dGh3MG5hYmQ4dHp5dGh3MG5hYmQ4dHp5dGh3MG5hYmQ4dHp5dGh3MG5hYmQ4dHp5dGh3MG5hYmQ4dHp5/67ThRZlYBvibtdF9JH/giphy.gif",
+    "https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif",
+    "https://media.giphy.com/media/LdOyjZ7io5Msw/giphy.gif",
+    "https://media.giphy.com/media/3oKIPa2TdahY8LAAxy/giphy.gif",
+    "https://media.giphy.com/media/xT0xeJpnrWC4XWblEk/giphy.gif",
+    "https://media.giphy.com/media/l3vRgiN4fSg8rkJy0/giphy.gif",
   ];
 
   const handleEasterEggClick = () => {
@@ -253,19 +252,16 @@ export default function Reports() {
   };
 
   const getCategoryExpenses = (category) => {
-    // Get ALL expenses for the selected year/month period first
     const periodExpenses = expenseItems.filter(e => {
       const itemDate = new Date(e.date);
       return itemDate >= yearStart && itemDate <= yearEnd;
     });
 
     return periodExpenses.filter(e => {
-      // Direct category match - always include
       if (e.category === category) {
         return true;
       }
 
-      // For keyword-based matching, define keywords per category
       const keywords = {
         travel: ['travel', 'transport', 'uber', 'lyft', 'taxi', 'mileage', 'gas', 'fuel', 'hotel', 'airbnb', 'flight', 'parking'],
         homeOffice: ['home office', 'rent', 'mortgage', 'desk', 'chair', 'home workspace'],
@@ -278,25 +274,19 @@ export default function Reports() {
         insurance: ['insurance', 'liability', 'health insurance', 'business insurance', 'coverage', 'policy'],
       };
 
-      // Build search text from all fields
       const searchText = `${e.category || ''} ${e.notes || ''} ${e.vendor || ''}`.toLowerCase();
       
-      // For "other" category, show items that don't match any specific category
       if (category === 'other') {
-        // If already categorized, don't show in other
         if (e.category && e.category !== 'other') {
           return false;
         }
         
-        // Check if it matches any known category keywords
         const allKeywords = Object.values(keywords).flat();
         const matchesAnyCategory = allKeywords.some(keyword => searchText.includes(keyword));
         
-        // Show in "other" if it doesn't match any category
         return !matchesAnyCategory;
       }
       
-      // For specific categories, check keywords if not explicitly categorized
       if (keywords[category]) {
         return keywords[category].some(keyword => searchText.includes(keyword));
       }
@@ -329,8 +319,8 @@ export default function Reports() {
       console.error('Delete expense error:', error);
       if (error.message?.includes('not found')) {
         toast.error("This expense was already deleted");
-        queryClient.invalidateQueries(['expenseItems']); // Invalidate anyway to ensure consistency
-        queryClient.invalidateQueries(['projects']); // Invalidate anyway to ensure consistency
+        queryClient.invalidateQueries(['expenseItems']);
+        queryClient.invalidateQueries(['projects']);
       } else {
         toast.error("Failed to delete expense: " + (error?.message || "Unknown error"));
       }
@@ -341,10 +331,9 @@ export default function Reports() {
     mutationFn: ({ id, data }) => base44.entities.ExpenseItem.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries(['expenseItems']);
-      queryClient.invalidateQueries(['projects']); // Invalidate projects to update ROI/expenses
+      queryClient.invalidateQueries(['projects']);
       toast.success("Expense updated");
       if (selectedCategory) {
-        // Re-fetch and update category expenses after mutation
         const refreshed = getCategoryExpenses(selectedCategory);
         setCategoryExpenses(refreshed);
       }
@@ -376,9 +365,7 @@ export default function Reports() {
     e.stopPropagation();
     if (window.confirm("Are you sure you want to delete this expense item? This action cannot be undone.")) {
       try {
-        console.log('Attempting to delete expense:', itemId);
         await deleteExpenseMutation.mutateAsync(itemId);
-        console.log('Expense deleted successfully');
       } catch (error) {
         console.error('Deletion process caught an error:', error);
       }
@@ -519,7 +506,6 @@ export default function Reports() {
           </div>
         </div>
 
-        {/* Easter Egg Button */}
         <div className="flex justify-end mb-2">
           <button
             onClick={handleEasterEggClick}
@@ -536,15 +522,9 @@ export default function Reports() {
               value="income" 
               className="flex items-center justify-center px-4 py-3 text-sm font-medium rounded-lg transition-all w-full"
               style={{
-                backgroundColor: activeTab === 'income'
-                  ? '#22A699'
-                  : (profile?.darkMode ? '#1f2937' : '#f3f4f6'),
-                border: activeTab === 'income'
-                  ? '1px solid #22A699'
-                  : `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}`,
-                color: activeTab === 'income'
-                  ? '#ffffff'
-                  : (profile?.darkMode ? '#d1d5db' : '#374151')
+                backgroundColor: activeTab === 'income' ? '#22A699' : (profile?.darkMode ? '#1f2937' : '#f3f4f6'),
+                border: activeTab === 'income' ? '1px solid #22A699' : `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}`,
+                color: activeTab === 'income' ? '#ffffff' : (profile?.darkMode ? '#d1d5db' : '#374151')
               }}
             >
               Income Statement
@@ -553,15 +533,9 @@ export default function Reports() {
               value="balance" 
               className="flex items-center justify-center px-4 py-3 text-sm font-medium rounded-lg transition-all w-full"
               style={{
-                backgroundColor: activeTab === 'balance'
-                  ? '#22A699'
-                  : (profile?.darkMode ? '#1f2937' : '#f3f4f6'),
-                border: activeTab === 'balance'
-                  ? '1px solid #22A699'
-                  : `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}`,
-                color: activeTab === 'balance'
-                  ? '#ffffff'
-                  : (profile?.darkMode ? '#d1d5db' : '#374151')
+                backgroundColor: activeTab === 'balance' ? '#22A699' : (profile?.darkMode ? '#1f2937' : '#f3f4f6'),
+                border: activeTab === 'balance' ? '1px solid #22A699' : `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}`,
+                color: activeTab === 'balance' ? '#ffffff' : (profile?.darkMode ? '#d1d5db' : '#374151')
               }}
             >
               Balance Sheet
@@ -570,15 +544,9 @@ export default function Reports() {
               value="roi" 
               className="flex items-center justify-center px-4 py-3 text-sm font-medium rounded-lg transition-all w-full"
               style={{
-                backgroundColor: activeTab === 'roi'
-                  ? '#22A699'
-                  : (profile?.darkMode ? '#1f2937' : '#f3f4f6'),
-                border: activeTab === 'roi'
-                  ? '1px solid #22A699'
-                  : `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}`,
-                color: activeTab === 'roi'
-                  ? '#ffffff'
-                  : (profile?.darkMode ? '#d1d5db' : '#374151')
+                backgroundColor: activeTab === 'roi' ? '#22A699' : (profile?.darkMode ? '#1f2937' : '#f3f4f6'),
+                border: activeTab === 'roi' ? '1px solid #22A699' : `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}`,
+                color: activeTab === 'roi' ? '#ffffff' : (profile?.darkMode ? '#d1d5db' : '#374151')
               }}
             >
               Project ROI
@@ -587,15 +555,9 @@ export default function Reports() {
               value="tax" 
               className="flex items-center justify-center px-4 py-3 text-sm font-medium rounded-lg transition-all w-full"
               style={{
-                backgroundColor: activeTab === 'tax'
-                  ? '#22A699'
-                  : (profile?.darkMode ? '#1f2937' : '#f3f4f6'),
-                border: activeTab === 'tax'
-                  ? '1px solid #22A699'
-                  : `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}`,
-                color: activeTab === 'tax'
-                  ? '#ffffff'
-                  : (profile?.darkMode ? '#d1d5db' : '#374151')
+                backgroundColor: activeTab === 'tax' ? '#22A699' : (profile?.darkMode ? '#1f2937' : '#f3f4f6'),
+                border: activeTab === 'tax' ? '1px solid #22A699' : `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}`,
+                color: activeTab === 'tax' ? '#ffffff' : (profile?.darkMode ? '#d1d5db' : '#374151')
               }}
             >
               Tax Prep
@@ -914,7 +876,7 @@ export default function Reports() {
                               {categoryLabels[key]}
                             </TableCell>
                             <TableCell className="text-right" style={{ color: profile?.darkMode ? '#e0e7ed' : '#374151' }}>{formatCurrency(data.amount)}</TableCell>
-                            <TableCell className="text-right text-sm" style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }>
+                            <TableCell className="text-right text-sm" style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>
                               {data.expenses.length}
                             </TableCell>
                             <TableCell className="text-right">
@@ -970,7 +932,6 @@ export default function Reports() {
         </Tabs>
       </div>
 
-      {/* Easter Egg Dialog */}
       <Dialog open={easterEggOpen} onOpenChange={setEasterEggOpen}>
         <DialogContent className="max-w-lg" style={{
           backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff',
@@ -994,7 +955,6 @@ export default function Reports() {
         </DialogContent>
       </Dialog>
 
-      {/* Category Expenses Dialog */}
       <Dialog open={selectedCategory !== null} onOpenChange={() => setSelectedCategory(null)}>
         <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto" style={{
           backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff',
@@ -1037,7 +997,6 @@ export default function Reports() {
                     </div>
                     
                     <div className="grid grid-cols-1 gap-3">
-                      {/* PROJECT DROPDOWN - First */}
                       <div className="flex items-center gap-2">
                         <Label className="text-sm font-medium" style={{ color: profile?.darkMode ? '#ffffff' : '#111827', minWidth: '80px' }}>
                           Project:
@@ -1073,7 +1032,6 @@ export default function Reports() {
                         </Select>
                       </div>
 
-                      {/* CATEGORY DROPDOWN - Second */}
                       <div className="flex items-center gap-2">
                         <Label className="text-sm font-medium" style={{ color: profile?.darkMode ? '#ffffff' : '#111827', minWidth: '80px' }}>
                           Recategorize:
@@ -1102,7 +1060,6 @@ export default function Reports() {
                         </Select>
                       </div>
 
-                      {/* DELETE BUTTON */}
                       <div className="flex justify-end">
                         <Button
                           variant="destructive"
