@@ -1,6 +1,7 @@
+
 import React, { useState } from "react";
 import { base44 } from "@/api/base44Client";
-import { useQuery, useMutation, useQueryClient } from "@tantml:function_calls>
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -39,7 +40,7 @@ export default function Reports() {
   const queryClient = useQueryClient();
 
   const funnyGifs = [
-    "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdHJ3NWM3aGo4OWF2M2d0MG5hYmQ4dHp5dGh3MG5hYmQ4dHp5dGh3MG5hYmQ4dHp5dGh3MG5hYmQ4dHp5dGh3MG5hYmQ4dHp5dGh3MG5hYmQ4dHp5dGh3MG5hYmQ4dHp5dGh3MG5hYmQ4dHp5dGh3MG5hYmQ4dHp5/67ThRZlYBvibtdF9JH/giphy.gif",
+    "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdHJ3NWM3aGo4OWF2M2d0MG5hYmQ4dHp5dGh3MG5hYmQ4dHp5dGh3MG5hYmQ4dHp5dGh3MG5hYmQ4dHp5dGh3MG5hYmQ4dHp5dGh3MG5hYmQ4dHp5dGh3MG5hYmQ4dHp5dGh3MG5hYmQ4dHp5/67ThRZlYBvibtdF9JH/giphy.gif",
     "https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif",
     "https://media.giphy.com/media/LdOyjZ7io5Msw/giphy.gif",
     "https://media.giphy.com/media/3oKIPa2TdahY8LAAxy/giphy.gif",
@@ -657,7 +658,7 @@ export default function Reports() {
 
                   <div className="border-t-2 pt-4">
                     <div className="flex justify-between items-center">
-                      <h3 className="font-bold text-xl" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>Net Income</h3>
+                      <h3 className="font-bold text-xl" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }>Net Income</h3>
                       <p className={`font-bold text-2xl ${netIncome >= 0 ? 'text-[#22A699]' : 'text-red-600'}`}>
                         {formatCurrency(netIncome)}
                       </p>
