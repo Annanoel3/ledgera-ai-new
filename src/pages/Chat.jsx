@@ -958,7 +958,7 @@ export default function Chat() {
                           <li style={{ marginBottom: '0.25rem' }}>Track money stuff without boring spreadsheets</li>
                           <li style={{ marginBottom: '0.25rem' }}>Catch expenses you definitely forgot about</li>
                           <li style={{ marginBottom: '0.25rem' }}>Actually understand your ROI not just pretend</li>
-                          <li style={{ marginBottom: '0.25rem' }>Make tax season less painful</li>
+                          <li style={{ marginBottom: '0.25rem' }}>Make tax season less painful</li>
                           <li style={{ marginBottom: '0.25rem' }}>Answer money questions in plain English</li>
                         </ul>
                         <p style={{
