@@ -12,8 +12,8 @@ import {
   Dialog,
   DialogContent,
   DialogHeader,
-  DialogTitle } from
-"@/components/ui/dialog";
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { processFinancialData } from "@/functions/processFinancialData";
@@ -21,301 +21,301 @@ import { processChat } from "@/functions/processChat";
 import { speechToText } from "@/functions/speechToText";
 
 // Move component definitions OUTSIDE to prevent re-mounting on every render
-const ChatHeader = ({ profile, showChatList, setShowChatList, handleNewChat, setShowCapabilities }) =>
-<div className="sticky top-0 z-10 shadow-sm pt-16 pb-3 px-4 min-h-[80px]" style={{
-  borderBottom: profile?.funMode ? 'none' : `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}`,
-  background: profile?.funMode ?
-  'linear-gradient(to right, #ec4899, #a855f7, #3b82f6)' :
-  profile?.darkMode ? '#1a1a1a' : '#ffffff'
-}}>
+const ChatHeader = ({ profile, showChatList, setShowChatList, handleNewChat, setShowCapabilities }) => (
+  <div className="sticky top-0 z-10 shadow-sm pb-3 px-4" style={{
+    borderBottom: profile?.funMode ? 'none' : `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}`,
+    background: profile?.funMode
+      ? 'linear-gradient(to right, #ec4899, #a855f7, #3b82f6)'
+      : (profile?.darkMode ? '#1a1a1a' : '#ffffff')
+  }}>
     <div className="flex items-center justify-between max-w-4xl mx-auto gap-3">
       <div className="flex items-center gap-3 min-w-0 flex-shrink">
         <Link to={createPageUrl("Dashboard")}>
           <div style={{
-          width: '2.5rem',
-          height: '2.5rem',
-          borderRadius: '9999px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          flexShrink: 0,
-          boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
-          background: profile?.funMode ? '#ffffff' : 'linear-gradient(135deg, #22A699, #1d8d82)',
-          cursor: 'pointer',
-          transition: 'transform 0.2s'
-        }}
-        onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
-        onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}>
-
+            width: '2.5rem',
+            height: '2.5rem',
+            borderRadius: '9999px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexShrink: 0,
+            boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+            background: profile?.funMode ? '#ffffff' : 'linear-gradient(135deg, #22A699, #1d8d82)',
+            cursor: 'pointer',
+            transition: 'transform 0.2s'
+          }}
+          onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
+          onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+          >
             <span style={{
-            fontWeight: '600',
-            fontSize: '1rem',
-            color: profile?.funMode ? '#a855f7' : '#ffffff'
-          }}>
+              fontWeight: '600',
+              fontSize: '1rem',
+              color: profile?.funMode ? '#a855f7' : '#ffffff'
+            }}>
               {profile?.funMode ? "💸" : "LA"}
             </span>
           </div>
         </Link>
         <div className="min-w-0">
-          <h2 className="my-2 truncate" style={{
-          fontSize: '1rem',
-          fontWeight: '600',
-          color: profile?.funMode ? '#ffffff' : profile?.darkMode ? '#ffffff' : '#111827'
-        }}>
+          <h2 className="truncate" style={{
+            fontSize: '1rem',
+            fontWeight: '600',
+            color: profile?.funMode ? '#ffffff' : (profile?.darkMode ? '#ffffff' : '#111827')
+          }}>
             {profile?.funMode ? "Your Money Wizard" : "Ledgera AI"}
           </h2>
           <p className="truncate" style={{
-          fontSize: '0.7rem',
-          color: profile?.funMode ? '#fce7f3' : profile?.darkMode ? '#9ca3af' : '#6b7280'
-        }}>
+            fontSize: '0.7rem',
+            color: profile?.funMode ? '#fce7f3' : (profile?.darkMode ? '#9ca3af' : '#6b7280')
+          }}>
             {profile?.funMode ? "Let's make bookkeeping fun" : "Available 24/7"}
           </p>
         </div>
       </div>
       <div className="flex items-center gap-2 flex-shrink-0">
         <Button
-        onClick={() => setShowCapabilities(true)}
-        variant="outline"
-        size="sm"
-        className="gap-2 hidden md:flex"
-        style={{
-          backgroundColor: profile?.darkMode ? '#374151' : '#ffffff',
-          border: `1px solid ${profile?.darkMode ? '#4b5563' : '#e5e7eb'}`,
-          color: profile?.darkMode ? '#d1d5db' : '#374151'
-        }}>
-
+          onClick={() => setShowCapabilities(true)}
+          variant="outline"
+          size="sm"
+          className="gap-2 hidden md:flex"
+          style={{
+            backgroundColor: profile?.darkMode ? '#374151' : '#ffffff',
+            border: `1px solid ${profile?.darkMode ? '#4b5563' : '#e5e7eb'}`,
+            color: profile?.darkMode ? '#d1d5db' : '#374151'
+          }}
+        >
           <Info className="w-4 h-4" /> What I Can Do
         </Button>
         <Button
-        onClick={() => setShowCapabilities(true)}
-        variant="outline"
-        size="sm"
-        className="md:hidden"
-        style={{
-          backgroundColor: profile?.darkMode ? '#374151' : '#ffffff',
-          border: `1px solid ${profile?.darkMode ? '#4b5563' : '#e5e7eb'}`,
-          color: profile?.darkMode ? '#d1d5db' : '#374151',
-          padding: '0.5rem'
-        }}>
-
+          onClick={() => setShowCapabilities(true)}
+          variant="outline"
+          size="sm"
+          className="md:hidden"
+          style={{
+            backgroundColor: profile?.darkMode ? '#374151' : '#ffffff',
+            border: `1px solid ${profile?.darkMode ? '#4b5563' : '#e5e7eb'}`,
+            color: profile?.darkMode ? '#d1d5db' : '#374151',
+            padding: '0.5rem'
+          }}
+        >
           <Info className="w-4 h-4" />
         </Button>
         <Button
-        onClick={() => setShowChatList(!showChatList)}
-        variant="outline"
-        size="sm"
-        className="gap-2 hidden md:flex"
-        style={{
-          backgroundColor: profile?.darkMode ? '#374151' : '#ffffff',
-          border: `1px solid ${profile?.darkMode ? '#4b5563' : '#e5e7eb'}`,
-          color: profile?.darkMode ? '#d1d5db' : '#374151'
-        }}>
-
+          onClick={() => setShowChatList(!showChatList)}
+          variant="outline"
+          size="sm"
+          className="gap-2 hidden md:flex"
+          style={{
+            backgroundColor: profile?.darkMode ? '#374151' : '#ffffff',
+            border: `1px solid ${profile?.darkMode ? '#4b5563' : '#e5e7eb'}`,
+            color: profile?.darkMode ? '#d1d5db' : '#374151'
+          }}
+        >
           <MessageSquare className="w-4 h-4" /> Chats
         </Button>
         <Button
-        onClick={() => setShowChatList(!showChatList)}
-        variant="outline"
-        size="sm"
-        className="md:hidden"
-        style={{
-          backgroundColor: profile?.darkMode ? '#374151' : '#ffffff',
-          border: `1px solid ${profile?.darkMode ? '#4b5563' : '#e5e7eb'}`,
-          color: profile?.darkMode ? '#d1d5db' : '#374151',
-          padding: '0.5rem'
-        }}>
-
+          onClick={() => setShowChatList(!showChatList)}
+          variant="outline"
+          size="sm"
+          className="md:hidden"
+          style={{
+            backgroundColor: profile?.darkMode ? '#374151' : '#ffffff',
+            border: `1px solid ${profile?.darkMode ? '#4b5563' : '#e5e7eb'}`,
+            color: profile?.darkMode ? '#d1d5db' : '#374151',
+            padding: '0.5rem'
+          }}
+        >
           <MessageSquare className="w-4 h-4" />
         </Button>
         <Button
-        onClick={handleNewChat}
-        variant="outline"
-        size="sm"
-        className="gap-2 hidden md:flex"
-        style={{
-          backgroundColor: profile?.darkMode ? '#374151' : '#ffffff',
-          border: `1px solid ${profile?.darkMode ? '#4b5563' : '#e5e7eb'}`,
-          color: profile?.darkMode ? '#d1d5db' : '#374151'
-        }}>
-
+          onClick={handleNewChat}
+          variant="outline"
+          size="sm"
+          className="gap-2 hidden md:flex"
+          style={{
+            backgroundColor: profile?.darkMode ? '#374151' : '#ffffff',
+            border: `1px solid ${profile?.darkMode ? '#4b5563' : '#e5e7eb'}`,
+            color: profile?.darkMode ? '#d1d5db' : '#374151'
+          }}
+        >
           <Plus className="w-4 h-4" /> New Chat
         </Button>
         <Button
-        onClick={handleNewChat}
-        variant="outline"
-        size="sm"
-        className="md:hidden"
-        style={{
-          backgroundColor: profile?.darkMode ? '#374151' : '#ffffff',
-          border: `1px solid ${profile?.darkMode ? '#4b5563' : '#e5e7eb'}`,
-          color: profile?.darkMode ? '#d1d5db' : '#374151',
-          padding: '0.5rem'
-        }}>
-
+          onClick={handleNewChat}
+          variant="outline"
+          size="sm"
+          className="md:hidden"
+          style={{
+            backgroundColor: profile?.darkMode ? '#374151' : '#ffffff',
+            border: `1px solid ${profile?.darkMode ? '#4b5563' : '#e5e7eb'}`,
+            color: profile?.darkMode ? '#d1d5db' : '#374151',
+            padding: '0.5rem'
+          }}
+        >
           <Plus className="w-4 h-4" />
         </Button>
       </div>
     </div>
-  </div>;
+  </div>
+);
 
-
-const ChatInputArea = ({ profile, selectedFiles, removeFile, fileInputRef, handleFileSelect, handleKeyPress, input, setInput, isRecording, stopRecording, startRecording, handleSend, sendingMessage, uploadingFile }) =>
-<>
-    {selectedFiles.length > 0 &&
-  <div style={{
-    borderTop: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}`,
-    background: profile?.darkMode ? '#1a1a1a' : '#f9fafb',
-    padding: '0.5rem 1rem'
-  }}>
-        <div className="max-w-4xl mx-auto flex gap-2 overflow-x-auto">
-          {selectedFiles.map((file, idx) =>
-      <div key={idx} style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: '0.5rem',
-        borderRadius: '0.5rem',
-        padding: '0.5rem 0.75rem',
-        fontSize: '0.875rem',
-        background: profile?.funMode ?
-        profile?.darkMode ?
-        'rgba(236, 72, 153, 0.3)' :
-        'linear-gradient(to right, #fce7f3, #fae8ff)' :
-        profile?.darkMode ? '#374151' : '#f3f4f6',
-        color: profile?.darkMode ? '#e5e7eb' : '#374151'
+const ChatInputArea = ({ profile, selectedFiles, removeFile, fileInputRef, handleFileSelect, handleKeyPress, input, setInput, isRecording, stopRecording, startRecording, handleSend, sendingMessage, uploadingFile }) => (
+  <>
+    {selectedFiles.length > 0 && (
+      <div style={{
+        borderTop: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}`,
+        background: profile?.darkMode ? '#1a1a1a' : '#f9fafb',
+        padding: '0.5rem 1rem'
       }}>
+        <div className="max-w-4xl mx-auto flex gap-2 overflow-x-auto">
+          {selectedFiles.map((file, idx) => (
+            <div key={idx} style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              borderRadius: '0.5rem',
+              padding: '0.5rem 0.75rem',
+              fontSize: '0.875rem',
+              background: profile?.funMode
+                ? (profile?.darkMode
+                    ? 'rgba(236, 72, 153, 0.3)'
+                    : 'linear-gradient(to right, #fce7f3, #fae8ff)')
+                : (profile?.darkMode ? '#374151' : '#f3f4f6'),
+              color: profile?.darkMode ? '#e5e7eb' : '#374151'
+            }}>
               <FileText className="w-4 h-4" />
               <span style={{ maxWidth: '150px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{file.name}</span>
               <button
-          onClick={() => removeFile(idx)}
-          style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>
-
+                onClick={() => removeFile(idx)}
+                style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}
+              >
                 <X className="w-4 h-4" />
               </button>
             </div>
-      )}
+          ))}
         </div>
       </div>
-  }
+    )}
 
-    <div className="pt-6 pb-24 px-4 min-h-[120px] flex items-start" style={{
-    borderTop: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}`,
-    boxShadow: profile?.funMode ? '0 -10px 15px -3px rgba(0, 0, 0, 0.1)' : '0 -4px 6px -1px rgba(0, 0, 0, 0.1)',
-    background: profile?.funMode ?
-    profile?.darkMode ?
-    'linear-gradient(to right, rgba(236, 72, 153, 0.2), rgba(168, 85, 247, 0.2), rgba(59, 130, 246, 0.2))' :
-    'linear-gradient(to right, #fce7f3, #faf5ff, #eff6ff)' :
-    profile?.darkMode ? '#1a1a1a' : '#f9fafb'
-  }}>
+    <div className="pt-4 px-4 pb-3" style={{
+      borderTop: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}`,
+      boxShadow: profile?.funMode ? '0 -10px 15px -3px rgba(0, 0, 0, 0.1)' : '0 -4px 6px -1px rgba(0, 0, 0, 0.1)',
+      background: profile?.funMode
+        ? (profile?.darkMode
+            ? '#1a1a1a'
+            : '#faf5ff')
+        : (profile?.darkMode ? '#1a1a1a' : '#f9fafb')
+    }}>
       <div className="max-w-4xl mx-auto">
         <div className="flex gap-2 items-end">
           <input
-          ref={fileInputRef}
-          type="file"
-          multiple
-          accept="*/*"
-          onChange={handleFileSelect}
-          style={{ display: 'none' }} />
-
+            ref={fileInputRef}
+            type="file"
+            multiple
+            accept="*/*"
+            onChange={handleFileSelect}
+            style={{ display: 'none' }}
+          />
           <Button
-          onClick={() => fileInputRef.current?.click()}
-          className="h-12 w-12 flex-shrink-0 transition-transform hover:scale-110"
-          style={{
-            background: profile?.funMode ?
-            'linear-gradient(to right, #f472b6, #a855f7)' :
-            profile?.darkMode ? '#374151' : '#f3f4f6',
-            color: profile?.funMode ? '#ffffff' : profile?.darkMode ? '#d1d5db' : '#111827'
-          }}
-          size="icon"
-          variant="outline"
-          disabled={uploadingFile || isRecording}>
-
+            onClick={() => fileInputRef.current?.click()}
+            className="h-12 w-12 flex-shrink-0 transition-transform hover:scale-110"
+            style={{
+              background: profile?.funMode
+                ? 'linear-gradient(to right, #f472b6, #a855f7)'
+                : (profile?.darkMode ? '#374151' : '#f3f4f6'),
+              color: profile?.funMode ? '#ffffff' : (profile?.darkMode ? '#d1d5db' : '#111827')
+            }}
+            size="icon"
+            variant="outline"
+            disabled={uploadingFile || isRecording}
+          >
             <Paperclip className="w-5 h-5" />
           </Button>
           <div className="flex-1 relative">
             <Textarea
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyPress={handleKeyPress}
-            placeholder={profile?.funMode ? "Spill the financial tea..." : "Type your message or speak..."}
-            className="min-h-[48px] max-h-32 resize-none text-base"
-            style={{
-              background: profile?.darkMode ? '#1f2937' : '#ffffff',
-              border: profile?.funMode ?
-              profile?.darkMode ? '1px solid #a855f7' : '1px solid #f9a8d4' :
-              profile?.darkMode ? '1px solid #374151' : '1px solid #e5e7eb',
-              color: profile?.darkMode ? '#ffffff' : '#111827'
-            }}
-            disabled={sendingMessage || isRecording || uploadingFile} />
-
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyPress={handleKeyPress}
+              placeholder={profile?.funMode ? "Spill the financial tea..." : "Type your message or speak..."}
+              className="min-h-[48px] max-h-32 resize-none text-base"
+              style={{
+                background: profile?.darkMode ? '#1f2937' : '#ffffff',
+                border: profile?.funMode
+                  ? (profile?.darkMode ? '1px solid #a855f7' : '1px solid #f9a8d4')
+                  : (profile?.darkMode ? '1px solid #374151' : '1px solid #e5e7eb'),
+                color: profile?.darkMode ? '#ffffff' : '#111827'
+              }}
+              disabled={sendingMessage || isRecording || uploadingFile}
+            />
           </div>
           <Button
-          onClick={isRecording ? stopRecording : startRecording}
-          className="h-12 w-12 flex-shrink-0 transition-transform hover:scale-110"
-          style={{
-            background: isRecording ?
-            '#ef4444' :
-            profile?.funMode ?
-            'linear-gradient(to right, #3b82f6, #a855f7)' :
-            profile?.darkMode ? '#374151' : '#f3f4f6',
-            color: isRecording ? '#ffffff' : profile?.funMode ? '#ffffff' : profile?.darkMode ? '#d1d5db' : '#111827',
-            animation: isRecording ? 'pulse 2s infinite' : 'none'
-          }}
-          size="icon"
-          variant={isRecording ? "default" : "outline"}
-          disabled={uploadingFile}>
-
-            {isRecording ?
-          <Square className="w-5 h-5 text-white" /> :
-
-          <Mic className="w-5 h-5" />
-          }
+            onClick={isRecording ? stopRecording : startRecording}
+            className="h-12 w-12 flex-shrink-0 transition-transform hover:scale-110"
+            style={{
+              background: isRecording
+                ? '#ef4444'
+                : (profile?.funMode
+                    ? 'linear-gradient(to right, #3b82f6, #a855f7)'
+                    : (profile?.darkMode ? '#374151' : '#f3f4f6')),
+              color: isRecording ? '#ffffff' : (profile?.funMode ? '#ffffff' : (profile?.darkMode ? '#d1d5db' : '#111827')),
+              animation: isRecording ? 'pulse 2s infinite' : 'none'
+            }}
+            size="icon"
+            variant={isRecording ? "default" : "outline"}
+            disabled={uploadingFile}
+          >
+            {isRecording ? (
+              <Square className="w-5 h-5 text-white" />
+            ) : (
+              <Mic className="w-5 h-5" />
+            )}
           </Button>
           <Button
-          onClick={handleSend}
-          disabled={!input.trim() && selectedFiles.length === 0 || sendingMessage || isRecording || uploadingFile}
-          className="h-12 w-12 flex-shrink-0 shadow-md transition-all hover:scale-110"
-          style={{
-            background: profile?.funMode ?
-            'linear-gradient(to right, #ec4899, #a855f7)' :
-            '#22A699'
-          }}
-          size="icon">
-
-            {sendingMessage || uploadingFile ?
-          <Loader2 className="w-5 h-5 animate-spin text-white" /> :
-
-          <Send className="w-5 h-5 text-white" />
-          }
+            onClick={handleSend}
+            disabled={(!input.trim() && selectedFiles.length === 0) || sendingMessage || isRecording || uploadingFile}
+            className="h-12 w-12 flex-shrink-0 shadow-md transition-all hover:scale-110"
+            style={{
+              background: profile?.funMode
+                ? 'linear-gradient(to right, #ec4899, #a855f7)'
+                : '#22A699'
+            }}
+            size="icon"
+          >
+            {sendingMessage || uploadingFile ? (
+              <Loader2 className="w-5 h-5 animate-spin text-white" />
+            ) : (
+              <Send className="w-5 h-5 text-white" />
+            )}
           </Button>
         </div>
-        {isRecording &&
-      <p style={{
-        fontSize: '0.75rem',
-        textAlign: 'center',
-        marginTop: '0.5rem',
-        animation: 'pulse 2s infinite',
-        fontWeight: '500',
-        color: profile?.funMode ? '#a855f7' : '#ef4444'
-      }}>
+        {isRecording && (
+          <p style={{
+            fontSize: '0.75rem',
+            textAlign: 'center',
+            marginTop: '0.5rem',
+            animation: 'pulse 2s infinite',
+            fontWeight: '500',
+            color: profile?.funMode ? '#a855f7' : '#ef4444'
+          }}>
             Recording... Click to stop
           </p>
-      }
-        {uploadingFile &&
-      <p style={{
-        fontSize: '0.75rem',
-        textAlign: 'center',
-        marginTop: '0.5rem',
-        animation: 'pulse 2s infinite',
-        fontWeight: '500',
-        color: profile?.funMode ? '#a855f7' : '#22A699'
-      }}>
+        )}
+        {uploadingFile && (
+          <p style={{
+            fontSize: '0.75rem',
+            textAlign: 'center',
+            marginTop: '0.5rem',
+            animation: 'pulse 2s infinite',
+            fontWeight: '500',
+            color: profile?.funMode ? '#a855f7' : '#22A699'
+          }}>
             Uploading your files...
           </p>
-      }
+        )}
       </div>
     </div>
-  </>;
-
+  </>
+);
 
 export default function Chat() {
   const [input, setInput] = useState("");
@@ -343,7 +343,7 @@ export default function Chat() {
       }
       return await base44.auth.me();
     },
-    staleTime: 5 * 60 * 1000
+    staleTime: 5 * 60 * 1000,
   });
 
   const { data: profile } = useQuery({
@@ -360,14 +360,14 @@ export default function Chat() {
           subscribed: false,
           trialStart: new Date().toISOString(),
           darkMode: false,
-          funMode: false
+          funMode: false,
         });
         return newProfile;
       }
       return profiles[0];
     },
     enabled: !!user,
-    staleTime: 5 * 60 * 1000
+    staleTime: 5 * 60 * 1000,
   });
 
   const { data: projects } = useQuery({
@@ -378,7 +378,7 @@ export default function Chat() {
     },
     initialData: [],
     staleTime: 2 * 60 * 1000,
-    enabled: !!user
+    enabled: !!user,
   });
 
   const { data: conversations, refetch: refetchConversations } = useQuery({
@@ -397,7 +397,7 @@ export default function Chat() {
     enabled: !!user,
     staleTime: 0,
     refetchOnMount: 'always',
-    initialData: []
+    initialData: [],
   });
 
   useEffect(() => {
@@ -410,7 +410,7 @@ export default function Chat() {
 
   useEffect(() => {
     if (conversationId && conversations) {
-      const conv = conversations.find((c) => c.id === conversationId);
+      const conv = conversations.find(c => c.id === conversationId);
       if (conv && conv.messages) {
         setMessages(conv.messages);
       }
@@ -451,12 +451,12 @@ export default function Chat() {
   };
 
   const handleSend = async () => {
-    if (!input.trim() && selectedFiles.length === 0 || sendingMessage || uploadingFile) return;
+    if ((!input.trim() && selectedFiles.length === 0) || sendingMessage || uploadingFile) return;
 
     let fileUrls = [];
     let fileNames = [];
     const userMessageText = input.trim();
-
+    
     if (selectedFiles.length > 0) {
       setUploadingFile(true);
       try {
@@ -653,7 +653,7 @@ export default function Chat() {
           toast.error("Could not transcribe audio. Please try again.");
         }
 
-        stream.getTracks().forEach((track) => track.stop());
+        stream.getTracks().forEach(track => track.stop());
       };
 
       recorder.start();
@@ -675,12 +675,12 @@ export default function Chat() {
 
   const handleFileSelect = (e) => {
     const files = Array.from(e.target.files);
-    setSelectedFiles((prev) => [...prev, ...files]);
+    setSelectedFiles(prev => [...prev, ...files]);
     e.target.value = null;
   };
 
   const removeFile = (index) => {
-    setSelectedFiles((prev) => prev.filter((_, i) => i !== index));
+    setSelectedFiles(prev => prev.filter((_, i) => i !== index));
   };
 
   const showWelcome = messages.length === 0 && !sendingMessage;
@@ -694,79 +694,79 @@ export default function Chat() {
             <p style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>Loading chat...</p>
           </div>
         </div>
-      </div>);
-
+      </div>
+    );
   }
 
   return (
     <div
       className="h-screen flex flex-col overflow-hidden"
       style={{
-        background: profile?.funMode ?
-        profile?.darkMode ?
-        'linear-gradient(to bottom right, rgba(236, 72, 153, 0.1), rgba(168, 85, 247, 0.1), rgba(59, 130, 246, 0.1))' :
-        'linear-gradient(to bottom right, #fdf2f8, #faf5ff, #eff6ff)' :
-        profile?.darkMode ? '#0f0f0f' : 'linear-gradient(to bottom, #f9fafb, #f3f4f6)'
-      }}>
-
+        background: profile?.funMode
+          ? (profile?.darkMode
+              ? 'linear-gradient(to bottom right, rgba(236, 72, 153, 0.1), rgba(168, 85, 247, 0.1), rgba(59, 130, 246, 0.1))'
+              : 'linear-gradient(to bottom right, #fdf2f8, #faf5ff, #eff6ff)')
+          : (profile?.darkMode ? '#0f0f0f' : 'linear-gradient(to bottom, #f9fafb, #f3f4f6)')
+      }}
+    >
       <ChatHeader profile={profile} showChatList={showChatList} setShowChatList={setShowChatList} handleNewChat={handleNewChat} setShowCapabilities={setShowCapabilities} />
 
-      {showChatList &&
-      <>
+      {showChatList && (
+        <>
           <div
-          className="fixed inset-0 bg-black bg-opacity-30 z-40"
-          onClick={() => setShowChatList(false)} />
-
+            className="fixed inset-0 bg-black bg-opacity-30 z-40"
+            onClick={() => setShowChatList(false)}
+          />
 
           <div className="absolute top-20 right-4 z-50 w-80 max-h-96 overflow-y-auto rounded-lg shadow-xl" style={{
-          backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff',
-          border: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}`
-        }}>
+            backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff',
+            border: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}`
+          }}>
             <div className="p-4">
               <div className="flex items-center justify-between mb-3">
                 <h3 className="font-semibold" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>Your Conversations</h3>
                 <button
-                onClick={() => setShowChatList(false)}
-                className="text-gray-400 hover:text-gray-600">
-
+                  onClick={() => setShowChatList(false)}
+                  className="text-gray-400 hover:text-gray-600"
+                >
                   <X className="w-5 h-5" />
                 </button>
               </div>
               <div className="space-y-2">
-                {conversations && conversations.length > 0 ?
-              conversations.map((conv) => {
-                const dateStr = conv.createdAt;
-                let displayDate = 'Recent';
-                if (dateStr) {
-                  try {
-                    displayDate = format(new Date(dateStr), 'MMM d');
-                  } catch (e) {
-                    displayDate = 'Recent';
-                  }
-                }
-
-                return (
-                  <div
-                    key={conv.id}
-                    onClick={() => handleSelectChat(conv)}
-                    className="flex items-center justify-between p-3 rounded-lg cursor-pointer transition-colors group"
-                    style={{
-                      backgroundColor: conv.id === conversationId ?
-                      profile?.darkMode ? '#374151' : '#f3f4f6' :
-                      'transparent',
-                      border: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}`
-                    }}
-                    onMouseEnter={(e) => {
-                      if (conv.id !== conversationId) {
-                        e.currentTarget.style.backgroundColor = profile?.darkMode ? '#374151' : '#f9fafb';
+                {conversations && conversations.length > 0 ? (
+                  conversations.map((conv) => {
+                    const dateStr = conv.createdAt;
+                    let displayDate = 'Recent';
+                    if (dateStr) {
+                      try {
+                        displayDate = format(new Date(dateStr), 'MMM d');
+                      } catch (e) {
+                        displayDate = 'Recent';
                       }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (conv.id !== conversationId) {
-                        e.currentTarget.style.backgroundColor = 'transparent';
-                      }
-                    }}>
+                    }
 
+                    return (
+                      <div
+                        key={conv.id}
+                        onClick={() => handleSelectChat(conv)}
+                        className="flex items-center justify-between p-3 rounded-lg cursor-pointer transition-colors group"
+                        style={{
+                          backgroundColor: conv.id === conversationId
+                            ? (profile?.darkMode ? '#374151' : '#f3f4f6')
+                            : 'transparent',
+                          border: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}`
+                        }}
+                        onMouseEnter={(e) => {
+                          if (conv.id !== conversationId) {
+                            e.currentTarget.style.backgroundColor = profile?.darkMode ? '#374151' : '#f9fafb';
+                          }
+                        }}
+                        onMouseLeave={(e) => {
+                          if (conv.id !== conversationId) {
+                            e.currentTarget.style.backgroundColor = 'transparent';
+                          }
+                        }}
+                      >
                         <div className="flex-1 min-w-0">
                           <p className="font-medium truncate" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>
                             {conv.name || 'Finance Chat'}
@@ -776,27 +776,27 @@ export default function Chat() {
                           </p>
                         </div>
                         <Button
-                      variant="ghost"
-                      size="icon"
-                      className="opacity-0 group-hover:opacity-100 transition-opacity h-8 w-8"
-                      onClick={(e) => handleDeleteConversation(conv.id, e)}
-                      style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>
-
+                          variant="ghost"
+                          size="icon"
+                          className="opacity-0 group-hover:opacity-100 transition-opacity h-8 w-8"
+                          onClick={(e) => handleDeleteConversation(conv.id, e)}
+                          style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}
+                        >
                           <Trash2 className="w-4 h-4" />
                         </Button>
-                      </div>);
-
-              }) :
-
-              <p className="text-sm text-center py-4" style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>
+                      </div>
+                    );
+                  })
+                ) : (
+                  <p className="text-sm text-center py-4" style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>
                     No conversations yet. Start chatting!
                   </p>
-              }
+                )}
               </div>
             </div>
           </div>
         </>
-      }
+      )}
 
       <Dialog open={showCapabilities} onOpenChange={setShowCapabilities}>
         <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto" style={{
@@ -891,70 +891,70 @@ export default function Chat() {
         </DialogContent>
       </Dialog>
 
-      <div className="flex-1 overflow-y-auto px-4 py-4">
+      <div className="flex-1 overflow-y-auto px-4 py-4" style={{ paddingBottom: '10rem' }}>
         <div className="max-w-4xl mx-auto space-y-4">
-          {showWelcome ?
-          <div className="flex flex-col items-center justify-center h-full">
+          {showWelcome ? (
+            <div className="flex flex-col items-center justify-center h-full">
               <div className="w-full max-w-2xl">
                 <div className="flex gap-3 justify-start mb-8">
                   <div style={{
-                  height: '2rem',
-                  width: '2rem',
-                  borderRadius: '9999px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  flexShrink: 0,
-                  boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
-                  background: profile?.funMode ?
-                  'linear-gradient(135deg, #f472b6, #a855f7)' :
-                  'linear-gradient(135deg, #22A699, #1d8d82)'
-                }}>
+                    height: '2rem',
+                    width: '2rem',
+                    borderRadius: '9999px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                    boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+                    background: profile?.funMode
+                      ? 'linear-gradient(135deg, #f472b6, #a855f7)'
+                      : 'linear-gradient(135deg, #22A699, #1d8d82)',
+                  }}>
                     <span style={{ color: '#ffffff', fontWeight: '600', fontSize: '0.875rem' }}>
                       {profile?.funMode ? "💰" : "LA"}
                     </span>
                   </div>
                   <div style={{
-                  maxWidth: '85%',
-                  borderRadius: '1rem',
-                  padding: '1rem',
-                  boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
-                  border: profile?.funMode ?
-                  profile?.darkMode ? '1px solid #a855f7' : '1px solid #fbc2eb' :
-                  profile?.darkMode ? '1px solid #374151' : '1px solid #e5e7eb',
-                  background: profile?.funMode ?
-                  profile?.darkMode ?
-                  'linear-gradient(135deg, #1f2937, rgba(168, 85, 247, 0.3))' :
-                  'linear-gradient(135deg, #ffffff, #fdf2f8)' :
-                  profile?.darkMode ? '#1f2937' : '#ffffff'
-                }}>
-                    {profile?.funMode ?
-                  <>
+                    maxWidth: '85%',
+                    borderRadius: '1rem',
+                    padding: '1rem',
+                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                    border: profile?.funMode
+                      ? (profile?.darkMode ? '1px solid #a855f7' : '1px solid #fbc2eb')
+                      : (profile?.darkMode ? '1px solid #374151' : '1px solid #e5e7eb'),
+                    background: profile?.funMode
+                      ? (profile?.darkMode
+                          ? 'linear-gradient(135deg, #1f2937, rgba(168, 85, 247, 0.3))'
+                          : 'linear-gradient(135deg, #ffffff, #fdf2f8)')
+                      : (profile?.darkMode ? '#1f2937' : '#ffffff')
+                  }}>
+                    {profile?.funMode ? (
+                      <>
                         <p style={{
-                      fontSize: '15px',
-                      lineHeight: '1.4',
-                      marginBottom: '0.5rem',
-                      fontWeight: '500',
-                      color: profile?.darkMode ? '#ffffff' : '#111827'
-                    }}>
+                          fontSize: '15px',
+                          lineHeight: '1.4',
+                          marginBottom: '0.5rem',
+                          fontWeight: '500',
+                          color: profile?.darkMode ? '#ffffff' : '#111827'
+                        }}>
                           Hey {user?.full_name?.split(' ')[0] || 'there'}! I am Ledgera AI, your accountant who actually gets it.
                         </p>
                         <p style={{
-                      fontSize: '15px',
-                      lineHeight: '1.4',
-                      marginBottom: '0.5rem',
-                      color: profile?.darkMode ? '#d1d5db' : '#374151'
-                    }}>
+                          fontSize: '15px',
+                          lineHeight: '1.4',
+                          marginBottom: '0.5rem',
+                          color: profile?.darkMode ? '#d1d5db' : '#374151'
+                        }}>
                           I am here to help you:
                         </p>
                         <ul style={{
-                      listStyleType: 'disc',
-                      listStylePosition: 'inside',
-                      marginBottom: '0.5rem',
-                      color: profile?.darkMode ? '#d1d5db' : '#374151',
-                      fontSize: '15px',
-                      lineHeight: '1.4'
-                    }}>
+                          listStyleType: 'disc',
+                          listStylePosition: 'inside',
+                          marginBottom: '0.5rem',
+                          color: profile?.darkMode ? '#d1d5db' : '#374151',
+                          fontSize: '15px',
+                          lineHeight: '1.4'
+                        }}>
                           <li style={{ marginBottom: '0.25rem' }}>Track money stuff without boring spreadsheets</li>
                           <li style={{ marginBottom: '0.25rem' }}>Catch expenses you definitely forgot about</li>
                           <li style={{ marginBottom: '0.25rem' }}>Actually understand your ROI not just pretend</li>
@@ -962,41 +962,41 @@ export default function Chat() {
                           <li style={{ marginBottom: '0.25rem' }}>Answer money questions in plain English</li>
                         </ul>
                         <p style={{
-                      fontSize: '15px',
-                      lineHeight: '1.4',
-                      color: profile?.darkMode ? '#ffffff' : '#111827',
-                      fontWeight: '500'
-                    }}>
+                          fontSize: '15px',
+                          lineHeight: '1.4',
+                          color: profile?.darkMode ? '#ffffff' : '#111827',
+                          fontWeight: '500'
+                        }}>
                           So... what do you do for work?
                         </p>
-                      </> :
-
-                  <>
+                      </>
+                    ) : (
+                      <>
                         <p style={{
-                      fontSize: '15px',
-                      lineHeight: '1.4',
-                      marginBottom: '0.5rem',
-                      fontWeight: '500',
-                      color: profile?.darkMode ? '#ffffff' : '#111827'
-                    }}>
+                          fontSize: '15px',
+                          lineHeight: '1.4',
+                          marginBottom: '0.5rem',
+                          fontWeight: '500',
+                          color: profile?.darkMode ? '#ffffff' : '#111827'
+                        }}>
                           Hi {user?.full_name?.split(' ')[0] || 'there'}! I am Ledgera AI, your personal accountant.
                         </p>
                         <p style={{
-                      fontSize: '15px',
-                      lineHeight: '1.4',
-                      marginBottom: '0.5rem',
-                      color: profile?.darkMode ? '#d1d5db' : '#374151'
-                    }}>
+                          fontSize: '15px',
+                          lineHeight: '1.4',
+                          marginBottom: '0.5rem',
+                          color: profile?.darkMode ? '#d1d5db' : '#374151'
+                        }}>
                           I can help you:
                         </p>
                         <ul style={{
-                      listStyleType: 'disc',
-                      listStylePosition: 'inside',
-                      marginBottom: '0.5rem',
-                      color: profile?.darkMode ? '#d1d5db' : '#374151',
-                      fontSize: '15px',
-                      lineHeight: '1.4'
-                    }}>
+                          listStyleType: 'disc',
+                          listStylePosition: 'inside',
+                          marginBottom: '0.5rem',
+                          color: profile?.darkMode ? '#d1d5db' : '#374151',
+                          fontSize: '15px',
+                          lineHeight: '1.4'
+                        }}>
                           <li style={{ marginBottom: '0.25rem' }}>Track all income and expenses by project</li>
                           <li style={{ marginBottom: '0.25rem' }}>Catch costs you might have missed</li>
                           <li style={{ marginBottom: '0.25rem' }}>Generate reports and ROI analysis</li>
@@ -1004,58 +1004,58 @@ export default function Chat() {
                           <li style={{ marginBottom: '0.25rem' }}>Answer questions about your business</li>
                         </ul>
                         <p style={{
-                      fontSize: '15px',
-                      lineHeight: '1.4',
-                      color: profile?.darkMode ? '#ffffff' : '#111827',
-                      fontWeight: '500'
-                    }}>
+                          fontSize: '15px',
+                          lineHeight: '1.4',
+                          color: profile?.darkMode ? '#ffffff' : '#111827',
+                          fontWeight: '500'
+                        }}>
                           Let us get started - what is your business? What do you do?
                         </p>
                       </>
-                  }
+                    )}
                   </div>
                 </div>
               </div>
-            </div> :
+            </div>
+          ) : (
+            <>
+              {messages.filter(m => m.role === 'user' || m.role === 'assistant').map((message, idx) => (
+                <MessageBubble key={idx} message={message} profile={profile} />
+              ))}
 
-          <>
-              {messages.filter((m) => m.role === 'user' || m.role === 'assistant').map((message, idx) =>
-            <MessageBubble key={idx} message={message} profile={profile} />
-            )}
-
-              {backgroundProcessing &&
-            <div className="flex gap-3 justify-start">
+              {backgroundProcessing && (
+                <div className="flex gap-3 justify-start">
                   <div style={{
-                height: '2rem',
-                width: '2rem',
-                borderRadius: '9999px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexShrink: 0,
-                boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
-                background: profile?.funMode ?
-                'linear-gradient(135deg, #f472b6, #a855f7)' :
-                'linear-gradient(135deg, #22A699, #1d8d82)'
-              }}>
+                    height: '2rem',
+                    width: '2rem',
+                    borderRadius: '9999px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                    boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+                    background: profile?.funMode
+                      ? 'linear-gradient(135deg, #f472b6, #a855f7)'
+                      : 'linear-gradient(135deg, #22A699, #1d8d82)',
+                  }}>
                     <span style={{ color: '#ffffff', fontWeight: '600', fontSize: '0.875rem' }}>
                       {profile?.funMode ? "💰" : "LA"}
                     </span>
                   </div>
                   <div style={{
-                maxWidth: '85%',
-                borderRadius: '1rem',
-                padding: '0.75rem 1rem',
-                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
-                border: profile?.funMode ?
-                profile?.darkMode ? '1px solid #a855f7' : '1px solid #fbc2eb' :
-                profile?.darkMode ? '1px solid #374151' : '1px solid #e5e7eb',
-                background: profile?.funMode ?
-                profile?.darkMode ?
-                'linear-gradient(135deg, #1f2937, rgba(168, 85, 247, 0.3))' :
-                'linear-gradient(135deg, #ffffff, #fdf2f8)' :
-                profile?.darkMode ? '#1f2937' : '#ffffff'
-              }}>
+                    maxWidth: '85%',
+                    borderRadius: '1rem',
+                    padding: '0.75rem 1rem',
+                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                    border: profile?.funMode
+                      ? (profile?.darkMode ? '1px solid #a855f7' : '1px solid #fbc2eb')
+                      : (profile?.darkMode ? '1px solid #374151' : '1px solid #e5e7eb'),
+                    background: profile?.funMode
+                      ? (profile?.darkMode
+                          ? 'linear-gradient(135deg, #1f2937, rgba(168, 85, 247, 0.3))'
+                          : 'linear-gradient(135deg, #ffffff, #fdf2f8)')
+                      : (profile?.darkMode ? '#1f2937' : '#ffffff')
+                  }}>
                     <div className="flex items-center gap-3">
                       <Loader2 className="w-4 h-4 animate-spin" style={{ color: '#22A699' }} />
                       <span style={{ color: profile?.darkMode ? '#d1d5db' : '#374151', fontSize: '15px' }}>
@@ -1064,30 +1064,32 @@ export default function Chat() {
                     </div>
                   </div>
                 </div>
-            }
+              )}
 
               <div ref={messagesEndRef} />
             </>
-          }
+          )}
         </div>
       </div>
 
-      <ChatInputArea
-        profile={profile}
-        selectedFiles={selectedFiles}
-        removeFile={removeFile}
-        fileInputRef={fileInputRef}
-        handleFileSelect={handleFileSelect}
-        handleKeyPress={handleKeyPress}
-        input={input}
-        setInput={setInput}
-        isRecording={isRecording}
-        stopRecording={stopRecording}
-        startRecording={startRecording}
-        handleSend={handleSend}
-        sendingMessage={sendingMessage}
-        uploadingFile={uploadingFile} />
-
-    </div>);
-
+      <div className="fixed bottom-0 left-0 right-0 z-20" style={{ paddingBottom: '5rem' }}>
+        <ChatInputArea
+          profile={profile}
+          selectedFiles={selectedFiles}
+          removeFile={removeFile}
+          fileInputRef={fileInputRef}
+          handleFileSelect={handleFileSelect}
+          handleKeyPress={handleKeyPress}
+          input={input}
+          setInput={setInput}
+          isRecording={isRecording}
+          stopRecording={stopRecording}
+          startRecording={startRecording}
+          handleSend={handleSend}
+          sendingMessage={sendingMessage}
+          uploadingFile={uploadingFile}
+        />
+      </div>
+    </div>
+  );
 }
