@@ -999,8 +999,7 @@ export default function Chat() {
                         }}>
                           <li style={{ marginBottom: '0.25rem' }}>Track all income and expenses by project</li>
                           <li style={{ marginBottom: '0.25rem' }}>Catch costs you might have missed</li>
-                          <li style={{ marginBottom: '0.25rem' }}>Generate reports and ROI analysis</li>
-                          <li style={{ marginBottom: '0.25rem' }}>Prepare for tax season</li>
+                          <li style={{ marginBottom: '0.25rem' }}>Create custom financial reports</li>
                           <li style={{ marginBottom: '0.25rem' }}>Answer questions about your business</li>
                         </ul>
                         <p style={{
