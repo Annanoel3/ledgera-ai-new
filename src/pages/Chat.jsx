@@ -880,7 +880,7 @@ export default function Chat() {
 
             <div className="pt-4 border-t" style={{ borderColor: profile?.darkMode ? '#374151' : '#e5e7eb' }}>
               <p className="text-sm" style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>
-                <strong style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }>Pro Tip:</strong> Just talk to me naturally! Tell me what you do, upload your files, and I will organize everything for you.
+                <strong style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>Pro Tip:</strong> Just talk to me naturally! Tell me what you do, upload your files, and I will organize everything for you.
               </p>
             </div>
           </div>
@@ -994,9 +994,9 @@ export default function Chat() {
                           lineHeight: '1.4'
                         }}>
                           <li style={{ marginBottom: '0.25rem' }}>Track all income and expenses by project</li>
-                          <li style={{ marginBottom: '0.25rem' }>Catch costs you might have missed</li>
-                          <li style={{ marginBottom: '0.25rem' }>Create custom financial reports</li>
-                          <li style={{ marginBottom: '0.25rem' }>Answer questions about your business</li>
+                          <li style={{ marginBottom: '0.25rem' }}>Catch costs you might have missed</li>
+                          <li style={{ marginBottom: '0.25rem' }}>Create custom financial reports</li>
+                          <li style={{ marginBottom: '0.25rem' }}>Answer questions about your business</li>
                         </ul>
                         <p style={{
                           fontSize: '15px',
