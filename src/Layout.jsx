@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
+import OneSignalInit from "@/components/shared/OneSignalInit";
 
 const navItems = [
   { title: "Chat", url: createPageUrl("Chat"), icon: MessageSquare },
@@ -38,35 +39,6 @@ export default function Layout({ children }) {
     queryFn: () => base44.auth.me(),
   });
 
-  // Set up OneSignal external user ID when user is available
-  useEffect(() => {
-    if (user && user.email) {
-      // Send external user ID to native wrapper via postMessage
-      window.parent.postMessage({
-        type: 'setOneSignalExternalUserId',
-        externalUserId: user.email
-      }, '*');
-    }
-  }, [user]);
-
-  // Listen for OneSignal player ID from native wrapper
-  useEffect(() => {
-    const handleMessage = (event) => {
-      if (event.data && event.data.type === 'oneSignalPlayerId') {
-        console.log('[Ledgera] Received OneSignal player ID:', event.data.playerId);
-        // Store player ID if needed for future use
-        if (event.data.playerId) {
-          sessionStorage.setItem('oneSignalPlayerId', event.data.playerId);
-        }
-      } else if (event.data && event.data.type === 'oneSignalExternalUserIdSet') {
-        console.log('[Ledgera] OneSignal external user ID set:', event.data);
-      }
-    };
-
-    window.addEventListener('message', handleMessage);
-    return () => window.removeEventListener('message', handleMessage);
-  }, []);
-
   useEffect(() => {
     if (profile?.darkMode !== undefined) {
       setDarkMode(profile.darkMode);
@@ -97,28 +69,18 @@ export default function Layout({ children }) {
 
   const handleLogout = async () => {
     try {
-      // Send logout message to native wrapper via postMessage
-      window.parent.postMessage({
-        type: 'oneSignalLogout'
-      }, '*');
-      
-      // Clear stored player ID
-      sessionStorage.removeItem('oneSignalPlayerId');
-      
-      // Now logout from base44
       await base44.auth.logout();
-      
-      // Reload the page
       window.location.reload();
     } catch (error) {
       console.error("Error logging out:", error);
-      // Force logout even if there's an error
       window.location.reload();
     }
   };
 
   return (
     <>
+      {user && <OneSignalInit user={user} />}
+      
       <style>{`
         :root {
           --primary: ${primaryColor};
