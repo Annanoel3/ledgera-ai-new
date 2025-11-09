@@ -189,11 +189,11 @@ export default function Layout({ children }) {
           </aside>
         )}
 
-        {/* Mobile Top Bar - ALWAYS VISIBLE with extended padding */}
-        <div className="md:hidden sticky top-0 z-10 flex h-16 flex-shrink-0 border-b" style={{
+        {/* Mobile Top Bar - EXTENDED HEIGHT */}
+        <div className="md:hidden sticky top-0 z-10 flex flex-shrink-0 border-b pt-10" style={{
           borderColor: darkMode ? '#374151' : '#e5e7eb',
           backgroundColor: darkMode ? '#1a1a1a' : '#ffffff',
-          paddingTop: '2.5rem'
+          height: '120px'
         }}>
           <button
             type="button"
@@ -286,11 +286,11 @@ export default function Layout({ children }) {
           </main>
         </div>
 
-        {/* Mobile Bottom Navigation - ALWAYS VISIBLE with extended padding */}
-        <nav className="md:hidden fixed bottom-0 left-0 right-0 z-10 flex h-16 border-t" style={{
+        {/* Mobile Bottom Navigation - EXTENDED HEIGHT */}
+        <nav className="md:hidden fixed bottom-0 left-0 right-0 z-10 flex border-t pb-6" style={{
           borderColor: darkMode ? '#374151' : '#e5e7eb',
           backgroundColor: darkMode ? '#1a1a1a' : '#ffffff',
-          paddingBottom: '1.5rem'
+          height: '120px'
         }}>
           {navItems.map((item) => {
             const isActive = currentPath === item.url || currentPath.startsWith(item.url + '/');
