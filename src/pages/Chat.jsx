@@ -22,7 +22,7 @@ import { speechToText } from "@/functions/speechToText";
 
 // Move component definitions OUTSIDE to prevent re-mounting on every render
 const ChatHeader = ({ profile, showChatList, setShowChatList, handleNewChat, setShowCapabilities }) => (
-  <div className="sticky top-0 z-10 shadow-sm pt-12 pb-3 px-4" style={{
+  <div className="sticky top-0 z-10 shadow-sm pt-16 pb-3 px-4" style={{
     borderBottom: profile?.funMode ? 'none' : `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}`,
     background: profile?.funMode
       ? 'linear-gradient(to right, #ec4899, #a855f7, #3b82f6)'
@@ -197,7 +197,7 @@ const ChatInputArea = ({ profile, selectedFiles, removeFile, fileInputRef, handl
       </div>
     )}
 
-    <div className="pt-3 pb-20 px-4" style={{
+    <div className="pt-6 pb-24 px-4" style={{
       borderTop: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}`,
       boxShadow: profile?.funMode ? '0 -10px 15px -3px rgba(0, 0, 0, 0.1)' : '0 -4px 6px -1px rgba(0, 0, 0, 0.1)',
       background: profile?.funMode
@@ -1001,7 +1001,7 @@ export default function Chat() {
                           <li style={{ marginBottom: '0.25rem' }}>Catch costs you might have missed</li>
                           <li style={{ marginBottom: '0.25rem' }}>Generate reports and ROI analysis</li>
                           <li style={{ marginBottom: '0.25rem' }}>Prepare for tax season</li>
-                          <li style={{ marginBottom: '0.25rem' }}>Answer questions about your business</li>
+                          <li style={{ marginBottom: '0.25rem' }>Answer questions about your business</li>
                         </ul>
                         <p style={{
                           fontSize: '15px',
