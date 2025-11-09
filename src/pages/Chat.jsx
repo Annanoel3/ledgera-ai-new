@@ -207,7 +207,7 @@ const ChatInputArea = ({ profile, selectedFiles, removeFile, fileInputRef, handl
     profile?.darkMode ? '#1a1a1a' : '#f9fafb'
   }}>
       <div className="max-w-4xl mx-auto">
-        <div className="flex gap-2 items-end">
+        <div className="my-2 flex gap-2 items-end">
           <input
           ref={fileInputRef}
           type="file"
@@ -217,7 +217,7 @@ const ChatInputArea = ({ profile, selectedFiles, removeFile, fileInputRef, handl
           style={{ display: 'none' }} />
 
           <Button
-          onClick={() => fileInputRef.current?.click()} className="bg-background my-2 text-sm font-medium rounded-md inline-flex items-center justify-center gap-2 whitespace-nowrap focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input shadow-sm hover:bg-accent hover:text-accent-foreground h-12 w-12 flex-shrink-0 transition-transform hover:scale-110"
+          onClick={() => fileInputRef.current?.click()} className="bg-background text-sm font-medium rounded-md flex-shrink-0 inline-flex items-center justify-center gap-2 whitespace-nowrap focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input shadow-sm hover:bg-accent hover:text-accent-foreground h-12 w-12 transition-transform hover:scale-110"
 
           style={{
             background: profile?.funMode ?
@@ -249,7 +249,7 @@ const ChatInputArea = ({ profile, selectedFiles, removeFile, fileInputRef, handl
 
           </div>
           <Button
-          onClick={isRecording ? stopRecording : startRecording} className="bg-background my-2 text-sm font-medium rounded-md inline-flex items-center justify-center gap-2 whitespace-nowrap focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input shadow-sm hover:bg-accent hover:text-accent-foreground h-12 w-12 flex-shrink-0 transition-transform hover:scale-110"
+          onClick={isRecording ? stopRecording : startRecording} className="bg-background text-sm font-medium rounded-md flex-shrink-0 inline-flex items-center justify-center gap-2 whitespace-nowrap focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input shadow-sm hover:bg-accent hover:text-accent-foreground h-12 w-12 transition-transform hover:scale-110"
 
           style={{
             background: isRecording ?
