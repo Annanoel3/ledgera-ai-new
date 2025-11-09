@@ -64,7 +64,7 @@ const ChatHeader = ({ profile, showChatList, setShowChatList, handleNewChat, set
         }}>
             {profile?.funMode ? "Your Money Wizard" : "Ledgera AI"}
           </h2>
-          <p className="truncate" style={{
+          <p className="py-1 truncate" style={{
           fontSize: '0.7rem',
           color: profile?.funMode ? '#fce7f3' : profile?.darkMode ? '#9ca3af' : '#6b7280'
         }}>
