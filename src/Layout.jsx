@@ -190,10 +190,9 @@ export default function Layout({ children }) {
         )}
 
         {/* Mobile Top Bar - KEEP on all pages including Chat */}
-        <div className="md:hidden sticky top-0 z-10 flex h-16 flex-shrink-0 border-b" style={{
+        <div className="md:hidden sticky top-0 z-10 flex h-16 flex-shrink-0 border-b pt-10" style={{
           borderColor: darkMode ? '#374151' : '#e5e7eb',
-          backgroundColor: darkMode ? '#1a1a1a' : '#ffffff',
-          paddingTop: 'calc(env(safe-area-inset-top, 0px))'
+          backgroundColor: darkMode ? '#1a1a1a' : '#ffffff'
         }}>
           <button
             type="button"
@@ -217,11 +216,11 @@ export default function Layout({ children }) {
 
         {/* Mobile Menu Overlay - KEEP on all pages */}
         {mobileMenuOpen && (
-          <div className="md:hidden fixed inset-0 z-40" style={{ backgroundColor: darkMode ? 'rgba(0,0,0,0.7)' : 'rgba(0,0,0,0.5)' }} onClick={() => setMobileMenuOpen(false)}>
+          <div className="md:hidden fixed inset-0 z-40" style={{ backgroundColor: darkMode ? 'rgba(0,0,0,0.7)' : 'rgba(0,0,0,0.5)', paddingTop: '2.5rem' }} onClick={() => setMobileMenuOpen(false)}>
             <div className="fixed inset-y-0 left-0 w-64 border-r" style={{
               backgroundColor: darkMode ? '#1a1a1a' : '#ffffff',
               borderColor: darkMode ? '#374151' : '#e5e7eb',
-              paddingTop: 'calc(env(safe-area-inset-top, 0px))'
+              paddingTop: '2.5rem'
             }} onClick={(e) => e.stopPropagation()}>
               <div className="p-6 flex flex-col h-full">
                 <nav className="space-y-1 flex-1">
@@ -279,7 +278,7 @@ export default function Layout({ children }) {
 
         {/* Main Content */}
         <div className={isChat ? "" : "md:pl-64 flex flex-col flex-1"} style={{
-          paddingBottom: isChat ? '0' : 'calc(4rem + env(safe-area-inset-bottom, 0px))'
+          paddingBottom: isChat ? '0' : '6rem'
         }}>
           <main className={isChat ? "" : "flex-1"}>
             {children}
@@ -288,10 +287,9 @@ export default function Layout({ children }) {
 
         {/* Mobile Bottom Navigation - ONLY HIDE ON CHAT PAGE */}
         {!isChat && (
-          <nav className="md:hidden fixed bottom-0 left-0 right-0 z-10 flex h-16 border-t" style={{
+          <nav className="md:hidden fixed bottom-0 left-0 right-0 z-10 flex h-16 border-t pb-6" style={{
             borderColor: darkMode ? '#374151' : '#e5e7eb',
-            backgroundColor: darkMode ? '#1a1a1a' : '#ffffff',
-            paddingBottom: 'calc(env(safe-area-inset-bottom, 0px))'
+            backgroundColor: darkMode ? '#1a1a1a' : '#ffffff'
           }}>
             {navItems.map((item) => {
               const isActive = currentPath === item.url || currentPath.startsWith(item.url + '/');

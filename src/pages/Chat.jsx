@@ -22,15 +22,11 @@ import { speechToText } from "@/functions/speechToText";
 
 // Move component definitions OUTSIDE to prevent re-mounting on every render
 const ChatHeader = ({ profile, showChatList, setShowChatList, handleNewChat, setShowCapabilities }) => (
-  <div className="sticky top-0 z-10 shadow-sm" style={{
+  <div className="sticky top-0 z-10 shadow-sm pt-12 pb-3 px-4" style={{
     borderBottom: profile?.funMode ? 'none' : `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}`,
     background: profile?.funMode
       ? 'linear-gradient(to right, #ec4899, #a855f7, #3b82f6)'
-      : (profile?.darkMode ? '#1a1a1a' : '#ffffff'),
-    paddingTop: 'calc(env(safe-area-inset-top, 0px) + 0.75rem)',
-    paddingBottom: '0.75rem',
-    paddingLeft: '1rem',
-    paddingRight: '1rem'
+      : (profile?.darkMode ? '#1a1a1a' : '#ffffff')
   }}>
     <div className="flex items-center justify-between max-w-4xl mx-auto gap-3">
       <div className="flex items-center gap-3 min-w-0 flex-shrink">
@@ -201,13 +197,9 @@ const ChatInputArea = ({ profile, selectedFiles, removeFile, fileInputRef, handl
       </div>
     )}
 
-    <div style={{
+    <div className="pt-3 pb-20 px-4" style={{
       borderTop: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}`,
       boxShadow: profile?.funMode ? '0 -10px 15px -3px rgba(0, 0, 0, 0.1)' : '0 -4px 6px -1px rgba(0, 0, 0, 0.1)',
-      paddingTop: '0.75rem',
-      paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 0.75rem)',
-      paddingLeft: '1rem',
-      paddingRight: '1rem',
       background: profile?.funMode
         ? (profile?.darkMode
             ? 'linear-gradient(to right, rgba(236, 72, 153, 0.2), rgba(168, 85, 247, 0.2), rgba(59, 130, 246, 0.2))'
@@ -1009,7 +1001,7 @@ export default function Chat() {
                           <li style={{ marginBottom: '0.25rem' }}>Catch costs you might have missed</li>
                           <li style={{ marginBottom: '0.25rem' }}>Generate reports and ROI analysis</li>
                           <li style={{ marginBottom: '0.25rem' }}>Prepare for tax season</li>
-                          <li style={{}}>Answer questions about your business</li>
+                          <li style={{ marginBottom: '0.25rem' }}>Answer questions about your business</li>
                         </ul>
                         <p style={{
                           fontSize: '15px',
