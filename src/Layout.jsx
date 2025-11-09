@@ -287,7 +287,7 @@ export default function Layout({ children }) {
         </div>
 
         {/* Mobile Bottom Navigation */}
-        <nav className="py-2 md:hidden fixed bottom-0 left-0 right-0 z-10 flex border-t" style={{
+        <nav className="md:hidden fixed bottom-0 left-0 right-0 z-10 flex border-t" style={{
           borderColor: darkMode ? '#374151' : '#e5e7eb',
           backgroundColor: darkMode ? '#1a1a1a' : '#ffffff',
           paddingBottom: '1.5rem',
