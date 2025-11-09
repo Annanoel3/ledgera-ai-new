@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -18,6 +19,145 @@ import { createPageUrl } from "@/utils";
 import { processFinancialData } from "@/functions/processFinancialData";
 import { processChat } from "@/functions/processChat";
 import { speechToText } from "@/functions/speechToText";
+
+// Move component definitions OUTSIDE to prevent re-mounting on every render
+const ChatHeader = ({ profile, showChatList, setShowChatList, handleNewChat, setShowCapabilities }) => (
+  <div className="sticky top-0 z-10 shadow-sm pb-3 px-4" style={{
+    borderBottom: profile?.funMode ? 'none' : `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}`,
+    background: profile?.funMode
+      ? 'linear-gradient(to right, #ec4899, #a855f7, #3b82f6)'
+      : (profile?.darkMode ? '#1a1a1a' : '#ffffff')
+  }}>
+    <div className="flex items-center justify-between max-w-4xl mx-auto gap-3">
+      <div className="flex items-center gap-3 min-w-0 flex-shrink">
+        <Link to={createPageUrl("Dashboard")}>
+          <div style={{
+            width: '2.5rem',
+            height: '2.5rem',
+            borderRadius: '9999px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexShrink: 0,
+            boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+            background: profile?.funMode ? '#ffffff' : 'linear-gradient(135deg, #22A699, #1d8d82)',
+            cursor: 'pointer',
+            transition: 'transform 0.2s'
+          }}
+          onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
+          onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+          >
+            <span style={{
+              fontWeight: '600',
+              fontSize: '1rem',
+              color: profile?.funMode ? '#a855f7' : '#ffffff'
+            }}>
+              {profile?.funMode ? "💸" : "LA"}
+            </span>
+          </div>
+        </Link>
+        <div className="min-w-0">
+          <h2 className="truncate" style={{
+            fontSize: '1rem',
+            fontWeight: '600',
+            color: profile?.funMode ? '#ffffff' : (profile?.darkMode ? '#ffffff' : '#111827')
+          }}>
+            {profile?.funMode ? "Your Money Wizard" : "Ledgera AI"}
+          </h2>
+          <p className="truncate" style={{
+            fontSize: '0.7rem',
+            color: profile?.funMode ? '#fce7f3' : (profile?.darkMode ? '#9ca3af' : '#6b7280')
+          }}>
+            {profile?.funMode ? "Let's make bookkeeping fun" : "Available 24/7"}
+          </p>
+        </div>
+      </div>
+      <div className="flex items-center gap-2 flex-shrink-0">
+        <Button
+          onClick={() => setShowCapabilities(true)}
+          variant="outline"
+          size="sm"
+          className="gap-2 hidden md:flex"
+          style={{
+            backgroundColor: profile?.darkMode ? '#374151' : '#ffffff',
+            border: `1px solid ${profile?.darkMode ? '#4b5563' : '#e5e7eb'}`,
+            color: profile?.darkMode ? '#d1d5db' : '#374151'
+          }}
+        >
+          <Info className="w-4 h-4" /> What I Can Do
+        </Button>
+        <Button
+          onClick={() => setShowCapabilities(true)}
+          variant="outline"
+          size="sm"
+          className="md:hidden"
+          style={{
+            backgroundColor: profile?.darkMode ? '#374151' : '#ffffff',
+            border: `1px solid ${profile?.darkMode ? '#4b5563' : '#e5e7eb'}`,
+            color: profile?.darkMode ? '#d1d5db' : '#374151',
+            padding: '0.5rem'
+          }}
+        >
+          <Info className="w-4 h-4" />
+        </Button>
+        <Button
+          onClick={() => setShowChatList(!showChatList)}
+          variant="outline"
+          size="sm"
+          className="gap-2 hidden md:flex"
+          style={{
+            backgroundColor: profile?.darkMode ? '#374151' : '#ffffff',
+            border: `1px solid ${profile?.darkMode ? '#4b5563' : '#e5e7eb'}`,
+            color: profile?.darkMode ? '#d1d5db' : '#374151'
+          }}
+        >
+          <MessageSquare className="w-4 h-4" /> Chats
+        </Button>
+        <Button
+          onClick={() => setShowChatList(!showChatList)}
+          variant="outline"
+          size="sm"
+          className="md:hidden"
+          style={{
+            backgroundColor: profile?.darkMode ? '#374151' : '#ffffff',
+            border: `1px solid ${profile?.darkMode ? '#4b5563' : '#e5e7eb'}`,
+            color: profile?.darkMode ? '#d1d5db' : '#374151',
+            padding: '0.5rem'
+          }}
+        >
+          <MessageSquare className="w-4 h-4" />
+        </Button>
+        <Button
+          onClick={handleNewChat}
+          variant="outline"
+          size="sm"
+          className="gap-2 hidden md:flex"
+          style={{
+            backgroundColor: profile?.darkMode ? '#374151' : '#ffffff',
+            border: `1px solid ${profile?.darkMode ? '#4b5563' : '#e5e7eb'}`,
+            color: profile?.darkMode ? '#d1d5db' : '#374151'
+          }}
+        >
+          <Plus className="w-4 h-4" /> New Chat
+        </Button>
+        <Button
+          onClick={handleNewChat}
+          variant="outline"
+          size="sm"
+          className="md:hidden"
+          style={{
+            backgroundColor: profile?.darkMode ? '#374151' : '#ffffff',
+            border: `1px solid ${profile?.darkMode ? '#4b5563' : '#e5e7eb'}`,
+            color: profile?.darkMode ? '#d1d5db' : '#374151',
+            padding: '0.5rem'
+          }}
+        >
+          <Plus className="w-4 h-4" />
+        </Button>
+      </div>
+    </div>
+  </div>
+);
 
 const ChatInputArea = ({ profile, selectedFiles, removeFile, fileInputRef, handleFileSelect, handleKeyPress, input, setInput, isRecording, stopRecording, startRecording, handleSend, sendingMessage, uploadingFile }) => (
   <>
@@ -60,7 +200,11 @@ const ChatInputArea = ({ profile, selectedFiles, removeFile, fileInputRef, handl
     <div className="pt-4 px-4 pb-3" style={{
       borderTop: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}`,
       boxShadow: profile?.funMode ? '0 -10px 15px -3px rgba(0, 0, 0, 0.1)' : '0 -4px 6px -1px rgba(0, 0, 0, 0.1)',
-      backgroundColor: profile?.darkMode ? '#1a1a1a' : '#ffffff'
+      background: profile?.funMode
+        ? (profile?.darkMode
+            ? '#1a1a1a'
+            : '#faf5ff')
+        : (profile?.darkMode ? '#1a1a1a' : '#f9fafb')
     }}>
       <div className="max-w-4xl mx-auto">
         <div className="flex gap-2 items-end">
@@ -565,143 +709,7 @@ export default function Chat() {
           : (profile?.darkMode ? '#0f0f0f' : 'linear-gradient(to bottom, #f9fafb, #f3f4f6)')
       }}
     >
-      {/* Simplified Header */}
-      <div className="sticky top-0 z-10 shadow-sm pb-2 px-4" style={{
-        borderBottom: profile?.funMode ? 'none' : `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}`,
-        background: profile?.funMode
-          ? 'linear-gradient(to right, #ec4899, #a855f7, #3b82f6)'
-          : (profile?.darkMode ? '#1a1a1a' : '#ffffff'),
-        paddingTop: '0.75rem'
-      }}>
-        <div className="flex items-center justify-between max-w-4xl mx-auto gap-3">
-          <div className="flex items-center gap-3 min-w-0 flex-shrink">
-            <Link to={createPageUrl("Dashboard")}>
-              <div style={{
-                width: '2.5rem',
-                height: '2.5rem',
-                borderRadius: '9999px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexShrink: 0,
-                boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
-                background: profile?.funMode ? '#ffffff' : 'linear-gradient(135deg, #22A699, #1d8d82)',
-                cursor: 'pointer',
-                transition: 'transform 0.2s'
-              }}
-              onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
-              onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
-              >
-                <span style={{
-                  fontWeight: '600',
-                  fontSize: '1rem',
-                  color: profile?.funMode ? '#a855f7' : '#ffffff'
-                }}>
-                  {profile?.funMode ? "💸" : "LA"}
-                </span>
-              </div>
-            </Link>
-            <div className="min-w-0">
-              <h2 className="truncate" style={{
-                fontSize: '1rem',
-                fontWeight: '600',
-                color: profile?.funMode ? '#ffffff' : (profile?.darkMode ? '#ffffff' : '#111827')
-              }}>
-                {profile?.funMode ? "Your Money Wizard" : "Ledgera AI"}
-              </h2>
-              <p className="truncate" style={{
-                fontSize: '0.7rem',
-                color: profile?.funMode ? '#fce7f3' : (profile?.darkMode ? '#9ca3af' : '#6b7280')
-              }}>
-                {profile?.funMode ? "Let's make bookkeeping fun" : "Available 24/7"}
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2 flex-shrink-0">
-            <Button
-              onClick={() => setShowCapabilities(true)}
-              variant="outline"
-              size="sm"
-              className="gap-2 hidden md:flex"
-              style={{
-                backgroundColor: profile?.darkMode ? '#374151' : '#ffffff',
-                border: `1px solid ${profile?.darkMode ? '#4b5563' : '#e5e7eb'}`,
-                color: profile?.darkMode ? '#d1d5db' : '#374151'
-              }}
-            >
-              <Info className="w-4 h-4" /> What I Can Do
-            </Button>
-            <Button
-              onClick={() => setShowCapabilities(true)}
-              variant="outline"
-              size="sm"
-              className="md:hidden"
-              style={{
-                backgroundColor: profile?.darkMode ? '#374151' : '#ffffff',
-                border: `1px solid ${profile?.darkMode ? '#4b5563' : '#e5e7eb'}`,
-                color: profile?.darkMode ? '#d1d5db' : '#374151',
-                padding: '0.5rem'
-              }}
-            >
-              <Info className="w-4 h-4" />
-            </Button>
-            <Button
-              onClick={() => setShowChatList(!showChatList)}
-              variant="outline"
-              size="sm"
-              className="gap-2 hidden md:flex"
-              style={{
-                backgroundColor: profile?.darkMode ? '#374151' : '#ffffff',
-                border: `1px solid ${profile?.darkMode ? '#4b5563' : '#e5e7eb'}`,
-                color: profile?.darkMode ? '#d1d5db' : '#374151'
-              }}
-            >
-              <MessageSquare className="w-4 h-4" /> Chats
-            </Button>
-            <Button
-              onClick={() => setShowChatList(!showChatList)}
-              variant="outline"
-              size="sm"
-              className="md:hidden"
-              style={{
-                backgroundColor: profile?.darkMode ? '#374151' : '#ffffff',
-                border: `1px solid ${profile?.darkMode ? '#4b5563' : '#e5e7eb'}`,
-                color: profile?.darkMode ? '#d1d5db' : '#374151',
-                padding: '0.5rem'
-              }}
-            >
-              <MessageSquare className="w-4 h-4" />
-            </Button>
-            <Button
-              onClick={handleNewChat}
-              variant="outline"
-              size="sm"
-              className="gap-2 hidden md:flex"
-              style={{
-                backgroundColor: profile?.darkMode ? '#374151' : '#ffffff',
-                border: `1px solid ${profile?.darkMode ? '#4b5563' : '#e5e7eb'}`,
-                color: profile?.darkMode ? '#d1d5db' : '#374151'
-              }}
-            >
-              <Plus className="w-4 h-4" /> New Chat
-            </Button>
-            <Button
-              onClick={handleNewChat}
-              variant="outline"
-              size="sm"
-              className="md:hidden"
-              style={{
-                backgroundColor: profile?.darkMode ? '#374151' : '#ffffff',
-                border: `1px solid ${profile?.darkMode ? '#4b5563' : '#e5e7eb'}`,
-                color: profile?.darkMode ? '#d1d5db' : '#374151',
-                padding: '0.5rem'
-              }}
-            >
-              <Plus className="w-4 h-4" />
-            </Button>
-          </div>
-        </div>
-      </div>
+      <ChatHeader profile={profile} showChatList={showChatList} setShowChatList={setShowChatList} handleNewChat={handleNewChat} setShowCapabilities={setShowCapabilities} />
 
       {showChatList && (
         <>
@@ -710,7 +718,7 @@ export default function Chat() {
             onClick={() => setShowChatList(false)}
           />
 
-          <div className="absolute top-16 right-4 z-50 w-80 max-h-96 overflow-y-auto rounded-lg shadow-xl" style={{
+          <div className="absolute top-20 right-4 z-50 w-80 max-h-96 overflow-y-auto rounded-lg shadow-xl" style={{
             backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff',
             border: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}`
           }}>
