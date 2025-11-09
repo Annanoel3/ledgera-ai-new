@@ -220,17 +220,15 @@ const ChatInputArea = ({ profile, selectedFiles, removeFile, fileInputRef, handl
 
           <Button
             onClick={() => fileInputRef.current?.click()}
-            className="text-sm font-medium rounded-md flex-shrink-0 inline-flex items-center justify-center gap-2 whitespace-nowrap focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input shadow-sm hover:bg-accent hover:text-accent-foreground h-12 w-12 transition-transform hover:scale-110"
+            className="h-12 w-12 flex-shrink-0 shadow-md transition-all hover:scale-110"
             style={{
               background: profile?.funMode ?
                 'linear-gradient(to right, #f472b6, #a855f7)' :
-                profile?.darkMode ? '#374151' : '#f3f4f6',
-              color: profile?.funMode ? '#ffffff' : profile?.darkMode ? '#d1d5db' : '#111827'
+                profile?.darkMode ? '#374151' : '#e5e7eb'
             }}
             size="icon"
-            variant="outline"
             disabled={uploadingFile || isRecording}>
-            <Paperclip className="w-5 h-5" />
+            <Paperclip className="w-5 h-5" style={{ color: profile?.funMode ? '#ffffff' : profile?.darkMode ? '#d1d5db' : '#111827' }} />
           </Button>
 
           <div className="flex-1 relative">
@@ -252,22 +250,20 @@ const ChatInputArea = ({ profile, selectedFiles, removeFile, fileInputRef, handl
 
           <Button
             onClick={isRecording ? stopRecording : startRecording}
-            className="text-sm font-medium rounded-md flex-shrink-0 inline-flex items-center justify-center gap-2 whitespace-nowrap focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input shadow-sm hover:bg-accent hover:text-accent-foreground h-12 w-12 transition-transform hover:scale-110"
+            className="h-12 w-12 flex-shrink-0 shadow-md transition-all hover:scale-110"
             style={{
               background: isRecording ?
                 '#ef4444' :
                 profile?.funMode ?
                   'linear-gradient(to right, #3b82f6, #a855f7)' :
-                  profile?.darkMode ? '#374151' : '#f3f4f6',
-              color: isRecording ? '#ffffff' : profile?.funMode ? '#ffffff' : profile?.darkMode ? '#d1d5db' : '#111827',
+                  profile?.darkMode ? '#374151' : '#e5e7eb',
               animation: isRecording ? 'pulse 2s infinite' : 'none'
             }}
             size="icon"
-            variant={isRecording ? "default" : "outline"}
             disabled={uploadingFile}>
             {isRecording ?
               <Square className="w-5 h-5 text-white" /> :
-              <Mic className="w-5 h-5" />
+              <Mic className="w-5 h-5" style={{ color: profile?.funMode ? '#ffffff' : profile?.darkMode ? '#d1d5db' : '#111827' }} />
             }
           </Button>
 
@@ -884,7 +880,7 @@ export default function Chat() {
 
             <div className="pt-4 border-t" style={{ borderColor: profile?.darkMode ? '#374151' : '#e5e7eb' }}>
               <p className="text-sm" style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>
-                <strong style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>Pro Tip:</strong> Just talk to me naturally! Tell me what you do, upload your files, and I will organize everything for you.
+                <strong style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }>Pro Tip:</strong> Just talk to me naturally! Tell me what you do, upload your files, and I will organize everything for you.
               </p>
             </div>
           </div>
@@ -998,9 +994,9 @@ export default function Chat() {
                           lineHeight: '1.4'
                         }}>
                           <li style={{ marginBottom: '0.25rem' }}>Track all income and expenses by project</li>
-                          <li style={{ marginBottom: '0.25rem' }}>Catch costs you might have missed</li>
-                          <li style={{ marginBottom: '0.25rem' }}>Create custom financial reports</li>
-                          <li style={{ marginBottom: '0.25rem' }}>Answer questions about your business</li>
+                          <li style={{ marginBottom: '0.25rem' }>Catch costs you might have missed</li>
+                          <li style={{ marginBottom: '0.25rem' }>Create custom financial reports</li>
+                          <li style={{ marginBottom: '0.25rem' }>Answer questions about your business</li>
                         </ul>
                         <p style={{
                           fontSize: '15px',
