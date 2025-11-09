@@ -197,7 +197,7 @@ const ChatInputArea = ({ profile, selectedFiles, removeFile, fileInputRef, handl
       </div>
   }
 
-    <div className="px-4 py-1 min-h-[120px] flex items-start" style={{
+    <div className="my-8 px-4 min-h-[120px] flex items-start" style={{
     borderTop: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}`,
     boxShadow: profile?.funMode ? '0 -10px 15px -3px rgba(0, 0, 0, 0.1)' : '0 -4px 6px -1px rgba(0, 0, 0, 0.1)',
     background: profile?.funMode ?
@@ -217,8 +217,8 @@ const ChatInputArea = ({ profile, selectedFiles, removeFile, fileInputRef, handl
           style={{ display: 'none' }} />
 
           <Button
-          onClick={() => fileInputRef.current?.click()}
-          className="h-12 w-12 flex-shrink-0 transition-transform hover:scale-110"
+          onClick={() => fileInputRef.current?.click()} className="bg-background my-2 text-sm font-medium rounded-md inline-flex items-center justify-center gap-2 whitespace-nowrap focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input shadow-sm hover:bg-accent hover:text-accent-foreground h-12 w-12 flex-shrink-0 transition-transform hover:scale-110"
+
           style={{
             background: profile?.funMode ?
             'linear-gradient(to right, #f472b6, #a855f7)' :
@@ -236,7 +236,7 @@ const ChatInputArea = ({ profile, selectedFiles, removeFile, fileInputRef, handl
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyPress={handleKeyPress}
-            placeholder={profile?.funMode ? "Spill the financial tea..." : "Type your message or speak..."} className="bg-transparent px-3 py-1 text-base rounded-md flex w-full border border-input shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm min-h-[48px] max-h-32 resize-none"
+            placeholder={profile?.funMode ? "Spill the financial tea..." : "Type your message or speak..."} className="bg-transparent my-1 px-3 py-1 text-base rounded-md flex w-full border border-input shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm min-h-[48px] max-h-32 resize-none"
 
             style={{
               background: profile?.darkMode ? '#1f2937' : '#ffffff',
@@ -249,8 +249,8 @@ const ChatInputArea = ({ profile, selectedFiles, removeFile, fileInputRef, handl
 
           </div>
           <Button
-          onClick={isRecording ? stopRecording : startRecording}
-          className="h-12 w-12 flex-shrink-0 transition-transform hover:scale-110"
+          onClick={isRecording ? stopRecording : startRecording} className="bg-background my-2 text-sm font-medium rounded-md inline-flex items-center justify-center gap-2 whitespace-nowrap focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input shadow-sm hover:bg-accent hover:text-accent-foreground h-12 w-12 flex-shrink-0 transition-transform hover:scale-110"
+
           style={{
             background: isRecording ?
             '#ef4444' :
@@ -891,7 +891,7 @@ export default function Chat() {
         </DialogContent>
       </Dialog>
 
-      <div className="flex-1 overflow-y-auto px-4 py-4">
+      <div className="px-4 flex-1 overflow-y-auto">
         <div className="max-w-4xl mx-auto space-y-4">
           {showWelcome ?
           <div className="flex flex-col items-center justify-center h-full">
