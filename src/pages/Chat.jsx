@@ -22,7 +22,7 @@ import { speechToText } from "@/functions/speechToText";
 
 // Move component definitions OUTSIDE to prevent re-mounting on every render
 const ChatHeader = ({ profile, showChatList, setShowChatList, handleNewChat, setShowCapabilities }) => (
-  <div className="sticky top-0 z-10 shadow-sm pb-3 px-4" style={{
+  <div className="sticky top-0 z-10 shadow-sm pb-3 px-5" style={{
     borderBottom: profile?.funMode ? 'none' : `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}`,
     background: profile?.funMode
       ? 'linear-gradient(to right, #ec4899, #a855f7, #3b82f6)'
