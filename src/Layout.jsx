@@ -189,10 +189,11 @@ export default function Layout({ children }) {
           </aside>
         )}
 
-        {/* Mobile Top Bar - KEEP on all pages including Chat */}
-        <div className="md:hidden sticky top-0 z-10 flex h-16 flex-shrink-0 border-b pt-10" style={{
+        {/* Mobile Top Bar - ALWAYS VISIBLE with extended padding */}
+        <div className="md:hidden sticky top-0 z-10 flex h-16 flex-shrink-0 border-b" style={{
           borderColor: darkMode ? '#374151' : '#e5e7eb',
-          backgroundColor: darkMode ? '#1a1a1a' : '#ffffff'
+          backgroundColor: darkMode ? '#1a1a1a' : '#ffffff',
+          paddingTop: '2.5rem'
         }}>
           <button
             type="button"
@@ -285,29 +286,28 @@ export default function Layout({ children }) {
           </main>
         </div>
 
-        {/* Mobile Bottom Navigation - ONLY HIDE ON CHAT PAGE */}
-        {!isChat && (
-          <nav className="md:hidden fixed bottom-0 left-0 right-0 z-10 flex h-16 border-t pb-6" style={{
-            borderColor: darkMode ? '#374151' : '#e5e7eb',
-            backgroundColor: darkMode ? '#1a1a1a' : '#ffffff'
-          }}>
-            {navItems.map((item) => {
-              const isActive = currentPath === item.url || currentPath.startsWith(item.url + '/');
-              return (
-                <Link
-                  key={item.title}
-                  to={item.url}
-                  className="flex flex-1 flex-col items-center justify-center text-xs font-medium"
-                  style={{ color: isActive ? primaryColor : (darkMode ? '#9ca3af' : '#6b7280') }}
-                  aria-current={isActive ? "page" : undefined}
-                >
-                  <item.icon className="h-6 w-6 mb-1" />
-                  {item.title}
-                </Link>
-              );
-            })}
-          </nav>
-        )}
+        {/* Mobile Bottom Navigation - ALWAYS VISIBLE with extended padding */}
+        <nav className="md:hidden fixed bottom-0 left-0 right-0 z-10 flex h-16 border-t" style={{
+          borderColor: darkMode ? '#374151' : '#e5e7eb',
+          backgroundColor: darkMode ? '#1a1a1a' : '#ffffff',
+          paddingBottom: '1.5rem'
+        }}>
+          {navItems.map((item) => {
+            const isActive = currentPath === item.url || currentPath.startsWith(item.url + '/');
+            return (
+              <Link
+                key={item.title}
+                to={item.url}
+                className="flex flex-1 flex-col items-center justify-center text-xs font-medium"
+                style={{ color: isActive ? primaryColor : (darkMode ? '#9ca3af' : '#6b7280') }}
+                aria-current={isActive ? "page" : undefined}
+              >
+                <item.icon className="h-6 w-6 mb-1" />
+                {item.title}
+              </Link>
+            );
+          })}
+        </nav>
       </div>
     </>
   );
