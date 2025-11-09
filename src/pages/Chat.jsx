@@ -197,7 +197,7 @@ const ChatInputArea = ({ profile, selectedFiles, removeFile, fileInputRef, handl
       </div>
   }
 
-    <div className="pt-6 pb-24 px-4 min-h-[120px] flex items-start" style={{
+    <div className="px-4 py-1 min-h-[120px] flex items-start" style={{
     borderTop: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}`,
     boxShadow: profile?.funMode ? '0 -10px 15px -3px rgba(0, 0, 0, 0.1)' : '0 -4px 6px -1px rgba(0, 0, 0, 0.1)',
     background: profile?.funMode ?
@@ -236,8 +236,8 @@ const ChatInputArea = ({ profile, selectedFiles, removeFile, fileInputRef, handl
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyPress={handleKeyPress}
-            placeholder={profile?.funMode ? "Spill the financial tea..." : "Type your message or speak..."}
-            className="min-h-[48px] max-h-32 resize-none text-base"
+            placeholder={profile?.funMode ? "Spill the financial tea..." : "Type your message or speak..."} className="bg-transparent px-3 py-1 text-base rounded-md flex w-full border border-input shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm min-h-[48px] max-h-32 resize-none"
+
             style={{
               background: profile?.darkMode ? '#1f2937' : '#ffffff',
               border: profile?.funMode ?
