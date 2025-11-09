@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -197,7 +196,7 @@ const ChatInputArea = ({ profile, selectedFiles, removeFile, fileInputRef, handl
       </div>
   }
 
-    <div className="my-1 px-4 min-h-[120px] flex items-start" style={{
+    <div className="px-4 pb-2 pt-3 flex items-start" style={{
     borderTop: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}`,
     boxShadow: profile?.funMode ? '0 -10px 15px -3px rgba(0, 0, 0, 0.1)' : '0 -4px 6px -1px rgba(0, 0, 0, 0.1)',
     background: profile?.funMode ?
@@ -206,7 +205,7 @@ const ChatInputArea = ({ profile, selectedFiles, removeFile, fileInputRef, handl
     'linear-gradient(to right, #fce7f3, #faf5ff, #eff6ff)' :
     profile?.darkMode ? '#1a1a1a' : '#f9fafb'
   }}>
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-4xl mx-auto w-full">
         <div className="flex gap-2 items-end">
           <input
           ref={fileInputRef}
@@ -891,8 +890,8 @@ export default function Chat() {
         </DialogContent>
       </Dialog>
 
-      <div className="px-4 flex-1 overflow-y-auto">
-        <div className="max-w-4xl mx-auto space-y-4">
+      <div className="px-4 flex-1 overflow-y-auto pb-28">
+        <div className="max-w-4xl mx-auto space-y-4 py-4">
           {showWelcome ?
           <div className="flex flex-col items-center justify-center h-full">
               <div className="w-full max-w-2xl">
