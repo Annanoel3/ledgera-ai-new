@@ -197,7 +197,7 @@ const ChatInputArea = ({ profile, selectedFiles, removeFile, fileInputRef, handl
       </div>
     )}
 
-    <div className="pt-6 px-4" style={{
+    <div className="pt-6 px-4 pb-4" style={{
       borderTop: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}`,
       boxShadow: profile?.funMode ? '0 -10px 15px -3px rgba(0, 0, 0, 0.1)' : '0 -4px 6px -1px rgba(0, 0, 0, 0.1)',
       background: profile?.funMode
@@ -891,7 +891,7 @@ export default function Chat() {
         </DialogContent>
       </Dialog>
 
-      <div className="flex-1 overflow-y-auto px-4 py-4">
+      <div className="flex-1 overflow-y-auto px-4 py-4" style={{ paddingBottom: '6rem' }}>
         <div className="max-w-4xl mx-auto space-y-4">
           {showWelcome ? (
             <div className="flex flex-col items-center justify-center h-full">
@@ -958,7 +958,7 @@ export default function Chat() {
                           <li style={{ marginBottom: '0.25rem' }}>Track money stuff without boring spreadsheets</li>
                           <li style={{ marginBottom: '0.25rem' }}>Catch expenses you definitely forgot about</li>
                           <li style={{ marginBottom: '0.25rem' }}>Actually understand your ROI not just pretend</li>
-                          <li style={{ marginBottom: '0.25rem' }}>Make tax season less painful</li>
+                          <li style={{ marginBottom: '0.25rem' }>Make tax season less painful</li>
                           <li style={{ marginBottom: '0.25rem' }}>Answer money questions in plain English</li>
                         </ul>
                         <p style={{
@@ -1072,22 +1072,24 @@ export default function Chat() {
         </div>
       </div>
 
-      <ChatInputArea
-        profile={profile}
-        selectedFiles={selectedFiles}
-        removeFile={removeFile}
-        fileInputRef={fileInputRef}
-        handleFileSelect={handleFileSelect}
-        handleKeyPress={handleKeyPress}
-        input={input}
-        setInput={setInput}
-        isRecording={isRecording}
-        stopRecording={stopRecording}
-        startRecording={startRecording}
-        handleSend={handleSend}
-        sendingMessage={sendingMessage}
-        uploadingFile={uploadingFile}
-      />
+      <div className="fixed bottom-0 left-0 right-0 z-20" style={{ paddingBottom: '5rem' }}>
+        <ChatInputArea
+          profile={profile}
+          selectedFiles={selectedFiles}
+          removeFile={removeFile}
+          fileInputRef={fileInputRef}
+          handleFileSelect={handleFileSelect}
+          handleKeyPress={handleKeyPress}
+          input={input}
+          setInput={setInput}
+          isRecording={isRecording}
+          stopRecording={stopRecording}
+          startRecording={startRecording}
+          handleSend={handleSend}
+          sendingMessage={sendingMessage}
+          uploadingFile={uploadingFile}
+        />
+      </div>
     </div>
   );
 }
