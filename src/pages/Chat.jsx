@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -1001,7 +1000,7 @@ export default function Chat() {
                           <li style={{ marginBottom: '0.25rem' }}>Catch costs you might have missed</li>
                           <li style={{ marginBottom: '0.25rem' }}>Generate reports and ROI analysis</li>
                           <li style={{ marginBottom: '0.25rem' }}>Prepare for tax season</li>
-                          <li style={{ marginBottom: '0.25rem' }>Answer questions about your business</li>
+                          <li style={{ marginBottom: '0.25rem' }}>Answer questions about your business</li>
                         </ul>
                         <p style={{
                           fontSize: '15px',
