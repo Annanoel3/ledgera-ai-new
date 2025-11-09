@@ -38,6 +38,35 @@ export default function Layout({ children }) {
     queryFn: () => base44.auth.me(),
   });
 
+  // Set up OneSignal external user ID when user is available
+  useEffect(() => {
+    if (user && user.email) {
+      // Send external user ID to native wrapper via postMessage
+      window.parent.postMessage({
+        type: 'setOneSignalExternalUserId',
+        externalUserId: user.email
+      }, '*');
+    }
+  }, [user]);
+
+  // Listen for OneSignal player ID from native wrapper
+  useEffect(() => {
+    const handleMessage = (event) => {
+      if (event.data && event.data.type === 'oneSignalPlayerId') {
+        console.log('[Ledgera] Received OneSignal player ID:', event.data.playerId);
+        // Store player ID if needed for future use
+        if (event.data.playerId) {
+          sessionStorage.setItem('oneSignalPlayerId', event.data.playerId);
+        }
+      } else if (event.data && event.data.type === 'oneSignalExternalUserIdSet') {
+        console.log('[Ledgera] OneSignal external user ID set:', event.data);
+      }
+    };
+
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, []);
+
   useEffect(() => {
     if (profile?.darkMode !== undefined) {
       setDarkMode(profile.darkMode);
@@ -68,15 +97,13 @@ export default function Layout({ children }) {
 
   const handleLogout = async () => {
     try {
-      // Log out of OneSignal first
-      if (window.OneSignal) {
-        await window.OneSignal.logout();
-      }
+      // Send logout message to native wrapper via postMessage
+      window.parent.postMessage({
+        type: 'oneSignalLogout'
+      }, '*');
       
-      // Call native push logout helper if available
-      if (window.onNativePushLogout) {
-        window.onNativePushLogout();
-      }
+      // Clear stored player ID
+      sessionStorage.removeItem('oneSignalPlayerId');
       
       // Now logout from base44
       await base44.auth.logout();
