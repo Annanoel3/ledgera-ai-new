@@ -238,7 +238,7 @@ const ChatInputArea = ({ profile, selectedFiles, removeFile, fileInputRef, handl
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyPress={handleKeyPress}
-              placeholder={profile?.funMode ? "Spill the financial tea..." : "Type your message or speak..."} className="bg-transparent my-1 px-3 py-1 text-base rounded-md flex w-full border border-input shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm min-h-[48px] max-h-32 resize-none"
+              placeholder={profile?.funMode ? "Spill the financial tea..." : "Type your message or speak..."} className="my-1 px-3 py-1 text-base rounded-md flex w-full border border-input shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm min-h-[48px] max-h-32 resize-none"
 
               style={{
                 backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff',
@@ -1002,7 +1002,7 @@ export default function Chat() {
                           <li style={{ marginBottom: '0.25rem' }}>Track all income and expenses by project</li>
                           <li style={{ marginBottom: '0.25rem' }}>Catch costs you might have missed</li>
                           <li style={{ marginBottom: '0.25rem' }}>Generate reports and ROI analysis</li>
-                          <li style={{ marginBottom: '0.25rem' }}>Prepare for tax season</li>
+                          <li style={{ marginBottom: '0.25rem' }>Prepare for tax season</li>
                           <li style={{ marginBottom: '0.25rem' }}>Answer questions about your business</li>
                         </ul>
                         <p style={{
