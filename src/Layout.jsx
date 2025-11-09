@@ -10,13 +10,13 @@ import { cn } from "@/lib/utils";
 import OneSignalInit from "@/components/shared/OneSignalInit";
 
 const navItems = [
-  { title: "Chat", url: createPageUrl("Chat"), icon: MessageSquare },
-  { title: "Dashboard", url: createPageUrl("Dashboard"), icon: LayoutDashboard },
-  { title: "Projects", url: createPageUrl("Projects"), icon: FolderKanban },
-  { title: "Reports", url: createPageUrl("Reports"), icon: TrendingUp },
-  { title: "Documents", url: createPageUrl("Documents"), icon: FileText },
-  { title: "Settings", url: createPageUrl("Settings"), icon: Settings },
-];
+{ title: "Chat", url: createPageUrl("Chat"), icon: MessageSquare },
+{ title: "Dashboard", url: createPageUrl("Dashboard"), icon: LayoutDashboard },
+{ title: "Projects", url: createPageUrl("Projects"), icon: FolderKanban },
+{ title: "Reports", url: createPageUrl("Reports"), icon: TrendingUp },
+{ title: "Documents", url: createPageUrl("Documents"), icon: FileText },
+{ title: "Settings", url: createPageUrl("Settings"), icon: Settings }];
+
 
 export default function Layout({ children }) {
   const location = useLocation();
@@ -31,12 +31,12 @@ export default function Layout({ children }) {
       const profiles = await base44.entities.UserProfile.filter({ created_by: user.email });
       return profiles[0];
     },
-    initialData: null,
+    initialData: null
   });
 
   const { data: user } = useQuery({
     queryKey: ['user'],
-    queryFn: () => base44.auth.me(),
+    queryFn: () => base44.auth.me()
   });
 
   useEffect(() => {
@@ -103,20 +103,20 @@ export default function Layout({ children }) {
       
       <div style={{ backgroundColor: darkMode ? '#0f0f0f' : '#ffffff', minHeight: '100vh' }}>
         {/* Desktop Sidebar - hide on Chat page */}
-        {!isChat && (
-          <aside className="hidden md:fixed md:inset-y-0 md:flex md:w-64 md:flex-col" style={{ backgroundColor: darkMode ? '#1a1a1a' : '#ffffff' }}>
-            <div className="flex min-h-0 flex-1 flex-col border-r" style={{ 
-              borderColor: darkMode ? '#374151' : '#e5e7eb',
-              backgroundColor: darkMode ? '#1a1a1a' : '#ffffff'
-            }}>
+        {!isChat &&
+        <aside className="hidden md:fixed md:inset-y-0 md:flex md:w-64 md:flex-col" style={{ backgroundColor: darkMode ? '#1a1a1a' : '#ffffff' }}>
+            <div className="flex min-h-0 flex-1 flex-col border-r" style={{
+            borderColor: darkMode ? '#374151' : '#e5e7eb',
+            backgroundColor: darkMode ? '#1a1a1a' : '#ffffff'
+          }}>
               <div className="flex flex-1 flex-col overflow-y-auto pt-5 pb-4">
                 <div className="flex items-center flex-shrink-0 px-6 mb-8">
                   <div className="flex items-center gap-3">
-                    <img 
-                      src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68eaceb5d712c1b62b8bd4d5/83975f5f2_Untitleddesign9.png" 
-                      alt="Ledgera AI"
-                      className="w-10 h-10 object-contain"
-                    />
+                    <img
+                    src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68eaceb5d712c1b62b8bd4d5/83975f5f2_Untitleddesign9.png"
+                    alt="Ledgera AI"
+                    className="w-10 h-10 object-contain" />
+
                     <div>
                       <h1 className="text-xl font-bold" style={{ color: darkMode ? '#ffffff' : '#111827' }}>Ledgera AI</h1>
                       <p className="text-xs" style={{ color: darkMode ? '#9ca3af' : '#6b7280' }}>
@@ -127,41 +127,41 @@ export default function Layout({ children }) {
                 </div>
                 <nav className="flex-1 space-y-1 px-3">
                   {navItems.map((item) => {
-                    const isActive = currentPath === item.url || currentPath.startsWith(item.url + '/');
-                    return (
-                      <Link
-                        key={item.title}
-                        to={item.url}
-                        className="group flex items-center px-3 py-3 text-sm font-medium rounded-lg transition-all"
-                        style={isActive ? { 
-                          backgroundColor: primaryColor,
-                          color: '#ffffff'
-                        } : {
-                          color: darkMode ? '#d1d5db' : '#374151',
-                          backgroundColor: 'transparent'
-                        }}
-                        onMouseEnter={(e) => {
-                          if (!isActive) {
-                            e.currentTarget.style.backgroundColor = darkMode ? '#1f2937' : '#f3f4f6';
-                          }
-                        }}
-                        onMouseLeave={(e) => {
-                          if (!isActive) {
-                            e.currentTarget.style.backgroundColor = 'transparent';
-                          }
-                        }}
-                        aria-current={isActive ? "page" : undefined}
-                      >
+                  const isActive = currentPath === item.url || currentPath.startsWith(item.url + '/');
+                  return (
+                    <Link
+                      key={item.title}
+                      to={item.url}
+                      className="group flex items-center px-3 py-3 text-sm font-medium rounded-lg transition-all"
+                      style={isActive ? {
+                        backgroundColor: primaryColor,
+                        color: '#ffffff'
+                      } : {
+                        color: darkMode ? '#d1d5db' : '#374151',
+                        backgroundColor: 'transparent'
+                      }}
+                      onMouseEnter={(e) => {
+                        if (!isActive) {
+                          e.currentTarget.style.backgroundColor = darkMode ? '#1f2937' : '#f3f4f6';
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (!isActive) {
+                          e.currentTarget.style.backgroundColor = 'transparent';
+                        }
+                      }}
+                      aria-current={isActive ? "page" : undefined}>
+
                         <item.icon className="mr-3 h-5 w-5 flex-shrink-0" />
                         {item.title}
-                      </Link>
-                    );
-                  })}
+                      </Link>);
+
+                })}
                 </nav>
                 
                 <div className="px-3 py-4 border-t" style={{ borderColor: darkMode ? '#374151' : '#e5e7eb' }}>
-                  {user && (
-                    <div className="mb-3 px-3">
+                  {user &&
+                <div className="mb-3 px-3">
                       <p className="text-sm font-medium truncate" style={{ color: darkMode ? '#ffffff' : '#111827' }}>
                         {user.full_name}
                       </p>
@@ -169,17 +169,17 @@ export default function Layout({ children }) {
                         {user.email}
                       </p>
                     </div>
-                  )}
+                }
                   <Button
-                    onClick={handleLogout}
-                    variant="outline"
-                    className="w-full gap-2 justify-start"
-                    style={{
-                      backgroundColor: darkMode ? '#1f2937' : '#ffffff',
-                      border: `1px solid ${darkMode ? '#374151' : '#e5e7eb'}`,
-                      color: darkMode ? '#d1d5db' : '#374151'
-                    }}
-                  >
+                  onClick={handleLogout}
+                  variant="outline"
+                  className="w-full gap-2 justify-start"
+                  style={{
+                    backgroundColor: darkMode ? '#1f2937' : '#ffffff',
+                    border: `1px solid ${darkMode ? '#374151' : '#e5e7eb'}`,
+                    color: darkMode ? '#d1d5db' : '#374151'
+                  }}>
+
                     <LogOut className="w-4 h-4" />
                     Log Out
                   </Button>
@@ -187,7 +187,7 @@ export default function Layout({ children }) {
               </div>
             </div>
           </aside>
-        )}
+        }
 
         {/* Mobile Top Bar */}
         <div className="md:hidden sticky top-0 z-10 flex flex-shrink-0 border-b" style={{
@@ -200,57 +200,57 @@ export default function Layout({ children }) {
             type="button"
             className="px-4"
             style={{ color: darkMode ? '#9ca3af' : '#6b7280' }}
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          >
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+
             {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </button>
-          <div className="flex flex-1 items-center justify-between px-4">
+          <div className="px-4 py-2 flex flex-1 items-center justify-between">
             <div className="flex items-center gap-2">
-              <img 
-                src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68eaceb5d712c1b62b8bd4d5/83975f5f2_Untitleddesign9.png" 
-                alt="Ledgera AI"
-                className="w-8 h-8 object-contain"
-              />
+              <img
+                src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68eaceb5d712c1b62b8bd4d5/83975f5f2_Untitleddesign9.png"
+                alt="Ledgera AI" className="w-8 h-8 object-contain" />
+
+
               <h1 className="text-lg font-bold" style={{ color: darkMode ? '#ffffff' : '#111827' }}>Ledgera AI</h1>
             </div>
           </div>
         </div>
 
         {/* Mobile Menu Overlay */}
-        {mobileMenuOpen && (
-          <div className="md:hidden fixed inset-0 z-40" style={{ backgroundColor: darkMode ? 'rgba(0,0,0,0.7)' : 'rgba(0,0,0,0.5)', paddingTop: '2rem' }} onClick={() => setMobileMenuOpen(false)}>
+        {mobileMenuOpen &&
+        <div className="md:hidden fixed inset-0 z-40" style={{ backgroundColor: darkMode ? 'rgba(0,0,0,0.7)' : 'rgba(0,0,0,0.5)', paddingTop: '2rem' }} onClick={() => setMobileMenuOpen(false)}>
             <div className="fixed inset-y-0 left-0 w-64 border-r" style={{
-              backgroundColor: darkMode ? '#1a1a1a' : '#ffffff',
-              borderColor: darkMode ? '#374151' : '#e5e7eb',
-              paddingTop: '2rem'
-            }} onClick={(e) => e.stopPropagation()}>
+            backgroundColor: darkMode ? '#1a1a1a' : '#ffffff',
+            borderColor: darkMode ? '#374151' : '#e5e7eb',
+            paddingTop: '2rem'
+          }} onClick={(e) => e.stopPropagation()}>
               <div className="p-6 flex flex-col h-full">
                 <nav className="space-y-1 flex-1">
                   {navItems.map((item) => {
-                    const isActive = currentPath === item.url;
-                    return (
-                      <Link
-                        key={item.title}
-                        to={item.url}
-                        onClick={() => setMobileMenuOpen(false)}
-                        className="group flex items-center px-3 py-3 text-sm font-medium rounded-lg"
-                        style={isActive ? {
-                          backgroundColor: primaryColor,
-                          color: '#ffffff'
-                        } : {
-                          color: darkMode ? '#d1d5db' : '#374151'
-                        }}
-                      >
+                  const isActive = currentPath === item.url;
+                  return (
+                    <Link
+                      key={item.title}
+                      to={item.url}
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="group flex items-center px-3 py-3 text-sm font-medium rounded-lg"
+                      style={isActive ? {
+                        backgroundColor: primaryColor,
+                        color: '#ffffff'
+                      } : {
+                        color: darkMode ? '#d1d5db' : '#374151'
+                      }}>
+
                         <item.icon className="mr-3 h-5 w-5" />
                         {item.title}
-                      </Link>
-                    );
-                  })}
+                      </Link>);
+
+                })}
                 </nav>
                 
                 <div className="border-t pt-4" style={{ borderColor: darkMode ? '#374151' : '#e5e7eb' }}>
-                  {user && (
-                    <div className="mb-3 px-3">
+                  {user &&
+                <div className="mb-3 px-3">
                       <p className="text-sm font-medium truncate" style={{ color: darkMode ? '#ffffff' : '#111827' }}>
                         {user.full_name}
                       </p>
@@ -258,17 +258,17 @@ export default function Layout({ children }) {
                         {user.email}
                       </p>
                     </div>
-                  )}
+                }
                   <Button
-                    onClick={handleLogout}
-                    variant="outline"
-                    className="w-full gap-2 justify-start"
-                    style={{
-                      backgroundColor: darkMode ? '#1f2937' : '#ffffff',
-                      border: `1px solid ${darkMode ? '#374151' : '#e5e7eb'}`,
-                      color: darkMode ? '#d1d5db' : '#374151'
-                    }}
-                  >
+                  onClick={handleLogout}
+                  variant="outline"
+                  className="w-full gap-2 justify-start"
+                  style={{
+                    backgroundColor: darkMode ? '#1f2937' : '#ffffff',
+                    border: `1px solid ${darkMode ? '#374151' : '#e5e7eb'}`,
+                    color: darkMode ? '#d1d5db' : '#374151'
+                  }}>
+
                     <LogOut className="w-4 h-4" />
                     Log Out
                   </Button>
@@ -276,7 +276,7 @@ export default function Layout({ children }) {
               </div>
             </div>
           </div>
-        )}
+        }
 
         {/* Main Content */}
         <div className={isChat ? "" : "md:pl-64 flex flex-col flex-1"} style={{
@@ -301,16 +301,16 @@ export default function Layout({ children }) {
                 key={item.title}
                 to={item.url}
                 className="flex flex-1 flex-col items-center justify-center text-xs font-medium"
-                style={{ color: isActive ? primaryColor : (darkMode ? '#9ca3af' : '#6b7280') }}
-                aria-current={isActive ? "page" : undefined}
-              >
+                style={{ color: isActive ? primaryColor : darkMode ? '#9ca3af' : '#6b7280' }}
+                aria-current={isActive ? "page" : undefined}>
+
                 <item.icon className="h-6 w-6 mb-1" />
                 {item.title}
-              </Link>
-            );
+              </Link>);
+
           })}
         </nav>
       </div>
-    </>
-  );
+    </>);
+
 }
