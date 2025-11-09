@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -218,8 +219,8 @@ const ChatInputArea = ({ profile, selectedFiles, removeFile, fileInputRef, handl
             style={{ display: 'none' }} />
 
           <Button
-            onClick={() => fileInputRef.current?.click()} className="bg-background text-sm font-medium rounded-md flex-shrink-0 inline-flex items-center justify-center gap-2 whitespace-nowrap focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input shadow-sm hover:bg-accent hover:text-accent-foreground h-12 w-12 transition-transform hover:scale-110"
-
+            onClick={() => fileInputRef.current?.click()}
+            className="text-sm font-medium rounded-md flex-shrink-0 inline-flex items-center justify-center gap-2 whitespace-nowrap focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input shadow-sm hover:bg-accent hover:text-accent-foreground h-12 w-12 transition-transform hover:scale-110"
             style={{
               background: profile?.funMode ?
                 'linear-gradient(to right, #f472b6, #a855f7)' :
@@ -229,29 +230,29 @@ const ChatInputArea = ({ profile, selectedFiles, removeFile, fileInputRef, handl
             size="icon"
             variant="outline"
             disabled={uploadingFile || isRecording}>
-
             <Paperclip className="w-5 h-5" />
           </Button>
+
           <div className="flex-1 relative">
             <Textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyPress={handleKeyPress}
-              placeholder={profile?.funMode ? "Spill the financial tea..." : "Type your message or speak..."} className="my-1 px-3 py-1 text-base rounded-md flex w-full border border-input shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm min-h-[48px] max-h-32 resize-none"
-
+              placeholder={profile?.funMode ? "Spill the financial tea..." : "Type your message or speak..."}
+              className="my-1 px-3 py-1 text-base rounded-md flex w-full border shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm min-h-[48px] max-h-32 resize-none"
               style={{
-                backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff',
+                backgroundColor: profile?.darkMode ? '#1f2937 !important' : '#ffffff',
                 border: profile?.funMode ?
                   profile?.darkMode ? '1px solid #a855f7' : '1px solid #f9a8d4' :
                   profile?.darkMode ? '1px solid #374151' : '1px solid #e5e7eb',
                 color: profile?.darkMode ? '#ffffff' : '#111827'
               }}
               disabled={sendingMessage || isRecording || uploadingFile} />
-
           </div>
-          <Button
-            onClick={isRecording ? stopRecording : startRecording} className="bg-background text-sm font-medium rounded-md flex-shrink-0 inline-flex items-center justify-center gap-2 whitespace-nowrap focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input shadow-sm hover:bg-accent hover:text-accent-foreground h-12 w-12 transition-transform hover:scale-110"
 
+          <Button
+            onClick={isRecording ? stopRecording : startRecording}
+            className="text-sm font-medium rounded-md flex-shrink-0 inline-flex items-center justify-center gap-2 whitespace-nowrap focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input shadow-sm hover:bg-accent hover:text-accent-foreground h-12 w-12 transition-transform hover:scale-110"
             style={{
               background: isRecording ?
                 '#ef4444' :
@@ -264,13 +265,12 @@ const ChatInputArea = ({ profile, selectedFiles, removeFile, fileInputRef, handl
             size="icon"
             variant={isRecording ? "default" : "outline"}
             disabled={uploadingFile}>
-
             {isRecording ?
               <Square className="w-5 h-5 text-white" /> :
-
               <Mic className="w-5 h-5" />
             }
           </Button>
+
           <Button
             onClick={handleSend}
             disabled={!input.trim() && selectedFiles.length === 0 || sendingMessage || isRecording || uploadingFile}
@@ -281,14 +281,13 @@ const ChatInputArea = ({ profile, selectedFiles, removeFile, fileInputRef, handl
                 '#22A699'
             }}
             size="icon">
-
             {sendingMessage || uploadingFile ?
               <Loader2 className="w-5 h-5 animate-spin text-white" /> :
-
               <Send className="w-5 h-5 text-white" />
             }
           </Button>
         </div>
+
         {isRecording &&
           <p style={{
             fontSize: '0.75rem',
@@ -1001,8 +1000,8 @@ export default function Chat() {
                           <li style={{ marginBottom: '0.25rem' }}>Track all income and expenses by project</li>
                           <li style={{ marginBottom: '0.25rem' }}>Catch costs you might have missed</li>
                           <li style={{ marginBottom: '0.25rem' }}>Generate reports and ROI analysis</li>
-                          <li style={{ marginBottom: '0.25rem' }}>Prepare for tax season</li>
-                          <li style={{ marginBottom: '0.25rem' }}>Answer questions about your business</li>
+                          <li style={{ marginBottom: '0.25rem' }>Prepare for tax season</li>
+                          <li style={{ marginBottom: '0.25rem' }>Answer questions about your business</li>
                         </ul>
                         <p style={{
                           fontSize: '15px',
