@@ -204,14 +204,14 @@ export default function Layout({ children }) {
 
             {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </button>
-          <div className="px-4 py-2 flex flex-1 items-center justify-between">
+          <div className="flex flex-1 items-center justify-between px-4">
             <div className="flex items-center gap-2">
               <img
                 src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68eaceb5d712c1b62b8bd4d5/83975f5f2_Untitleddesign9.png"
-                alt="Ledgera AI" className="w-8 h-8 object-contain" />
+                alt="Ledgera AI"
+                className="w-8 h-8 object-contain" />
 
-
-              <h1 className="text-lg font-bold" style={{ color: darkMode ? '#ffffff' : '#111827' }}>Ledgera AI</h1>
+              <h1 className="my-3 text-lg font-bold" style={{ color: darkMode ? '#ffffff' : '#111827' }}>Ledgera AI</h1>
             </div>
           </div>
         </div>
