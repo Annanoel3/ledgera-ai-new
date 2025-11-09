@@ -197,7 +197,7 @@ const ChatInputArea = ({ profile, selectedFiles, removeFile, fileInputRef, handl
       </div>
     )}
 
-    <div className="pt-6 px-4 pb-4" style={{
+    <div className="pt-4 px-4 pb-3" style={{
       borderTop: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}`,
       boxShadow: profile?.funMode ? '0 -10px 15px -3px rgba(0, 0, 0, 0.1)' : '0 -4px 6px -1px rgba(0, 0, 0, 0.1)',
       background: profile?.funMode
@@ -891,7 +891,7 @@ export default function Chat() {
         </DialogContent>
       </Dialog>
 
-      <div className="flex-1 overflow-y-auto px-4 py-4" style={{ paddingBottom: '6rem' }}>
+      <div className="flex-1 overflow-y-auto px-4 py-4" style={{ paddingBottom: '10rem' }}>
         <div className="max-w-4xl mx-auto space-y-4">
           {showWelcome ? (
             <div className="flex flex-col items-center justify-center h-full">
