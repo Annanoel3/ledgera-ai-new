@@ -334,7 +334,7 @@ export default function Settings() {
     }
   };
 
-  const trialEnd = profile?.trialStart ? new Date(new Date(profile.trialStart).getTime() + 7 * 24 * 60 * 60 * 1000) : null;
+  const trialEnd = profile?.trialStart ? new Date(new Date(profile.trialStart).getTime() + 14 * 24 * 60 * 60 * 1000) : null;
   const daysLeft = trialEnd ? Math.max(0, differenceInDays(trialEnd, new Date())) : 0;
 
   if (userLoading) {
@@ -493,7 +493,7 @@ export default function Settings() {
                       <p className="text-sm text-yellow-700 dark:text-yellow-300">{daysLeft} days remaining</p>
                     </div>
                   </div>
-                  <Badge variant="outline" className="border-yellow-600 text-yellow-600 dark:border-yellow-400 dark:text-yellow-400 bg-transparent">
+                  <Badge variant="outline" className="border-yellow-600 text-yellow-600 dark:text-yellow-400 dark:text-yellow-400 bg-transparent">
                     Free Trial
                   </Badge>
                 </div>
@@ -505,7 +505,7 @@ export default function Settings() {
                     <Check className="w-5 h-5 text-green-600 dark:text-green-400" />
                     <div>
                       <p className="font-medium text-green-900 dark:text-green-200">Active Subscription</p>
-                      <p className="text-sm text-green-700 dark:text-green-300">$6/month</p>
+                      <p className="text-sm text-green-700 dark:text-green-300">$5.99/month</p>
                     </div>
                   </div>
                   <Badge className="bg-green-600 text-white">Active</Badge>
@@ -518,7 +518,7 @@ export default function Settings() {
                 color: profile?.darkMode ? '#ffffff' : '#111827'
               }}>
                 <CreditCard className="w-4 h-4" />
-                {profile?.subscribed ? "Manage Subscription" : "Subscribe Now - $6/month"}
+                {profile?.subscribed ? "Manage Subscription" : "Subscribe Now - $5.99/month"}
               </Button>
             </CardContent>
           </Card>
