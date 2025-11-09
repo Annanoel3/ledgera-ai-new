@@ -209,7 +209,7 @@ const ChatInputArea = ({ profile, selectedFiles, removeFile, fileInputRef, handl
     profile?.darkMode ? '#1a1a1a' : '#f9fafb'
   }}>
       <div className="max-w-4xl mx-auto w-full">
-        <div className="flex gap-2 items-end">
+        <div className="flex gap-2 items-center">
           <input
           ref={fileInputRef}
           type="file"
