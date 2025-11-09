@@ -203,11 +203,10 @@ const ChatInputArea = ({ profile, selectedFiles, removeFile, fileInputRef, handl
       borderTop: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}`,
       boxShadow: profile?.funMode ? '0 -10px 15px -3px rgba(0, 0, 0, 0.1)' : '0 -4px 6px -1px rgba(0, 0, 0, 0.1)',
       background: profile?.funMode
-         ? profile?.darkMode
-         ? 'linear-gradient(to right, #ec4899, #a855f7, #3b82f6)' // no alpha
-         : 'linear-gradient(to right, #fce7f3, #faf5ff, #eff6ff)'
-       : (profile?.darkMode ? '#1a1a1a' : '#f9fafb')
-
+  ? profile?.darkMode
+    ? 'linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), linear-gradient(to right, #ec4899, #a855f7, #3b82f6)'
+    : 'linear-gradient(to right, #fce7f3, #faf5ff, #eff6ff)'
+  : (profile?.darkMode ? '#1a1a1a' : '#f9fafb')
     }}>
       <div className="max-w-4xl mx-auto w-full">
         <div className="flex gap-2 items-center">
