@@ -25,7 +25,7 @@ export default function Dashboard() {
         return null;
       }
       return await base44.auth.me();
-    },
+    }
   });
 
   const { data: profile } = useQuery({
@@ -35,7 +35,7 @@ export default function Dashboard() {
       const profiles = await base44.entities.UserProfile.filter({ created_by: user.email });
       return profiles[0];
     },
-    enabled: !!user,
+    enabled: !!user
   });
 
   const { data: projects } = useQuery({
@@ -45,46 +45,46 @@ export default function Dashboard() {
       const allProjects = await base44.entities.Project.filter({ created_by: user.email }, '-created_date');
       const allIncome = await base44.entities.IncomeItem.filter({ created_by: user.email });
       const allExpenses = await base44.entities.ExpenseItem.filter({ created_by: user.email });
-      
-      return allProjects.map(project => {
-        const projectIncome = allIncome
-          .filter(item => item.projectId === project.id)
-          .reduce((sum, item) => sum + (item.amount || 0), 0);
-        
-        const projectExpenses = allExpenses
-          .filter(item => item.projectId === project.id)
-          .reduce((sum, item) => sum + (item.amount || 0), 0);
-        
+
+      return allProjects.map((project) => {
+        const projectIncome = allIncome.
+        filter((item) => item.projectId === project.id).
+        reduce((sum, item) => sum + (item.amount || 0), 0);
+
+        const projectExpenses = allExpenses.
+        filter((item) => item.projectId === project.id).
+        reduce((sum, item) => sum + (item.amount || 0), 0);
+
         return {
           ...project,
           totalIncome: projectIncome,
-          totalExpense: projectExpenses,
+          totalExpense: projectExpenses
         };
       });
     },
     initialData: [],
-    enabled: !!user,
+    enabled: !!user
   });
 
   const { data: incomeItems } = useQuery({
     queryKey: ['incomeItems'],
     queryFn: () => base44.entities.IncomeItem.filter({ created_by: user.email }, '-date'),
     initialData: [],
-    enabled: !!user,
+    enabled: !!user
   });
 
   const { data: expenseItems } = useQuery({
     queryKey: ['expenseItems'],
     queryFn: () => base44.entities.ExpenseItem.filter({ created_by: user.email }, '-date'),
     initialData: [],
-    enabled: !!user,
+    enabled: !!user
   });
 
   const formatCurrency = (amount) => {
     if (!profile) return `$${amount.toFixed(2)}`;
     return new Intl.NumberFormat(profile.locale || 'en-US', {
       style: 'currency',
-      currency: profile.currency || 'USD',
+      currency: profile.currency || 'USD'
     }).format(amount);
   };
 
@@ -95,7 +95,7 @@ export default function Dashboard() {
       queryClient.invalidateQueries(['incomeItems']);
       queryClient.invalidateQueries(['projects']);
       toast.success("Updated!");
-    },
+    }
   });
 
   const updateExpenseMutation = useMutation({
@@ -104,7 +104,7 @@ export default function Dashboard() {
       queryClient.invalidateQueries(['expenseItems']);
       queryClient.invalidateQueries(['projects']);
       toast.success("Updated!");
-    },
+    }
   });
 
   const deleteIncomeMutation = useMutation({
@@ -113,7 +113,7 @@ export default function Dashboard() {
       queryClient.invalidateQueries(['incomeItems']);
       queryClient.invalidateQueries(['projects']);
       toast.success("Deleted!");
-    },
+    }
   });
 
   const deleteExpenseMutation = useMutation({
@@ -122,7 +122,7 @@ export default function Dashboard() {
       queryClient.invalidateQueries(['expenseItems']);
       queryClient.invalidateQueries(['projects']);
       toast.success("Deleted!");
-    },
+    }
   });
 
   const convertMutation = useMutation({
@@ -141,7 +141,7 @@ export default function Dashboard() {
       queryClient.invalidateQueries(['expenseItems']);
       queryClient.invalidateQueries(['projects']);
       toast.success("Converted!");
-    },
+    }
   });
 
   const handleUpdateIncome = async (id, data) => {
@@ -161,12 +161,12 @@ export default function Dashboard() {
   };
 
   const handleConvertIncome = async (id) => {
-    const item = incomeItems.find(i => i.id === id);
+    const item = incomeItems.find((i) => i.id === id);
     if (!item) {
       toast.error("Item not found for conversion.");
       return;
     }
-    
+
     const newData = {
       projectId: item.projectId,
       amount: item.amount,
@@ -174,48 +174,48 @@ export default function Dashboard() {
       category: 'other', // Default category for converted items
       vendor: item.notes || '', // Using notes as vendor for income to expense
       notes: item.notes || '',
-      created_by: user.email, // Ensure created_by is passed
+      created_by: user.email // Ensure created_by is passed
     };
-    
+
     await convertMutation.mutateAsync({ id, fromType: 'income', toType: 'expense', data: newData });
   };
 
   const handleConvertExpense = async (id) => {
-    const item = expenseItems.find(i => i.id === id);
+    const item = expenseItems.find((i) => i.id === id);
     if (!item) {
       toast.error("Item not found for conversion.");
       return;
     }
-    
+
     const newData = {
       projectId: item.projectId,
       amount: item.amount,
       date: item.date,
       category: 'other', // Default category for converted items
       notes: item.notes || item.vendor || '', // Using notes/vendor as notes for expense to income
-      created_by: user.email, // Ensure created_by is passed
+      created_by: user.email // Ensure created_by is passed
     };
-    
+
     await convertMutation.mutateAsync({ id, fromType: 'expense', toType: 'income', data: newData });
   };
 
   // Calculate MTD stats
   const monthStart = startOfMonth(new Date());
   const monthEnd = endOfMonth(new Date());
-  
-  const mtdIncome = incomeItems
-    .filter(item => {
-      const itemDate = new Date(item.date);
-      return itemDate >= monthStart && itemDate <= monthEnd;
-    })
-    .reduce((sum, item) => sum + (item.amount || 0), 0);
 
-  const mtdExpenses = expenseItems
-    .filter(item => {
-      const itemDate = new Date(item.date);
-      return itemDate >= monthStart && itemDate <= monthEnd;
-    })
-    .reduce((sum, item) => sum + (item.amount || 0), 0);
+  const mtdIncome = incomeItems.
+  filter((item) => {
+    const itemDate = new Date(item.date);
+    return itemDate >= monthStart && itemDate <= monthEnd;
+  }).
+  reduce((sum, item) => sum + (item.amount || 0), 0);
+
+  const mtdExpenses = expenseItems.
+  filter((item) => {
+    const itemDate = new Date(item.date);
+    return itemDate >= monthStart && itemDate <= monthEnd;
+  }).
+  reduce((sum, item) => sum + (item.amount || 0), 0);
 
   const mtdProfit = mtdIncome - mtdExpenses;
 
@@ -225,52 +225,52 @@ export default function Dashboard() {
     const monthDate = subMonths(new Date(), i);
     const monthStartDate = startOfMonth(monthDate);
     const monthEndDate = endOfMonth(monthDate);
-    
-    const income = incomeItems
-      .filter(item => {
-        const itemDate = new Date(item.date);
-        return itemDate >= monthStartDate && itemDate <= monthEndDate;
-      })
-      .reduce((sum, item) => sum + (item.amount || 0), 0);
 
-    const expenses = expenseItems
-      .filter(item => {
-        const itemDate = new Date(item.date);
-        return itemDate >= monthStartDate && itemDate <= monthEndDate;
-      })
-      .reduce((sum, item) => sum + (item.amount || 0), 0);
+    const income = incomeItems.
+    filter((item) => {
+      const itemDate = new Date(item.date);
+      return itemDate >= monthStartDate && itemDate <= monthEndDate;
+    }).
+    reduce((sum, item) => sum + (item.amount || 0), 0);
+
+    const expenses = expenseItems.
+    filter((item) => {
+      const itemDate = new Date(item.date);
+      return itemDate >= monthStartDate && itemDate <= monthEndDate;
+    }).
+    reduce((sum, item) => sum + (item.amount || 0), 0);
 
     chartData.push({
       month: format(monthDate, 'MMM'),
       income,
       expenses,
-      profit: income - expenses,
+      profit: income - expenses
     });
   }
 
   // Top projects by profit
-  const topProjects = projects
-    .map(p => ({
-      ...p,
-      profit: (p.totalIncome || 0) - (p.totalExpense || 0),
-      margin: p.totalIncome > 0 ? (((p.totalIncome - p.totalExpense) / p.totalIncome) * 100).toFixed(1) : 0
-    }))
-    .sort((a, b) => b.profit - a.profit)
-    .slice(0, 5);
+  const topProjects = projects.
+  map((p) => ({
+    ...p,
+    profit: (p.totalIncome || 0) - (p.totalExpense || 0),
+    margin: p.totalIncome > 0 ? ((p.totalIncome - p.totalExpense) / p.totalIncome * 100).toFixed(1) : 0
+  })).
+  sort((a, b) => b.profit - a.profit).
+  slice(0, 5);
 
   const hasData = incomeItems.length > 0 || expenseItems.length > 0;
 
-  const recentActivity = [...incomeItems.map(item => ({ ...item, type: 'income', title: item.notes || `Income #${item.id}` })),
-                          ...expenseItems.map(item => ({ ...item, type: 'expense', title: item.notes || item.vendor || `Expense #${item.id}` }))]
-                          .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  const recentActivity = [...incomeItems.map((item) => ({ ...item, type: 'income', title: item.notes || `Income #${item.id}` })),
+  ...expenseItems.map((item) => ({ ...item, type: 'expense', title: item.notes || item.vendor || `Expense #${item.id}` }))].
+  sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
 
   if (userLoading) {
     return (
       <div className="h-screen flex items-center justify-center" style={{ backgroundColor: profile?.darkMode ? '#0f0f0f' : '#f9fafb' }}>
         <Loader2 className="w-8 h-8 animate-spin text-[#22A699]" />
-      </div>
-    );
+      </div>);
+
   }
 
   if (!hasData) {
@@ -294,12 +294,12 @@ export default function Dashboard() {
             </CardContent>
           </Card>
         </div>
-      </div>
-    );
+      </div>);
+
   }
 
   return (
-    <div className="p-6 md:p-8 pb-24 md:pb-8 min-h-screen" style={{ backgroundColor: profile?.darkMode ? '#0f0f0f' : '#f9fafb' }}>
+    <div className="px-6 py-6 md:p-8 md:pb-8 min-h-screen" style={{ backgroundColor: profile?.darkMode ? '#0f0f0f' : '#f9fafb' }}>
       <div className="max-w-6xl mx-auto">
         <div className="flex items-center justify-between mb-8">
           <h1 className="text-3xl font-bold" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>Dashboard</h1>
@@ -330,7 +330,7 @@ export default function Dashboard() {
             <CardContent>
               <div className="text-2xl font-bold" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>{formatCurrency(mtdIncome)}</div>
               <p className="text-sm mt-1" style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>
-                {incomeItems.filter(item => {
+                {incomeItems.filter((item) => {
                   const itemDate = new Date(item.date);
                   return itemDate >= monthStart && itemDate <= monthEnd;
                 }).length} transactions
@@ -346,7 +346,7 @@ export default function Dashboard() {
             <CardContent>
               <div className="text-2xl font-bold" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>{formatCurrency(mtdExpenses)}</div>
               <p className="text-sm mt-1" style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>
-                {expenseItems.filter(item => {
+                {expenseItems.filter((item) => {
                   const itemDate = new Date(item.date);
                   return itemDate >= monthStart && itemDate <= monthEnd;
                 }).length} transactions
@@ -366,14 +366,14 @@ export default function Dashboard() {
                 <CartesianGrid strokeDasharray="3 3" stroke={profile?.darkMode ? '#374151' : '#e5e5e5'} />
                 <XAxis dataKey="month" stroke={profile?.darkMode ? '#9ca3af' : '#6b7280'} />
                 <YAxis stroke={profile?.darkMode ? '#9ca3af' : '#6b7280'} />
-                <Tooltip 
+                <Tooltip
                   formatter={(value) => formatCurrency(value)}
-                  contentStyle={{ 
-                    backgroundColor: profile?.darkMode ? '#1f2937' : '#fff', 
+                  contentStyle={{
+                    backgroundColor: profile?.darkMode ? '#1f2937' : '#fff',
                     border: `1px solid ${profile?.darkMode ? '#374151' : '#e5e5e5'}`,
                     color: profile?.darkMode ? '#fff' : '#000'
-                  }}
-                />
+                  }} />
+
                 <Bar dataKey="income" fill="#22A699" />
                 <Bar dataKey="expenses" fill="#ef4444" />
               </BarChart>
@@ -393,33 +393,33 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {recentActivity.length === 0 ? (
-                <p className="text-center py-8" style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>
+              {recentActivity.length === 0 ?
+              <p className="text-center py-8" style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>
                   No activity yet. Start by chatting with Ledgera AI!
-                </p>
-              ) : (
-                recentActivity.slice(0, 10).map((item) => (
-                  <QuickEditItem
-                    key={`${item.type}-${item.id}`}
-                    item={item}
-                    type={item.type}
-                    projects={projects}
-                    onUpdate={item.type === 'income' ? handleUpdateIncome : handleUpdateExpense}
-                    onDelete={item.type === 'income' ? handleDeleteIncome : handleDeleteExpense}
-                    onConvert={item.type === 'income' ? handleConvertIncome : handleConvertExpense}
-                    formatCurrency={formatCurrency}
-                    profile={profile}
-                    isSaving={updateIncomeMutation.isLoading || updateExpenseMutation.isLoading || deleteIncomeMutation.isLoading || deleteExpenseMutation.isLoading || convertMutation.isLoading}
-                  />
-                ))
-              )}
+                </p> :
+
+              recentActivity.slice(0, 10).map((item) =>
+              <QuickEditItem
+                key={`${item.type}-${item.id}`}
+                item={item}
+                type={item.type}
+                projects={projects}
+                onUpdate={item.type === 'income' ? handleUpdateIncome : handleUpdateExpense}
+                onDelete={item.type === 'income' ? handleDeleteIncome : handleDeleteExpense}
+                onConvert={item.type === 'income' ? handleConvertIncome : handleConvertExpense}
+                formatCurrency={formatCurrency}
+                profile={profile}
+                isSaving={updateIncomeMutation.isLoading || updateExpenseMutation.isLoading || deleteIncomeMutation.isLoading || deleteExpenseMutation.isLoading || convertMutation.isLoading} />
+
+              )
+              }
             </div>
           </CardContent>
         </Card>
 
         {/* Top Projects */}
-        {topProjects.length > 0 && (
-          <Card style={{ backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff', border: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}` }}>
+        {topProjects.length > 0 &&
+        <Card style={{ backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff', border: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}` }}>
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>Top Projects</CardTitle>
               <Link to={createPageUrl("Projects")}>
@@ -430,15 +430,15 @@ export default function Dashboard() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {topProjects.map((project) => (
-                  <Link key={project.id} to={createPageUrl(`ProjectDetail?id=${project.id}`)}>
+                {topProjects.map((project) =>
+              <Link key={project.id} to={createPageUrl(`ProjectDetail?id=${project.id}`)}>
                     <div className="flex items-center justify-between p-4 rounded-lg transition-colors" style={{
-                      border: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}`,
-                      backgroundColor: profile?.darkMode ? 'transparent' : '#ffffff'
-                    }}
-                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = profile?.darkMode ? '#374151' : '#f9fafb'}
-                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = profile?.darkMode ? 'transparent' : '#ffffff'}
-                    >
+                  border: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}`,
+                  backgroundColor: profile?.darkMode ? 'transparent' : '#ffffff'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = profile?.darkMode ? '#374151' : '#f9fafb'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = profile?.darkMode ? 'transparent' : '#ffffff'}>
+
                       <div>
                         <h4 className="font-medium" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>{project.title}</h4>
                         <p className="text-sm" style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>
@@ -453,12 +453,12 @@ export default function Dashboard() {
                       </div>
                     </div>
                   </Link>
-                ))}
+              )}
               </div>
             </CardContent>
           </Card>
-        )}
+        }
       </div>
-    </div>
-  );
+    </div>);
+
 }
