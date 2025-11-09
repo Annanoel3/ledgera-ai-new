@@ -197,7 +197,7 @@ const ChatInputArea = ({ profile, selectedFiles, removeFile, fileInputRef, handl
       </div>
   }
 
-    <div className="my-20 px-4 flex items-start" style={{
+    <div className="px-4 pb-2 pt-3 flex items-start" style={{
     borderTop: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}`,
     boxShadow: profile?.funMode ? '0 -10px 15px -3px rgba(0, 0, 0, 0.1)' : '0 -4px 6px -1px rgba(0, 0, 0, 0.1)',
     background: profile?.funMode ?
@@ -207,7 +207,7 @@ const ChatInputArea = ({ profile, selectedFiles, removeFile, fileInputRef, handl
     profile?.darkMode ? '#1a1a1a' : '#f9fafb'
   }}>
       <div className="max-w-4xl mx-auto w-full">
-        <div className="my-1 flex gap-2 items-end">
+        <div className="flex gap-2 items-end">
           <input
           ref={fileInputRef}
           type="file"
@@ -1000,7 +1000,7 @@ export default function Chat() {
                           <li style={{ marginBottom: '0.25rem' }}>Track all income and expenses by project</li>
                           <li style={{ marginBottom: '0.25rem' }}>Catch costs you might have missed</li>
                           <li style={{ marginBottom: '0.25rem' }}>Generate reports and ROI analysis</li>
-                          <li style={{ marginBottom: '0.25rem' }}>Prepare for tax season</li>
+                          <li style={{ marginBottom: '0.25rem' }>Prepare for tax season</li>
                           <li style={{ marginBottom: '0.25rem' }}>Answer questions about your business</li>
                         </ul>
                         <p style={{
