@@ -162,7 +162,8 @@ const ChatHeader = ({ profile, showChatList, setShowChatList, handleNewChat, set
 const ChatInputArea = ({ profile, selectedFiles, removeFile, fileInputRef, handleFileSelect, handleKeyPress, input, setInput, isRecording, stopRecording, startRecording, handleSend, sendingMessage, uploadingFile }) =>
 <>
     {selectedFiles.length > 0 &&
-  <div style={{
+  <div className="fixed left-0 right-0 z-20" style={{
+    bottom: '9.5rem',
     borderTop: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}`,
     background: profile?.darkMode ? '#1a1a1a' : '#f9fafb',
     padding: '0.5rem 1rem'
@@ -197,7 +198,8 @@ const ChatInputArea = ({ profile, selectedFiles, removeFile, fileInputRef, handl
       </div>
   }
 
-    <div className="px-4 pb-2 pt-3 flex items-start" style={{
+    <div className="fixed left-0 right-0 z-20 px-4 pb-2 pt-3" style={{
+    bottom: '5rem',
     borderTop: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}`,
     boxShadow: profile?.funMode ? '0 -10px 15px -3px rgba(0, 0, 0, 0.1)' : '0 -4px 6px -1px rgba(0, 0, 0, 0.1)',
     background: profile?.funMode ?
@@ -891,7 +893,7 @@ export default function Chat() {
         </DialogContent>
       </Dialog>
 
-      <div className="px-4 flex-1 overflow-y-auto pb-16">
+      <div className="px-4 flex-1 overflow-y-auto" style={{ paddingBottom: '10rem' }}>
         <div className="max-w-4xl mx-auto space-y-4 py-4">
           {showWelcome ?
           <div className="flex flex-col items-center justify-center h-full">
