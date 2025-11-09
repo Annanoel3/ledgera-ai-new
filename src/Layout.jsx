@@ -193,7 +193,7 @@ export default function Layout({ children }) {
         <div className="md:hidden sticky top-0 z-10 flex h-16 flex-shrink-0 border-b" style={{
           borderColor: darkMode ? '#374151' : '#e5e7eb',
           backgroundColor: darkMode ? '#1a1a1a' : '#ffffff',
-          paddingTop: 'env(safe-area-inset-top)'
+          paddingTop: 'calc(env(safe-area-inset-top, 0px))'
         }}>
           <button
             type="button"
@@ -221,7 +221,7 @@ export default function Layout({ children }) {
             <div className="fixed inset-y-0 left-0 w-64 border-r" style={{
               backgroundColor: darkMode ? '#1a1a1a' : '#ffffff',
               borderColor: darkMode ? '#374151' : '#e5e7eb',
-              paddingTop: 'env(safe-area-inset-top)'
+              paddingTop: 'calc(env(safe-area-inset-top, 0px))'
             }} onClick={(e) => e.stopPropagation()}>
               <div className="p-6 flex flex-col h-full">
                 <nav className="space-y-1 flex-1">
@@ -279,7 +279,7 @@ export default function Layout({ children }) {
 
         {/* Main Content */}
         <div className={isChat ? "" : "md:pl-64 flex flex-col flex-1"} style={{
-          paddingBottom: isChat ? '0' : 'max(4rem, calc(4rem + env(safe-area-inset-bottom)))'
+          paddingBottom: isChat ? '0' : 'calc(4rem + env(safe-area-inset-bottom, 0px))'
         }}>
           <main className={isChat ? "" : "flex-1"}>
             {children}
@@ -291,7 +291,7 @@ export default function Layout({ children }) {
           <nav className="md:hidden fixed bottom-0 left-0 right-0 z-10 flex h-16 border-t" style={{
             borderColor: darkMode ? '#374151' : '#e5e7eb',
             backgroundColor: darkMode ? '#1a1a1a' : '#ffffff',
-            paddingBottom: 'env(safe-area-inset-bottom)'
+            paddingBottom: 'calc(env(safe-area-inset-bottom, 0px))'
           }}>
             {navItems.map((item) => {
               const isActive = currentPath === item.url || currentPath.startsWith(item.url + '/');

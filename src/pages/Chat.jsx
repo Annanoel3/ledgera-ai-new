@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -26,7 +27,7 @@ const ChatHeader = ({ profile, showChatList, setShowChatList, handleNewChat, set
     background: profile?.funMode
       ? 'linear-gradient(to right, #ec4899, #a855f7, #3b82f6)'
       : (profile?.darkMode ? '#1a1a1a' : '#ffffff'),
-    paddingTop: 'max(0.75rem, env(safe-area-inset-top))',
+    paddingTop: 'calc(env(safe-area-inset-top, 0px) + 0.75rem)',
     paddingBottom: '0.75rem',
     paddingLeft: '1rem',
     paddingRight: '1rem'
@@ -204,7 +205,7 @@ const ChatInputArea = ({ profile, selectedFiles, removeFile, fileInputRef, handl
       borderTop: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}`,
       boxShadow: profile?.funMode ? '0 -10px 15px -3px rgba(0, 0, 0, 0.1)' : '0 -4px 6px -1px rgba(0, 0, 0, 0.1)',
       paddingTop: '0.75rem',
-      paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))',
+      paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 0.75rem)',
       paddingLeft: '1rem',
       paddingRight: '1rem',
       background: profile?.funMode
@@ -1008,7 +1009,7 @@ export default function Chat() {
                           <li style={{ marginBottom: '0.25rem' }}>Catch costs you might have missed</li>
                           <li style={{ marginBottom: '0.25rem' }}>Generate reports and ROI analysis</li>
                           <li style={{ marginBottom: '0.25rem' }}>Prepare for tax season</li>
-                          <li style={{ marginBottom: '0.25rem' }}>Answer questions about your business</li>
+                          <li style={{ marginBottom: '0.25rem' }>Answer questions about your business</li>
                         </ul>
                         <p style={{
                           fontSize: '15px',
