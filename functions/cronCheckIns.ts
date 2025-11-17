@@ -37,7 +37,9 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const base44 = createClient();
+    const base44 = createClient({
+      useServiceRole: true
+    });
 
     // Get all users
     const users = await base44.asServiceRole.entities.User.list();
