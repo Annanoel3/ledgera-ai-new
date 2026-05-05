@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -9,9 +8,10 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
+
 import { Textarea } from "@/components/ui/textarea";
-import { Download, Trash2, CreditCard, Clock, Check, Loader2, FileText, Plus, X, Sparkles, CheckCircle2 } from "lucide-react";
-import { differenceInDays, format } from "date-fns";
+import { Download, Trash2, Loader2, FileText, Plus, X, Sparkles, CheckCircle2 } from "lucide-react";
+import { format } from "date-fns";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import toast from 'react-hot-toast';
@@ -334,8 +334,7 @@ export default function Settings() {
     }
   };
 
-  const trialEnd = profile?.trialStart ? new Date(new Date(profile.trialStart).getTime() + 14 * 24 * 60 * 60 * 1000) : null;
-  const daysLeft = trialEnd ? Math.max(0, differenceInDays(trialEnd, new Date())) : 0;
+
 
   if (userLoading) {
     return (
@@ -478,50 +477,7 @@ export default function Settings() {
             </CardContent>
           </Card>
 
-          {/* Billing Section */}
-          <Card style={{ backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff', border: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}` }}>
-            <CardHeader>
-              <CardTitle style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>Billing</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {!profile?.subscribed && (
-                <div className="flex items-center justify-between p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg border border-yellow-200 dark:border-yellow-800">
-                  <div className="flex items-center gap-3">
-                    <Clock className="w-5 h-5 text-yellow-600 dark:text-yellow-400" />
-                    <div>
-                      <p className="font-medium text-yellow-900 dark:text-yellow-200">Trial Active</p>
-                      <p className="text-sm text-yellow-700 dark:text-yellow-300">{daysLeft} days remaining</p>
-                    </div>
-                  </div>
-                  <Badge variant="outline" className="border-yellow-600 text-yellow-600 dark:text-yellow-400 dark:text-yellow-400 bg-transparent">
-                    Free Trial
-                  </Badge>
-                </div>
-              )}
 
-              {profile?.subscribed && (
-                <div className="flex items-center justify-between p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
-                  <div className="flex items-center gap-3">
-                    <Check className="w-5 h-5 text-green-600 dark:text-green-400" />
-                    <div>
-                      <p className="font-medium text-green-900 dark:text-green-200">Active Subscription</p>
-                      <p className="text-sm text-green-700 dark:text-green-300">$5.99/month</p>
-                    </div>
-                  </div>
-                  <Badge className="bg-green-600 text-white">Active</Badge>
-                </div>
-              )}
-
-              <Button variant="outline" className="w-full gap-2 hover:bg-gray-50 dark:hover:bg-gray-600" style={{
-                backgroundColor: profile?.darkMode ? '#374151' : '#ffffff',
-                border: `1px solid ${profile?.darkMode ? '#4b5563' : '#e5e7eb'}`,
-                color: profile?.darkMode ? '#ffffff' : '#111827'
-              }}>
-                <CreditCard className="w-4 h-4" />
-                {profile?.subscribed ? "Manage Subscription" : "Subscribe Now - $5.99/month"}
-              </Button>
-            </CardContent>
-          </Card>
 
           {/* Data Section */}
           <Card style={{ backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff', border: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}` }}>

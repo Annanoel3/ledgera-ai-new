@@ -1,4 +1,3 @@
-
 import React from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -9,7 +8,7 @@ import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { startOfMonth, endOfMonth, subMonths, format } from "date-fns";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import TrialBadge from "../components/chat/TrialBadge";
+
 import QuickEditItem from "../components/dashboard/QuickEditItem";
 import toast from "react-hot-toast"; // Assuming react-hot-toast for toast notifications
 
@@ -279,7 +278,6 @@ export default function Dashboard() {
         <div className="max-w-6xl mx-auto">
           <div className="flex items-center justify-between mb-8">
             <h1 className="text-3xl font-bold" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>Dashboard</h1>
-            <TrialBadge profile={profile} />
           </div>
           <Card style={{ backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff', border: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}` }}>
             <CardContent className="flex flex-col items-center justify-center py-16">
@@ -302,8 +300,7 @@ export default function Dashboard() {
     <div className="px-6 py-6 md:p-8 md:pb-8 min-h-screen" style={{ backgroundColor: profile?.darkMode ? '#0f0f0f' : '#f9fafb' }}>
       <div className="max-w-6xl mx-auto">
         <div className="flex items-center justify-between mb-8">
-          <h1 className="text-3xl font-bold" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>Dashboard</h1>
-          <TrialBadge profile={profile} />
+        <h1 className="text-3xl font-bold" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>Dashboard</h1>
         </div>
 
         {/* KPI Cards */}
