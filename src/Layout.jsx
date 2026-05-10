@@ -116,10 +116,22 @@ export default function Layout({ children }) {
         /* Safe area insets for mobile devices */
         @supports (padding-top: env(safe-area-inset-top)) {
           .mobile-top-bar {
-            padding-top: calc(0.5rem + env(safe-area-inset-top));
+            padding-top: calc(0.75rem + env(safe-area-inset-top));
+            padding-left: env(safe-area-inset-left);
+            padding-right: env(safe-area-inset-right);
           }
           .mobile-bottom-nav {
-            padding-bottom: calc(1.5rem + env(safe-area-inset-bottom));
+            padding-bottom: calc(0.75rem + env(safe-area-inset-bottom));
+            padding-left: env(safe-area-inset-left);
+            padding-right: env(safe-area-inset-right);
+          }
+        }
+        
+        /* Ensure main content respects safe areas on mobile */
+        @media (max-width: 768px) {
+          body {
+            padding-left: env(safe-area-inset-left);
+            padding-right: env(safe-area-inset-right);
           }
         }
       `}</style>
@@ -321,11 +333,11 @@ export default function Layout({ children }) {
               <Link
                 key={item.title}
                 to={item.url}
-                className="flex flex-1 flex-col items-center justify-center text-xs font-medium"
+                className="flex flex-1 flex-col items-center justify-center text-xs font-medium pt-1"
                 style={{ color: isActive ? primaryColor : (darkMode ? '#9ca3af' : '#6b7280') }}
                 aria-current={isActive ? "page" : undefined}
               >
-                <item.icon className="h-6 w-6 mb-1" />
+                <item.icon className="h-6 w-6 mb-2" />
                 {item.title}
               </Link>
             );
