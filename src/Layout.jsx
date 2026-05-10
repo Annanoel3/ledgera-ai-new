@@ -314,6 +314,7 @@ export default function Layout({ children }) {
 
         {/* Main Content */}
         <div className={isChat ? "" : "md:pl-64 flex flex-col flex-1"} style={{
+          paddingTop: 'max(0.5rem, env(safe-area-inset-top))',
           paddingBottom: isChat ? '0' : '5rem'
         }}>
           <main className={isChat ? "" : "flex-1"}>
