@@ -22,8 +22,8 @@ import { speechToText } from "@/functions/speechToText";
 // Move component definitions OUTSIDE to prevent re-mounting on every render
 const ChatHeader = ({ profile, showChatList, setShowChatList, handleNewChat, setShowCapabilities }) =>
   <div className="px-4 fixed top-0 left-0 right-0 z-50 shadow-sm" style={{
-    paddingTop: 'max(0.5rem, env(safe-area-inset-top))',
-    paddingBottom: '0.25rem',
+    paddingTop: 'max(2rem, env(safe-area-inset-top))',
+    paddingBottom: '0.5rem',
     borderBottom: profile?.funMode ? 'none' : `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}`,
     background: profile?.funMode ?
       'linear-gradient(to right, #ec4899, #a855f7, #3b82f6)' :
@@ -164,7 +164,7 @@ const ChatInputArea = ({ profile, selectedFiles, removeFile, fileInputRef, handl
   <>
     {selectedFiles.length > 0 &&
       <div className="fixed left-0 right-0 z-20" style={{
-        bottom: 'calc(9.5rem + env(safe-area-inset-bottom))',
+        bottom: 'calc(10.5rem + max(1.25rem, env(safe-area-inset-bottom)))',
         borderTop: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}`,
         background: profile?.darkMode ? '#1a1a1a' : '#f9fafb',
         padding: '0.5rem 1rem'
@@ -200,7 +200,7 @@ const ChatInputArea = ({ profile, selectedFiles, removeFile, fileInputRef, handl
     }
 
     <div className="fixed left-0 right-0 z-20 px-4 pb-2 pt-3" style={{
-      bottom: 'calc(5rem + env(safe-area-inset-bottom))',
+      bottom: 'calc(6rem + max(1.25rem, env(safe-area-inset-bottom)))',
       borderTop: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}`,
       boxShadow: profile?.funMode ? '0 -10px 15px -3px rgba(0, 0, 0, 0.1)' : '0 -4px 6px -1px rgba(0, 0, 0, 0.1)',
       background: profile?.funMode
@@ -888,7 +888,7 @@ export default function Chat() {
         </DialogContent>
       </Dialog>
 
-      <div className="px-4 flex-1 overflow-y-auto" style={{ paddingBottom: '10rem', paddingTop: '4rem' }}>
+      <div className="px-4 flex-1 overflow-y-auto" style={{ paddingBottom: '14rem', paddingTop: '6rem' }}>
         <div className="max-w-4xl mx-auto space-y-4 py-4">
           {showWelcome ?
             <div className="flex flex-col items-center justify-center h-full">
