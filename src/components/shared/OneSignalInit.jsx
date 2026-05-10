@@ -7,6 +7,18 @@ function isRunningInCapacitor() {
 
 export default function OneSignalInit({ user }) {
   useEffect(() => {
+    // Load OneSignal SDK for web if not in Capacitor
+    if (!isRunningInCapacitor() && !window.OneSignalDeferred) {
+      window.OneSignalDeferred = window.OneSignalDeferred || [];
+      const script = document.createElement('script');
+      script.src = 'https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js';
+      script.defer = true;
+      document.head.appendChild(script);
+      console.log('[OneSignal] Loading web SDK...');
+    }
+  }, []);
+
+  useEffect(() => {
     const syncOneSignal = async () => {
       if (!user) {
         console.log('[OneSignal] No user provided to OneSignalInit');
@@ -15,8 +27,6 @@ export default function OneSignalInit({ user }) {
 
       const userEmail = user?.email;
 
-      // Use real email, or construct fake email from user.id for phone-only login users
-      // OneSignal requires email format for external ID
       let externalId;
       if (userEmail && userEmail.includes('@')) {
         externalId = userEmail;
@@ -50,27 +60,43 @@ export default function OneSignalInit({ user }) {
           // Always call login regardless of permission result
           await NotifyBridge.login({ externalId: externalId });
           console.log('[OneSignal] ✅ login() sent for:', externalId);
+        } else {
+          console.log('[OneSignal] Calling NotifyBridge.logout()');
+          await NotifyBridge.logout();
         }
       } else {
         console.log('[OneSignal] Running in web browser');
-        if (externalId) {
-          window.OneSignal = window.OneSignal || [];
-          window.OneSignal.push(function() {
-            window.OneSignal.init({
-              appId: "f9bccfd2-7da8-475e-8091-d28ed41d7e14",
-              allowLocalhostAsSecureOrigin: true
-            });
-            console.log('[OneSignal] ✅ Web SDK using login() with:', externalId);
-            window.OneSignal.login(externalId);
-          });
-        } else {
-          if (window.OneSignal) {
-            window.OneSignal.push(function() {
-              window.OneSignal.logout();
-              console.log('[OneSignal] Web SDK logged out');
-            });
+
+        const initOneSignal = () => {
+          if (!window.OneSignalDeferred) {
+            console.log('[OneSignal] ⏳ Waiting for SDK to load...');
+            setTimeout(initOneSignal, 500);
+            return;
           }
-        }
+
+          window.OneSignalDeferred.push(async function(OneSignal) {
+            try {
+              await OneSignal.init({
+                appId: "f9bccfd2-7da8-475e-8091-d28ed41d7e14",
+                allowLocalhostAsSecureOrigin: true,
+                notifyButton: {
+                  enable: false
+                }
+              });
+
+              console.log('[OneSignal] ✅ SDK initialized');
+
+              if (externalId) {
+                await OneSignal.login(externalId);
+                console.log('[OneSignal] ✅ User logged in with:', externalId);
+              }
+            } catch (error) {
+              console.error('[OneSignal] Initialization error:', error);
+            }
+          });
+        };
+
+        initOneSignal();
       }
     };
 

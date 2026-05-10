@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1085940293411",
+    "project_id": "ledgera-ai",
+    "storage_bucket": "ledgera-ai.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1085940293411:android:f29982b791a36dc615b696",
+        "android_client_info": {
+          "package_name": "com.ledgeraai.android"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyARh1SCQw6amOMPwaLqDTnNEzLCv69XfAg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
