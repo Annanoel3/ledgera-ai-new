@@ -164,7 +164,7 @@ const ChatInputArea = ({ profile, selectedFiles, removeFile, fileInputRef, handl
   <>
     {selectedFiles.length > 0 &&
       <div className="fixed left-0 right-0 z-20" style={{
-        bottom: 'calc(9rem + max(1.5rem, env(safe-area-inset-bottom)))',
+        bottom: 'calc(4.5rem + 4rem)',
         borderTop: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}`,
         background: profile?.darkMode ? '#1a1a1a' : '#f9fafb',
         padding: '0.5rem 1rem'
@@ -200,7 +200,7 @@ const ChatInputArea = ({ profile, selectedFiles, removeFile, fileInputRef, handl
     }
 
     <div className="fixed left-0 right-0 z-20 px-4 pb-2 pt-3" style={{
-      bottom: 'calc(4.5rem + max(1.5rem, env(safe-area-inset-bottom)))',
+      bottom: '4.5rem',
       borderTop: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}`,
       boxShadow: profile?.funMode ? '0 -10px 15px -3px rgba(0, 0, 0, 0.1)' : '0 -4px 6px -1px rgba(0, 0, 0, 0.1)',
       background: profile?.funMode
