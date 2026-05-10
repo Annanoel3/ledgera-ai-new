@@ -326,9 +326,9 @@ export default function Layout({ children }) {
         <nav className="md:hidden fixed bottom-0 left-0 right-0 z-10 flex border-t" style={{
           borderColor: darkMode ? '#374151' : '#e5e7eb',
           backgroundColor: darkMode ? '#1a1a1a' : '#ffffff',
-          paddingBottom: 'max(1.5rem, env(safe-area-inset-bottom))',
-          paddingTop: '0.5rem',
-          minHeight: '4.5rem'
+          paddingBottom: 'max(2rem, env(safe-area-inset-bottom))',
+          paddingTop: '1rem',
+          minHeight: '5.5rem'
         }}>
           {navItems.map((item) => {
             const isActive = currentPath === item.url || currentPath.startsWith(item.url + '/');
