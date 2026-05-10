@@ -116,7 +116,8 @@ export default function Layout({ children }) {
         /* Safe area insets for mobile devices */
         @supports (padding-top: env(safe-area-inset-top)) {
           .mobile-top-bar {
-            padding-top: calc(0.75rem + env(safe-area-inset-top));
+            padding-top: max(0.75rem, env(safe-area-inset-top));
+            padding-bottom: 0.75rem;
             padding-left: env(safe-area-inset-left);
             padding-right: env(safe-area-inset-right);
           }
@@ -225,10 +226,10 @@ export default function Layout({ children }) {
         )}
 
         {/* Mobile Top Bar */}
-        <div className="mobile-top-bar md:hidden sticky top-0 z-10 flex flex-shrink-0 border-b" style={{
+        <div className="mobile-top-bar md:hidden sticky top-0 z-10 flex flex-shrink-0 items-center border-b" style={{
           borderColor: darkMode ? '#374151' : '#e5e7eb',
           backgroundColor: darkMode ? '#1a1a1a' : '#ffffff',
-          height: '3.5rem'
+          minHeight: '3.5rem'
         }}>
           <button
             type="button"
