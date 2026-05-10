@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -22,7 +21,9 @@ import { speechToText } from "@/functions/speechToText";
 
 // Move component definitions OUTSIDE to prevent re-mounting on every render
 const ChatHeader = ({ profile, showChatList, setShowChatList, handleNewChat, setShowCapabilities }) =>
-  <div className="px-4 py-1 fixed top-0 left-0 right-0 z-50 shadow-sm" style={{
+  <div className="px-4 fixed top-0 left-0 right-0 z-50 shadow-sm" style={{
+    paddingTop: 'max(0.5rem, env(safe-area-inset-top))',
+    paddingBottom: '0.25rem',
     borderBottom: profile?.funMode ? 'none' : `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}`,
     background: profile?.funMode ?
       'linear-gradient(to right, #ec4899, #a855f7, #3b82f6)' :
@@ -163,7 +164,7 @@ const ChatInputArea = ({ profile, selectedFiles, removeFile, fileInputRef, handl
   <>
     {selectedFiles.length > 0 &&
       <div className="fixed left-0 right-0 z-20" style={{
-        bottom: '9.5rem',
+        bottom: 'calc(9.5rem + env(safe-area-inset-bottom))',
         borderTop: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}`,
         background: profile?.darkMode ? '#1a1a1a' : '#f9fafb',
         padding: '0.5rem 1rem'
@@ -199,7 +200,7 @@ const ChatInputArea = ({ profile, selectedFiles, removeFile, fileInputRef, handl
     }
 
     <div className="fixed left-0 right-0 z-20 px-4 pb-2 pt-3" style={{
-      bottom: '5rem',
+      bottom: 'calc(5rem + env(safe-area-inset-bottom))',
       borderTop: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}`,
       boxShadow: profile?.funMode ? '0 -10px 15px -3px rgba(0, 0, 0, 0.1)' : '0 -4px 6px -1px rgba(0, 0, 0, 0.1)',
       background: profile?.funMode
