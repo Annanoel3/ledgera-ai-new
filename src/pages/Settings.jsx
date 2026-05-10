@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,7 +10,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 
 import { Textarea } from "@/components/ui/textarea";
-import { Download, Trash2, Loader2, FileText, Plus, X, Sparkles, CheckCircle2 } from "lucide-react";
+import { Download, Trash2, Loader2, FileText, Plus, X, Sparkles, CheckCircle2, AlertTriangle } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { format } from "date-fns";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -326,11 +327,19 @@ export default function Settings() {
     }
   });
 
-  const handleResetApp = () => {
-    if (window.confirm("⚠️ WARNING: This will permanently delete ALL your financial data including projects, income, expenses, and documents. This action CANNOT be undone. Your chat history will remain. Are you absolutely sure?")) {
-      if (window.confirm("Last chance! Click OK to permanently erase all financial data.")) {
-        deleteAllDataMutation.mutate();
-      }
+  const [showResetDialog, setShowResetDialog] = useState(false);
+  const [showDeleteAccountDialog, setShowDeleteAccountDialog] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState('');
+
+  const handleResetApp = () => setShowResetDialog(true);
+
+  const handleDeleteAccount = async () => {
+    // Delete all data then log out
+    try {
+      await deleteAllDataMutation.mutateAsync();
+      await base44.auth.logout('/');
+    } catch (e) {
+      toast.error("Failed to delete account: " + e.message);
     }
   };
 
@@ -345,6 +354,9 @@ export default function Settings() {
   }
 
   return (
+    <>
+    <ResetDialog />
+    <DeleteAccountDialog />
     <div className="p-6 md:p-8 pb-24 md:pb-8 min-h-screen" style={{ backgroundColor: profile?.darkMode ? '#0f0f0f' : '#f9fafb' }}>
       <div className="max-w-4xl mx-auto">
         <h1 className="text-3xl font-bold mb-8" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>Settings</h1>
@@ -608,11 +620,16 @@ export default function Settings() {
                 This will permanently delete all projects, income, expenses, and documents. This action cannot be undone. Your chat history will remain.
               </p>
 
-              <Button variant="outline" className="w-full gap-2 justify-start hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 mt-4" style={{
-                backgroundColor: profile?.darkMode ? '#374151' : '#ffffff',
-                border: `1px solid ${profile?.darkMode ? '#4b5563' : '#e5e7eb'}`,
-                color: profile?.darkMode ? '#ef4444' : '#dc2626'
-              }}>
+              <Button
+                variant="outline"
+                onClick={() => setShowDeleteAccountDialog(true)}
+                className="w-full gap-2 justify-start hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 mt-4"
+                style={{
+                  backgroundColor: profile?.darkMode ? '#374151' : '#ffffff',
+                  border: `1px solid ${profile?.darkMode ? '#4b5563' : '#e5e7eb'}`,
+                  color: profile?.darkMode ? '#ef4444' : '#dc2626'
+                }}
+              >
                 <Trash2 className="w-4 h-4" />
                 Delete Account
               </Button>
@@ -621,7 +638,82 @@ export default function Settings() {
         </div>
       </div>
     </div>
+    </>
   );
+
+  // Reset data confirmation dialog
+  function ResetDialog() {
+    return (
+      <Dialog open={showResetDialog} onOpenChange={setShowResetDialog}>
+        <DialogContent style={{ backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff', border: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}` }}>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-red-600">
+              <AlertTriangle className="w-5 h-5" /> Reset All Financial Data?
+            </DialogTitle>
+          </DialogHeader>
+          <p className="text-sm" style={{ color: profile?.darkMode ? '#d1d5db' : '#374151' }}>
+            This will permanently delete all projects, income, expenses, and documents. Your chat history will remain. <strong>This cannot be undone.</strong>
+          </p>
+          <DialogFooter className="gap-2 flex-col sm:flex-row">
+            <Button variant="outline" onClick={() => setShowResetDialog(false)} style={{ backgroundColor: profile?.darkMode ? '#374151' : '#ffffff', border: `1px solid ${profile?.darkMode ? '#4b5563' : '#e5e7eb'}`, color: profile?.darkMode ? '#d1d5db' : '#374151' }}>
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              disabled={deleteAllDataMutation.isPending}
+              onClick={() => { setShowResetDialog(false); deleteAllDataMutation.mutate(); }}
+            >
+              {deleteAllDataMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+              Yes, Reset Data
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
+  // Delete account confirmation dialog
+  function DeleteAccountDialog() {
+    return (
+      <Dialog open={showDeleteAccountDialog} onOpenChange={(o) => { setShowDeleteAccountDialog(o); setDeleteConfirmText(''); }}>
+        <DialogContent style={{ backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff', border: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}` }}>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-red-600">
+              <AlertTriangle className="w-5 h-5" /> Delete Your Account?
+            </DialogTitle>
+          </DialogHeader>
+          <p className="text-sm" style={{ color: profile?.darkMode ? '#d1d5db' : '#374151' }}>
+            This will permanently delete your account and all associated data. <strong>This cannot be undone.</strong>
+          </p>
+          <p className="text-sm mt-2" style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>
+            Type <strong>DELETE</strong> to confirm:
+          </p>
+          <input
+            type="text"
+            value={deleteConfirmText}
+            onChange={(e) => setDeleteConfirmText(e.target.value)}
+            placeholder="DELETE"
+            className="w-full mt-1 px-3 py-2 rounded-md border text-sm"
+            style={{ backgroundColor: profile?.darkMode ? '#374151' : '#ffffff', border: `1px solid ${profile?.darkMode ? '#4b5563' : '#e5e7eb'}`, color: profile?.darkMode ? '#ffffff' : '#111827' }}
+          />
+          <DialogFooter className="gap-2 flex-col sm:flex-row">
+            <Button variant="outline" onClick={() => { setShowDeleteAccountDialog(false); setDeleteConfirmText(''); }} style={{ backgroundColor: profile?.darkMode ? '#374151' : '#ffffff', border: `1px solid ${profile?.darkMode ? '#4b5563' : '#e5e7eb'}`, color: profile?.darkMode ? '#d1d5db' : '#374151' }}>
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              disabled={deleteConfirmText !== 'DELETE' || deleteAllDataMutation.isPending}
+              onClick={handleDeleteAccount}
+            >
+              {deleteAllDataMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+              Delete My Account
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
 }
 
 function FeedbackForm({ profile, user }) {

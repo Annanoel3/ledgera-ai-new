@@ -1,5 +1,7 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { base44 } from "@/api/base44Client";
+import { usePullToRefresh } from "@/hooks/usePullToRefresh";
+import { Loader2 as RefreshIcon } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -14,6 +16,12 @@ import toast from "react-hot-toast"; // Assuming react-hot-toast for toast notif
 
 export default function Dashboard() {
   const queryClient = useQueryClient();
+
+  const handleRefresh = useCallback(async () => {
+    await queryClient.invalidateQueries();
+  }, [queryClient]);
+
+  const { refreshing, pullDistance } = usePullToRefresh(handleRefresh);
 
   const { data: user, isLoading: userLoading } = useQuery({
     queryKey: ['user'],
@@ -298,6 +306,12 @@ export default function Dashboard() {
 
   return (
     <div className="px-6 py-6 md:p-8 md:pb-8 min-h-screen" style={{ backgroundColor: profile?.darkMode ? '#0f0f0f' : '#f9fafb' }}>
+      {/* Pull-to-refresh indicator */}
+      {(pullDistance > 10 || refreshing) && (
+        <div className="flex justify-center items-center py-2 transition-all" style={{ height: refreshing ? '40px' : `${Math.min(pullDistance / 2, 40)}px`, overflow: 'hidden' }}>
+          <RefreshIcon className={`w-5 h-5 text-[#22A699] ${refreshing ? 'animate-spin' : ''}`} style={{ transform: refreshing ? undefined : `rotate(${pullDistance * 2}deg)` }} />
+        </div>
+      )}
       <div className="max-w-6xl mx-auto">
         <div className="flex items-center justify-between mb-8">
         <h1 className="text-3xl font-bold" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>Dashboard</h1>

@@ -1,5 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
+import { usePullToRefresh } from "@/hooks/usePullToRefresh";
+import { Loader2 as RefreshIcon } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -13,6 +15,12 @@ import { createPageUrl } from "@/utils";
 export default function Documents() {
   const [search, setSearch] = useState("");
   const queryClient = useQueryClient();
+
+  const handleRefresh = useCallback(async () => {
+    await queryClient.invalidateQueries(['documents']);
+  }, [queryClient]);
+
+  const { refreshing, pullDistance } = usePullToRefresh(handleRefresh);
 
   const { data: user, isLoading: userLoading } = useQuery({
     queryKey: ['user'],
@@ -95,6 +103,11 @@ export default function Documents() {
 
   return (
     <div className="p-6 md:p-8 pb-24 md:pb-8 min-h-screen" style={{ backgroundColor: profile?.darkMode ? '#0f0f0f' : '#f9fafb' }}>
+      {(pullDistance > 10 || refreshing) && (
+        <div className="flex justify-center items-center transition-all" style={{ height: refreshing ? '40px' : `${Math.min(pullDistance / 2, 40)}px`, overflow: 'hidden' }}>
+          <RefreshIcon className={`w-5 h-5 text-[#22A699] ${refreshing ? 'animate-spin' : ''}`} style={{ transform: refreshing ? undefined : `rotate(${pullDistance * 2}deg)` }} />
+        </div>
+      )}
       <div className="max-w-6xl mx-auto">
         <h1 className="text-3xl font-bold mb-2" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>Documents</h1>
         <p className="mb-8" style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>All your invoices, contracts, and receipts in one place</p>

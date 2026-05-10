@@ -2,6 +2,19 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Mobile enhancements */
+html,
+body {
+  overscroll-behavior: none;
+}
+
+button,
+nav,
+a {
+  -webkit-touch-callout: none;
+  user-select: none;
+}
+
 
 /* :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;

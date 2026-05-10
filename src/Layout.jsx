@@ -38,6 +38,20 @@ export default function Layout({ children }) {
     queryFn: () => base44.auth.me(),
   });
 
+  // Sync with system dark mode preference when no profile override
+  useEffect(() => {
+    const mq = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleChange = (e) => {
+      if (profile?.darkMode === undefined || profile?.darkMode === null) {
+        setDarkMode(e.matches);
+      }
+    };
+    mq.addEventListener('change', handleChange);
+    // Set initial system preference only if profile hasn't loaded yet
+    if (!profile) setDarkMode(mq.matches);
+    return () => mq.removeEventListener('change', handleChange);
+  }, [profile]);
+
   useEffect(() => {
     if (profile?.darkMode !== undefined) {
       setDarkMode(profile.darkMode);
