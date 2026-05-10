@@ -233,13 +233,13 @@ export default function Layout({ children }) {
         }}>
           <button
             type="button"
-            className="px-4"
+            className="px-4 flex items-center"
             style={{ color: darkMode ? '#9ca3af' : '#6b7280' }}
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
             {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </button>
-          <div className="flex flex-1 items-center justify-between px-4">
+          <div className="flex flex-1 items-center justify-between px-4 gap-2">
             <div className="flex items-center gap-2">
               <img 
                 src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68eaceb5d712c1b62b8bd4d5/83975f5f2_Untitleddesign9.png" 
