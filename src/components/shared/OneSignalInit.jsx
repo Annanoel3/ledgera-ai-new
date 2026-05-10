@@ -1,61 +1,70 @@
 import { useEffect } from 'react';
 
+// Helper function to detect if running in Capacitor mobile app
+function isRunningInCapacitor() {
+    return window.Capacitor?.isNativePlatform?.() ?? false;
+}
+
 export default function OneSignalInit({ user }) {
   useEffect(() => {
-    console.log('[Ledgera OneSignal] Component mounted/updated with user:', user);
-    
-    if (!user) {
-      console.log('[Ledgera OneSignal] No user object - skipping initialization');
-      return;
-    }
-    
-    if (!user.email) {
-      console.error('[Ledgera OneSignal] WARNING: User object exists but email is missing!', user);
-      return;
-    }
-
-    console.log('[Ledgera OneSignal] Valid user detected - email:', user.email);
-
-    // Detect if running in Capacitor (mobile app)
-    const isCapacitor = window.Capacitor !== undefined;
-    console.log('[Ledgera OneSignal] Running in Capacitor:', isCapacitor);
-
-    if (isCapacitor) {
-      // Mobile: Send postMessage to native wrapper
-      console.log('[Ledgera OneSignal] Sending postMessage to native wrapper...');
-      window.parent.postMessage({
-        type: 'setOneSignalExternalUserId',
-        externalUserId: user.email
-      }, '*');
-      
-      console.log('[Ledgera OneSignal] ✅ Sent external user ID to native wrapper:', user.email);
-    } else {
-      // Web: Use OneSignal Web SDK 5.x
-      console.log('[Ledgera OneSignal] Checking for OneSignal Web SDK...');
-      if (window.OneSignal) {
-        console.log('[Ledgera OneSignal] OneSignal SDK found, logging in...');
-        window.OneSignal.login(user.email);
-        console.log('[Ledgera OneSignal] ✅ Web SDK logged in:', user.email);
-      } else {
-        console.warn('[Ledgera OneSignal] OneSignal SDK not found on window object');
+    const syncOneSignal = async () => {
+      if (!user) {
+        console.log('[OneSignal] No user provided to OneSignalInit');
+        return;
       }
-    }
 
-    // Cleanup on unmount (logout)
-    return () => {
-      console.log('[Ledgera OneSignal] Component unmounting - logging out');
-      if (isCapacitor) {
-        window.parent.postMessage({
-          type: 'oneSignalLogout'
-        }, '*');
-        console.log('[Ledgera OneSignal] Sent logout to native wrapper');
+      const userEmail = user?.email;
+
+      // Use real email, or construct fake email from user.id for phone-only login users
+      // OneSignal requires email format for external ID
+      let externalId;
+      if (userEmail && userEmail.includes('@')) {
+        externalId = userEmail;
+        console.log('[OneSignal] ✅ Using real email as external ID:', externalId);
+      } else if (user?.id) {
+        externalId = `${user.id}@ledgera.app`;
+        console.log('[OneSignal] ⚠️ No email found, using generated ID:', externalId);
       } else {
-        if (window.OneSignal) {
-          window.OneSignal.logout();
-          console.log('[Ledgera OneSignal] Web SDK logged out');
+        console.error('[OneSignal] No email or user ID available, skipping');
+        return;
+      }
+
+      if (isRunningInCapacitor()) {
+        console.log('[OneSignal] Running in Capacitor mobile app');
+        const NotifyBridge = window.Capacitor?.Plugins?.NotifyBridge;
+
+        if (!NotifyBridge) {
+          console.warn('[OneSignal] NotifyBridge plugin not found');
+          return;
+        }
+
+        console.log('[OneSignal] ✅ Calling NotifyBridge.login() with:', externalId);
+        await NotifyBridge.requestPermission();
+        await NotifyBridge.login({ externalId: externalId });
+      } else {
+        console.log('[OneSignal] Running in web browser');
+        if (externalId) {
+          window.OneSignal = window.OneSignal || [];
+          window.OneSignal.push(function() {
+            window.OneSignal.init({
+              appId: "f9bccfd2-7da8-475e-8091-d28ed41d7e14",
+              allowLocalhostAsSecureOrigin: true
+            });
+            console.log('[OneSignal] ✅ Web SDK using login() with:', externalId);
+            window.OneSignal.login(externalId);
+          });
+        } else {
+          if (window.OneSignal) {
+            window.OneSignal.push(function() {
+              window.OneSignal.logout();
+              console.log('[OneSignal] Web SDK logged out');
+            });
+          }
         }
       }
     };
+
+    syncOneSignal();
   }, [user]);
 
   return null;
