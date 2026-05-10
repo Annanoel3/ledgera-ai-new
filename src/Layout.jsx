@@ -323,12 +323,12 @@ export default function Layout({ children }) {
         </div>
 
         {/* Mobile Bottom Navigation */}
-        <nav className="mobile-bottom-nav md:hidden fixed bottom-0 left-0 right-0 z-10 flex border-t" style={{
+        <nav className="md:hidden fixed bottom-0 left-0 right-0 z-10 flex border-t" style={{
           borderColor: darkMode ? '#374151' : '#e5e7eb',
           backgroundColor: darkMode ? '#1a1a1a' : '#ffffff',
-          paddingBottom: 'max(1.25rem, env(safe-area-inset-bottom))',
-          height: 'auto',
-          minHeight: '5rem'
+          paddingBottom: 'max(1.5rem, env(safe-area-inset-bottom))',
+          paddingTop: '0.5rem',
+          minHeight: '4.5rem'
         }}>
           {navItems.map((item) => {
             const isActive = currentPath === item.url || currentPath.startsWith(item.url + '/');
@@ -336,11 +336,11 @@ export default function Layout({ children }) {
               <Link
                 key={item.title}
                 to={item.url}
-                className="flex flex-1 flex-col items-center justify-center text-xs font-medium pt-1"
+                className="flex flex-1 flex-col items-center justify-start text-xs font-medium"
                 style={{ color: isActive ? primaryColor : (darkMode ? '#9ca3af' : '#6b7280') }}
                 aria-current={isActive ? "page" : undefined}
               >
-                <item.icon className="h-6 w-6 mb-2" />
+                <item.icon className="h-6 w-6 mb-1" />
                 {item.title}
               </Link>
             );
