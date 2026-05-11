@@ -212,6 +212,20 @@ const tools = [
                 required: ["type", "scheduledFor"]
             }
         }
+    },
+    {
+        type: "function",
+        function: {
+            name: "delete_project",
+            description: "Deletes a project and all its associated income, expense, and subscription records",
+            parameters: {
+                type: "object",
+                properties: {
+                    projectId: { type: "string", description: "The ID of the project to delete" }
+                },
+                required: ["projectId"]
+            }
+        }
     }
 ];
 
@@ -440,6 +454,30 @@ async function executeTool(toolName, args, base44, userEmail) {
                 });
                 return { success: true, checkIn };
             }
+
+            case "delete_project": {
+                // Delete all associated income items
+                const incomeItems = await base44.entities.IncomeItem.filter({ projectId: args.projectId, created_by: userEmail });
+                for (const income of incomeItems) {
+                    await base44.entities.IncomeItem.delete(income.id);
+                }
+
+                // Delete all associated expense items
+                const expenseItems = await base44.entities.ExpenseItem.filter({ projectId: args.projectId, created_by: userEmail });
+                for (const expense of expenseItems) {
+                    await base44.entities.ExpenseItem.delete(expense.id);
+                }
+
+                // Delete all associated subscriptions
+                const subscriptions = await base44.entities.RecurringSubscription.filter({ projectId: args.projectId, created_by: userEmail });
+                for (const subscription of subscriptions) {
+                    await base44.entities.RecurringSubscription.delete(subscription.id);
+                }
+
+                // Delete the project itself
+                await base44.entities.Project.delete(args.projectId);
+                return { success: true, message: "Project deleted successfully" };
+            }
             
             default:
                 return { success: false, error: `Unknown tool: ${toolName}` };
@@ -572,7 +610,7 @@ SMART EXPENSE CATEGORIZATION: When creating expenses, intelligently assign them 
 
 RECATEGORIZING EXPENSES: When user asks to change category or move expenses, you can UPDATE the ExpenseItem with a new category.
 
-For PROJECTS: Always create a project when user tells you their business. Create additional projects when requested. Track profitability.
+For PROJECTS: Always create a project when user tells you their business. Create additional projects when requested. Track profitability. You CAN delete projects when user explicitly requests it.
 
 CRITICAL FOR FINANCIAL CALCULATIONS:
 When calculating totals, profit, or any financial metrics, ALWAYS use Project.totalIncome and Project.totalExpense fields directly. NEVER sum up individual items. These fields are pre-calculated and guaranteed accurate.
