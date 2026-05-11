@@ -589,6 +589,10 @@ export default function Chat() {
       const message = input.trim();
       setInput("");
 
+      // Optimistically add user message to UI
+      const newUserMessage = { role: 'user', content: message };
+      setMessages(prev => [...prev, newUserMessage]);
+
       setSendingMessage(true);
       try {
         const response = await processChat({
