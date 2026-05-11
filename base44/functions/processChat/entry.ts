@@ -466,24 +466,59 @@ async function executeTool(toolName, args, base44, userEmail) {
                     created_by: userEmail
                 });
                 
-                // If vendor/description suggests recurring, create a subscription too
-                const recurringKeywords = ['subscription', 'monthly', 'yearly', 'recurring', 'claude', 'chatgpt', 'adobe', 'figma', 'slack', 'github', 'netlify', 'aws', 'stripe'];
+                // Intelligently detect recurring patterns
+                const recurringKeywords = ['subscription', 'monthly', 'yearly', 'recurring', 'claude', 'chatgpt', 'gpt', 'openai', 'adobe', 'figma', 'slack', 'github', 'netlify', 'aws', 'stripe', 'base44', 'netflix', 'spotify', 'hulu', 'canva', 'notion', 'linear', 'copilot'];
                 const description = (args.vendor || args.notes || "").toLowerCase();
-                const isRecurring = recurringKeywords.some(keyword => description.includes(keyword));
+                const isLikelyRecurring = recurringKeywords.some(keyword => description.includes(keyword));
                 
-                if (isRecurring) {
+                if (isLikelyRecurring) {
                     try {
-                        await base44.entities.RecurringSubscription.create({
-                            projectId: args.projectId,
-                            name: args.vendor || args.notes || "Subscription",
-                            amount: args.amount,
-                            frequency: "monthly",
-                            startDate: args.date,
-                            category: args.category || "subscriptions",
-                            notes: args.notes || "",
-                            active: true,
-                            created_by: userEmail
-                        });
+                        // Check if there are other expenses from this vendor in the past
+                        const allExpenses = await base44.entities.ExpenseItem.filter({ projectId: args.projectId, created_by: userEmail });
+                        const sameVendorExpenses = allExpenses.filter(e => e.vendor && e.vendor.toLowerCase() === (args.vendor || "").toLowerCase());
+                        
+                        // If multiple expenses from same vendor exist, it's definitely recurring
+                        if (sameVendorExpenses.length >= 2) {
+                            // Calculate average amount and frequency
+                            const amounts = sameVendorExpenses.map(e => e.amount);
+                            const avgAmount = amounts.reduce((a, b) => a + b, 0) / amounts.length;
+                            const dates = sameVendorExpenses.map(e => new Date(e.date).getTime()).sort((a, b) => b - a);
+                            
+                            // Estimate frequency from date gaps
+                            let frequency = "monthly";
+                            if (dates.length >= 2) {
+                                const daysBetween = (dates[0] - dates[1]) / (1000 * 60 * 60 * 24);
+                                if (daysBetween > 300) frequency = "yearly";
+                                else if (daysBetween > 20 && daysBetween < 35) frequency = "monthly";
+                                else if (daysBetween > 5 && daysBetween < 10) frequency = "weekly";
+                            }
+                            
+                            await base44.entities.RecurringSubscription.create({
+                                projectId: args.projectId,
+                                name: args.vendor || "Subscription",
+                                amount: Math.round(avgAmount * 100) / 100,
+                                frequency: frequency,
+                                startDate: sameVendorExpenses[sameVendorExpenses.length - 1].date,
+                                category: args.category || "subscriptions",
+                                notes: `Auto-detected recurring from ${sameVendorExpenses.length + 1} transactions`,
+                                active: true,
+                                created_by: userEmail
+                            });
+                        } else if (sameVendorExpenses.length === 1) {
+                            // Single prior expense + this one = likely recurring, assume monthly
+                            const avgAmount = (sameVendorExpenses[0].amount + args.amount) / 2;
+                            await base44.entities.RecurringSubscription.create({
+                                projectId: args.projectId,
+                                name: args.vendor || "Subscription",
+                                amount: Math.round(avgAmount * 100) / 100,
+                                frequency: "monthly",
+                                startDate: sameVendorExpenses[0].date,
+                                category: args.category || "subscriptions",
+                                notes: `Auto-detected recurring subscription`,
+                                active: true,
+                                created_by: userEmail
+                            });
+                        }
                     } catch (error) {
                         console.log('Could not create recurring subscription:', error.message);
                     }
@@ -766,13 +801,18 @@ For PROJECTS: Always create a project when user tells you their business. Create
 
 For EVENTS: You can create and delete events, and list events for a project. When user mentions an upcoming event (gig, meeting, etc.), ask if they want to create an event record.
 
-For RECURRING EXPENSES: When user wants to set up a recurring subscription or expense:
-1. Use create_recurring_expense to schedule monthly/yearly charges
-2. For frequency="yearly", set startDate to the first occurrence and the system will repeat it
-3. For frequency="monthly", set startDate to the first month it occurs (e.g., March 1st) and it repeats monthly
-4. If user says "2026" year and "started in March 2026", set startDate="2026-03-01" with frequency="monthly"
-5. If user specifies an end date or says "for the rest of 2026", calculate endDate (e.g., "2026-12-31")
-6. This creates a single recurring record - the system will handle generating individual expense entries
+For RECURRING EXPENSES: The system is SMART and auto-detects recurring patterns:
+1. When you record a subscription-like expense (Claude, Base44, Netflix, etc.), the system checks for similar past expenses
+2. If 2+ transactions from the same vendor exist, it automatically creates a recurring subscription with:
+   - Average amount calculated from all matching expenses
+   - Frequency auto-detected from date gaps (weekly, monthly, yearly)
+   - Auto-grouped with note explaining it was detected
+3. If user explicitly requests recurring setup, use create_recurring_expense with the appropriate frequency
+4. For frequency="yearly", set startDate to the first occurrence
+5. For frequency="monthly", set startDate to the first month it occurs
+6. If user specifies an end date, calculate endDate (e.g., "2026-12-31")
+7. Don't mention the auto-detection to user unless relevant - just confirm the subscription was created
+8. Users can always manually adjust or create subscriptions via the UI with the arrow button on expenses
 
 DELETION OPERATIONS: You can now delete income items, expense items, subscriptions, events, and projects when the user requests it. Always confirm what's being deleted before doing so.
 
