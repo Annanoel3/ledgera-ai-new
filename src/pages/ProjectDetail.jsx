@@ -388,84 +388,84 @@ export default function ProjectDetail() {
           </div>
 
           <div className="flex gap-4 flex-wrap items-center mt-6">
-            <Select value={selectedYear} onValueChange={setSelectedYear}>
-              <SelectTrigger className="w-32" style={{
-                backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff',
-                border: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}`,
-                color: profile?.darkMode ? '#ffffff' : '#111827'
-              }}>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent style={{ backgroundColor: profile?.darkMode ? '#374151' : '#ffffff', border: `1px solid ${profile?.darkMode ? '#4b5563' : '#e5e7eb'}` }}>
-                {availableYears.map(year => (
-                  <SelectItem key={year} value={year} style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>{year}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+             <Select value={selectedYear} onValueChange={setSelectedYear}>
+               <SelectTrigger className="w-32" style={{
+                 backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff',
+                 border: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}`,
+                 color: profile?.darkMode ? '#ffffff' : '#111827'
+               }}>
+                 <SelectValue />
+               </SelectTrigger>
+               <SelectContent style={{ backgroundColor: profile?.darkMode ? '#374151' : '#ffffff', border: `1px solid ${profile?.darkMode ? '#4b5563' : '#e5e7eb'}` }}>
+                 {availableYears.map(year => (
+                   <SelectItem key={year} value={year} style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>{year}</SelectItem>
+                 ))}
+               </SelectContent>
+             </Select>
 
-            <Select value={selectedMonth} onValueChange={setSelectedMonth}>
-              <SelectTrigger className="w-32" style={{
-                backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff',
-                border: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}`,
-                color: profile?.darkMode ? '#ffffff' : '#111827'
-              }}>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent style={{ backgroundColor: profile?.darkMode ? '#374151' : '#ffffff', border: `1px solid ${profile?.darkMode ? '#4b5563' : '#e5e7eb'}` }}>
-                <SelectItem value="all" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>All Months</SelectItem>
-                <SelectItem value="ytd" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>Year to Date</SelectItem>
-                <SelectItem value="0" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>January</SelectItem>
-                <SelectItem value="1" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>February</SelectItem>
-                <SelectItem value="2" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>March</SelectItem>
-                <SelectItem value="3" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>April</SelectItem>
-                <SelectItem value="4" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>May</SelectItem>
-                <SelectItem value="5" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>June</SelectItem>
-                <SelectItem value="6" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>July</SelectItem>
-                <SelectItem value="7" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>August</SelectItem>
-                <SelectItem value="8" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>September</SelectItem>
-                <SelectItem value="9" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>October</SelectItem>
-                <SelectItem value="10" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>November</SelectItem>
-                <SelectItem value="11" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>December</SelectItem>
-              </SelectContent>
-            </Select>
+             <Select value={selectedMonth} onValueChange={setSelectedMonth}>
+               <SelectTrigger className="w-32" style={{
+                 backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff',
+                 border: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}`,
+                 color: profile?.darkMode ? '#ffffff' : '#111827'
+               }}>
+                 <SelectValue />
+               </SelectTrigger>
+               <SelectContent style={{ backgroundColor: profile?.darkMode ? '#374151' : '#ffffff', border: `1px solid ${profile?.darkMode ? '#4b5563' : '#e5e7eb'}` }}>
+                 <SelectItem value="all" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>All Months</SelectItem>
+                 <SelectItem value="ytd" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>Year to Date</SelectItem>
+                 <SelectItem value="0" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>January</SelectItem>
+                 <SelectItem value="1" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>February</SelectItem>
+                 <SelectItem value="2" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>March</SelectItem>
+                 <SelectItem value="3" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>April</SelectItem>
+                 <SelectItem value="4" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>May</SelectItem>
+                 <SelectItem value="5" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>June</SelectItem>
+                 <SelectItem value="6" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>July</SelectItem>
+                 <SelectItem value="7" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>August</SelectItem>
+                 <SelectItem value="8" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>September</SelectItem>
+                 <SelectItem value="9" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>October</SelectItem>
+                 <SelectItem value="10" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>November</SelectItem>
+                 <SelectItem value="11" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>December</SelectItem>
+               </SelectContent>
+             </Select>
+           </div>
 
-            <div className="flex gap-2 ml-auto">
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="gap-2"
-                onClick={() => setShowEventsModal(true)}
-                style={{
-                  backgroundColor: profile?.darkMode ? '#374151' : '#ffffff',
-                  border: `1px solid ${profile?.darkMode ? '#4b5563' : '#e5e7eb'}`,
-                  color: profile?.darkMode ? '#d1d5db' : '#374151'
-                }}
-              >
-                <Calendar className="w-4 h-4" /> Events
-              </Button>
-              <Button variant="outline" size="sm" className="gap-2" style={{
-                backgroundColor: profile?.darkMode ? '#374151' : '#ffffff',
-                border: `1px solid ${profile?.darkMode ? '#4b5563' : '#e5e7eb'}`,
-                color: profile?.darkMode ? '#d1d5db' : '#374151'
-              }}>
-                <Pencil className="w-4 h-4" />
-              </Button>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="gap-2"
-                onClick={handleDeleteProject}
-                disabled={deleteProjectMutation.isPending}
-                style={{
-                  backgroundColor: profile?.darkMode ? '#374151' : '#ffffff',
-                  border: `1px solid ${profile?.darkMode ? '#4b5563' : '#e5e7eb'}`,
-                  color: '#ef4444'
-                }}
-              >
-                {deleteProjectMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash className="w-4 h-4" />}
-              </Button>
-            </div>
-          </div>
+           <div className="flex gap-2 mt-4">
+             <Button 
+               variant="outline" 
+               size="sm" 
+               className="gap-2"
+               onClick={() => setShowEventsModal(true)}
+               style={{
+                 backgroundColor: profile?.darkMode ? '#374151' : '#ffffff',
+                 border: `1px solid ${profile?.darkMode ? '#4b5563' : '#e5e7eb'}`,
+                 color: profile?.darkMode ? '#d1d5db' : '#374151'
+               }}
+             >
+               <Calendar className="w-4 h-4" /> Events
+             </Button>
+             <Button variant="outline" size="sm" className="gap-2" style={{
+               backgroundColor: profile?.darkMode ? '#374151' : '#ffffff',
+               border: `1px solid ${profile?.darkMode ? '#4b5563' : '#e5e7eb'}`,
+               color: profile?.darkMode ? '#d1d5db' : '#374151'
+             }}>
+               <Pencil className="w-4 h-4" />
+             </Button>
+             <Button 
+               variant="outline" 
+               size="sm" 
+               className="gap-2"
+               onClick={handleDeleteProject}
+               disabled={deleteProjectMutation.isPending}
+               style={{
+                 backgroundColor: profile?.darkMode ? '#374151' : '#ffffff',
+                 border: `1px solid ${profile?.darkMode ? '#4b5563' : '#e5e7eb'}`,
+                 color: '#ef4444'
+               }}
+             >
+               {deleteProjectMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash className="w-4 h-4" />}
+             </Button>
+           </div>
         </div>
 
         {/* Clickable Stats Cards */}
