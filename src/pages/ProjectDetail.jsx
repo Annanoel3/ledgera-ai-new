@@ -526,7 +526,7 @@ export default function ProjectDetail() {
         </div>
 
         {/* Income Details Dropdown */}
-        {showIncomeDetails && filteredIncomeItems.length > 0 && (
+         {showIncomeDetails && incomeItems.length > 0 && (
           <Card className="mb-6" style={{ backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff', border: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}` }}>
             <CardHeader>
               <CardTitle style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>Income Items</CardTitle>
@@ -544,7 +544,7 @@ export default function ProjectDetail() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredIncomeItems.map((item) => (
+                   {incomeItems.map((item) => (
                     <TableRow key={item.id} className="dark:border-gray-700">
                       <TableCell className="dark:text-gray-300">{format(new Date(item.date), 'MMM d, yyyy')}</TableCell>
                       <TableCell className="dark:text-gray-300">{item.category}</TableCell>
@@ -595,7 +595,7 @@ export default function ProjectDetail() {
         )}
 
         {/* Expense Details Dropdown */}
-        {showExpenseDetails && filteredExpenseItems.length > 0 && (
+         {showExpenseDetails && expenseItems.length > 0 && (
           <Card className="mb-6" style={{ backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff', border: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}` }}>
             <CardHeader>
               <CardTitle style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>Expense Items</CardTitle>
@@ -614,7 +614,7 @@ export default function ProjectDetail() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredExpenseItems.map((item) => (
+                   {expenseItems.map((item) => (
                     <TableRow key={item.id} className="dark:border-gray-700">
                          <TableCell className="dark:text-gray-300">{format(new Date(item.date), 'MMM d, yyyy')}</TableCell>
                          <TableCell className="dark:text-gray-300">{item.category}</TableCell>
