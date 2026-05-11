@@ -18,6 +18,7 @@ import toast from "react-hot-toast"; // Assuming react-hot-toast for toast notif
 export default function Dashboard() {
   const queryClient = useQueryClient();
   const [selectedYear, setSelectedYear] = React.useState(new Date().getFullYear().toString());
+  const [selectedMonth, setSelectedMonth] = React.useState(new Date().getMonth());
 
   const handleRefresh = useCallback(async () => {
     await queryClient.invalidateQueries();
@@ -230,21 +231,52 @@ export default function Dashboard() {
     return itemDate >= yearStart && itemDate <= yearEnd;
   });
 
-  // Calculate MTD stats (current month of selected year)
-  const monthStart = startOfMonth(new Date());
-  const monthEnd = endOfMonth(new Date());
+  // Check if viewing current year
+  const isCurrentYear = parseInt(selectedYear) === new Date().getFullYear();
+  
+  // For current year, use current month; for past years, use selected month dropdown
+  const displayMonth = isCurrentYear ? new Date().getMonth() : selectedMonth;
+  
+  // Calculate period stats
+  const yearIncome = yearIncomeItems.reduce((sum, item) => sum + (item.amount || 0), 0);
+  const yearExpenses = yearExpenseItems.reduce((sum, item) => sum + (item.amount || 0), 0);
+  const yearProfit = yearIncome - yearExpenses;
+  
+  // Calculate specific month stats
+  const monthStart = startOfMonth(new Date(parseInt(selectedYear), displayMonth, 1));
+  const monthEnd = endOfMonth(new Date(parseInt(selectedYear), displayMonth, 1));
 
-  const mtdIncome = yearIncomeItems.
+  const monthIncome = yearIncomeItems.
   filter((item) => {
     const itemDate = new Date(item.date);
     return itemDate >= monthStart && itemDate <= monthEnd;
   }).
   reduce((sum, item) => sum + (item.amount || 0), 0);
 
-  const mtdExpenses = yearExpenseItems.
+  const monthExpenses = yearExpenseItems.
   filter((item) => {
     const itemDate = new Date(item.date);
     return itemDate >= monthStart && itemDate <= monthEnd;
+  }).
+  reduce((sum, item) => sum + (item.amount || 0), 0);
+
+  const monthProfit = monthIncome - monthExpenses;
+  
+  // For current month MTD (only if current year)
+  const currentMonthStart = startOfMonth(new Date());
+  const currentMonthEnd = endOfMonth(new Date());
+  
+  const mtdIncome = incomeItems.
+  filter((item) => {
+    const itemDate = new Date(item.date);
+    return itemDate >= currentMonthStart && itemDate <= currentMonthEnd;
+  }).
+  reduce((sum, item) => sum + (item.amount || 0), 0);
+
+  const mtdExpenses = expenseItems.
+  filter((item) => {
+    const itemDate = new Date(item.date);
+    return itemDate >= currentMonthStart && itemDate <= currentMonthEnd;
   }).
   reduce((sum, item) => sum + (item.amount || 0), 0);
 
@@ -382,52 +414,146 @@ export default function Dashboard() {
         </div>
 
         {/* KPI Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <Card style={{ backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff', border: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}` }}>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium" style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>Profit This Month</CardTitle>
-              <Wallet className="w-4 h-4 text-gray-400" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>{formatCurrency(mtdProfit)}</div>
-              <div className={`flex items-center gap-1 text-sm mt-1`} style={{ color: mtdProfit >= 0 ? '#22A699' : '#ef4444' }}>
-                {mtdProfit >= 0 ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
-                {mtdProfit >= 0 ? 'Positive' : 'Negative'}
+        <div className="space-y-4 mb-8">
+          {isCurrentYear && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <Card style={{ backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff', border: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}` }}>
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle className="text-sm font-medium" style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>Profit This Month</CardTitle>
+                  <Wallet className="w-4 h-4 text-gray-400" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>{formatCurrency(mtdProfit)}</div>
+                  <div className={`flex items-center gap-1 text-sm mt-1`} style={{ color: mtdProfit >= 0 ? '#22A699' : '#ef4444' }}>
+                    {mtdProfit >= 0 ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
+                    {mtdProfit >= 0 ? 'Positive' : 'Negative'}
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card style={{ backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff', border: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}` }}>
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle className="text-sm font-medium" style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>Income This Month</CardTitle>
+                  <DollarSign className="w-4 h-4 text-gray-400" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>{formatCurrency(mtdIncome)}</div>
+                  <p className="text-sm mt-1" style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>
+                    {incomeItems.filter((item) => {
+                      const itemDate = new Date(item.date);
+                      return itemDate >= currentMonthStart && itemDate <= currentMonthEnd;
+                    }).length} transactions
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card style={{ backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff', border: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}` }}>
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle className="text-sm font-medium" style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>Expenses This Month</CardTitle>
+                  <CreditCard className="w-4 h-4 text-gray-400" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>{formatCurrency(mtdExpenses)}</div>
+                  <p className="text-sm mt-1" style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>
+                    {expenseItems.filter((item) => {
+                      const itemDate = new Date(item.date);
+                      return itemDate >= currentMonthStart && itemDate <= currentMonthEnd;
+                    }).length} transactions
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+          
+          {!isCurrentYear && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <Card style={{ backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff', border: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}` }}>
+                  <CardHeader className="flex flex-row items-center justify-between pb-2">
+                    <CardTitle className="text-sm font-medium" style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>Year Profit</CardTitle>
+                    <Wallet className="w-4 h-4 text-gray-400" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>{formatCurrency(yearProfit)}</div>
+                    <div className={`flex items-center gap-1 text-sm mt-1`} style={{ color: yearProfit >= 0 ? '#22A699' : '#ef4444' }}>
+                      {yearProfit >= 0 ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
+                      {yearProfit >= 0 ? 'Positive' : 'Negative'}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card style={{ backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff', border: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}` }}>
+                  <CardHeader className="flex flex-row items-center justify-between pb-2">
+                    <CardTitle className="text-sm font-medium" style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>Year Income</CardTitle>
+                    <DollarSign className="w-4 h-4 text-gray-400" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>{formatCurrency(yearIncome)}</div>
+                    <p className="text-sm mt-1" style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>
+                      {yearIncomeItems.length} transactions
+                    </p>
+                  </CardContent>
+                </Card>
+
+                <Card style={{ backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff', border: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}` }}>
+                  <CardHeader className="flex flex-row items-center justify-between pb-2">
+                    <CardTitle className="text-sm font-medium" style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>Year Expenses</CardTitle>
+                    <CreditCard className="w-4 h-4 text-gray-400" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>{formatCurrency(yearExpenses)}</div>
+                    <p className="text-sm mt-1" style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>
+                      {yearExpenseItems.length} transactions
+                    </p>
+                  </CardContent>
+                </Card>
               </div>
-            </CardContent>
-          </Card>
 
-          <Card style={{ backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff', border: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}` }}>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium" style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>Income This Month</CardTitle>
-              <DollarSign className="w-4 h-4 text-gray-400" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>{formatCurrency(mtdIncome)}</div>
-              <p className="text-sm mt-1" style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>
-                {incomeItems.filter((item) => {
-                  const itemDate = new Date(item.date);
-                  return itemDate >= monthStart && itemDate <= monthEnd;
-                }).length} transactions
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card style={{ backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff', border: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}` }}>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium" style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>Expenses This Month</CardTitle>
-              <CreditCard className="w-4 h-4 text-gray-400" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>{formatCurrency(mtdExpenses)}</div>
-              <p className="text-sm mt-1" style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>
-                {expenseItems.filter((item) => {
-                  const itemDate = new Date(item.date);
-                  return itemDate >= monthStart && itemDate <= monthEnd;
-                }).length} transactions
-              </p>
-            </CardContent>
-          </Card>
+              <Card style={{ backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff', border: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}` }}>
+                <CardHeader>
+                  <CardTitle style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>View Specific Month</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div>
+                    <label style={{ color: profile?.darkMode ? '#d1d5db' : '#374151' }} className="text-sm font-medium block mb-2">Select Month</label>
+                    <Select value={selectedMonth.toString()} onValueChange={(v) => setSelectedMonth(parseInt(v))}>
+                      <SelectTrigger style={{
+                        backgroundColor: profile?.darkMode ? '#374151' : '#ffffff',
+                        border: `1px solid ${profile?.darkMode ? '#4b5563' : '#e5e7eb'}`,
+                        color: profile?.darkMode ? '#ffffff' : '#111827'
+                      }}>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent style={{
+                        backgroundColor: profile?.darkMode ? '#374151' : '#ffffff',
+                        border: `1px solid ${profile?.darkMode ? '#4b5563' : '#e5e7eb'}`
+                      }}>
+                        {['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'].map((month, idx) => (
+                          <SelectItem key={idx} value={idx.toString()} style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>
+                            {month}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                      <p style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }} className="text-sm">Profit</p>
+                      <p style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }} className="text-xl font-bold">{formatCurrency(monthProfit)}</p>
+                    </div>
+                    <div>
+                      <p style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }} className="text-sm">Income</p>
+                      <p style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }} className="text-xl font-bold">{formatCurrency(monthIncome)}</p>
+                    </div>
+                    <div>
+                      <p style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }} className="text-sm">Expenses</p>
+                      <p style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }} className="text-xl font-bold">{formatCurrency(monthExpenses)}</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
         </div>
 
         {/* 6-Month Chart */}
