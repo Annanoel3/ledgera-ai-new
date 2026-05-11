@@ -263,6 +263,33 @@ export default function ProjectDetail() {
     }
   });
 
+  const convertToRecurringMutation = useMutation({
+    mutationFn: async (expenseId) => {
+      const expense = await base44.entities.ExpenseItem.filter({ id: expenseId });
+      if (!expense[0]) throw new Error("Expense not found");
+      
+      const exp = expense[0];
+      return base44.entities.RecurringSubscription.create({
+        projectId: exp.projectId,
+        name: exp.vendor || "Recurring Expense",
+        amount: exp.amount,
+        frequency: "monthly",
+        startDate: exp.date,
+        category: exp.category || "subscriptions",
+        notes: exp.notes || "",
+        active: true,
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(['subscriptions', projectId]);
+      toast.success("Added to recurring expenses");
+    },
+    onError: (error) => {
+      console.error('Convert error:', error);
+      toast.error("Failed to add to recurring");
+    }
+  });
+
   const handleDeleteProject = () => {
     if (window.confirm(`Are you sure you want to delete "${project.title}"? This action cannot be undone.`)) {
       deleteProjectMutation.mutate(projectId);
@@ -589,48 +616,60 @@ export default function ProjectDetail() {
                 <TableBody>
                   {filteredExpenseItems.map((item) => (
                     <TableRow key={item.id} className="dark:border-gray-700">
-                      <TableCell className="dark:text-gray-300">{format(new Date(item.date), 'MMM d, yyyy')}</TableCell>
-                      <TableCell className="dark:text-gray-300">{item.category}</TableCell>
-                      <TableCell className="text-gray-500 dark:text-gray-400">{item.vendor || '-'}</TableCell>
-                      <TableCell className="font-medium text-red-500">{formatCurrency(item.amount)}</TableCell>
-                      <TableCell className="text-gray-500 dark:text-gray-400">{item.notes || '-'}</TableCell>
-                      <TableCell>
-                        <Select
-                          value={item.projectId}
-                          onValueChange={(newProjectId) => handleExpenseProjectChange(item.id, newProjectId)}
-                          disabled={updateExpenseProjectMutation.isPending}
-                        >
-                          <SelectTrigger className="w-40" style={{
-                            backgroundColor: profile?.darkMode ? '#374151' : '#ffffff',
-                            border: `1px solid ${profile?.darkMode ? '#4b5563' : '#e5e7eb'}`,
-                            color: profile?.darkMode ? '#ffffff' : '#111827'
-                          }}>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent style={{
-                            backgroundColor: profile?.darkMode ? '#374151' : '#ffffff',
-                            border: `1px solid ${profile?.darkMode ? '#4b5563' : '#e5e7eb'}`
-                          }}>
-                            {allProjects.map(proj => (
-                              <SelectItem key={proj.id} value={proj.id} style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>
-                                {proj.title}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </TableCell>
-                      <TableCell>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={(e) => handleDeleteExpense(e, item.id)}
-                          className="hover:text-red-500"
-                          disabled={deleteExpenseMutation.isPending}
-                        >
-                          {deleteExpenseMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
-                        </Button>
-                      </TableCell>
-                    </TableRow>
+                         <TableCell className="dark:text-gray-300">{format(new Date(item.date), 'MMM d, yyyy')}</TableCell>
+                         <TableCell className="dark:text-gray-300">{item.category}</TableCell>
+                         <TableCell className="text-gray-500 dark:text-gray-400">{item.vendor || '-'}</TableCell>
+                         <TableCell className="font-medium text-red-500">{formatCurrency(item.amount)}</TableCell>
+                         <TableCell className="text-gray-500 dark:text-gray-400">{item.notes || '-'}</TableCell>
+                         <TableCell>
+                           <Select
+                             value={item.projectId}
+                             onValueChange={(newProjectId) => handleExpenseProjectChange(item.id, newProjectId)}
+                             disabled={updateExpenseProjectMutation.isPending}
+                           >
+                             <SelectTrigger className="w-40" style={{
+                               backgroundColor: profile?.darkMode ? '#374151' : '#ffffff',
+                               border: `1px solid ${profile?.darkMode ? '#4b5563' : '#e5e7eb'}`,
+                               color: profile?.darkMode ? '#ffffff' : '#111827'
+                             }}>
+                               <SelectValue />
+                             </SelectTrigger>
+                             <SelectContent style={{
+                               backgroundColor: profile?.darkMode ? '#374151' : '#ffffff',
+                               border: `1px solid ${profile?.darkMode ? '#4b5563' : '#e5e7eb'}`
+                             }}>
+                               {allProjects.map(proj => (
+                                 <SelectItem key={proj.id} value={proj.id} style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>
+                                   {proj.title}
+                                 </SelectItem>
+                               ))}
+                             </SelectContent>
+                           </Select>
+                         </TableCell>
+                         <TableCell>
+                           <div className="flex gap-1">
+                             <Button
+                               variant="ghost"
+                               size="sm"
+                               onClick={() => convertToRecurringMutation.mutate(item.id)}
+                               disabled={convertToRecurringMutation.isPending}
+                               style={{ color: '#22A699' }}
+                               title="Convert to recurring"
+                             >
+                               {convertToRecurringMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : "→"}
+                             </Button>
+                             <Button
+                               variant="ghost"
+                               size="icon"
+                               onClick={(e) => handleDeleteExpense(e, item.id)}
+                               className="hover:text-red-500"
+                               disabled={deleteExpenseMutation.isPending}
+                             >
+                               {deleteExpenseMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                             </Button>
+                           </div>
+                         </TableCell>
+                       </TableRow>
                   ))}
                 </TableBody>
               </Table>
