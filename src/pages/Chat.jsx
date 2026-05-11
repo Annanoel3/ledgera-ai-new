@@ -956,6 +956,7 @@ export default function Chat() {
                           <li style={{ marginBottom: '0.25rem' }}>Catch expenses you definitely forgot about</li>
                           <li style={{ marginBottom: '0.25rem' }}>Actually understand your ROI not just pretend</li>
                           <li style={{ marginBottom: '0.25rem' }}>Make tax season less painful</li>
+                          <li style={{ marginBottom: '0.25rem' }}>Get reminders to log income/expenses after events</li>
                           <li style={{ marginBottom: '0.25rem' }}>Answer money questions in plain English</li>
                         </ul>
                         <p style={{
@@ -997,6 +998,7 @@ export default function Chat() {
                           <li style={{ marginBottom: '0.25rem' }}>Track all income and expenses by project</li>
                           <li style={{ marginBottom: '0.25rem' }}>Catch costs you might have missed</li>
                           <li style={{ marginBottom: '0.25rem' }}>Create custom financial reports</li>
+                          <li style={{ marginBottom: '0.25rem' }}>Get reminders to log income/expenses after events</li>
                           <li style={{ marginBottom: '0.25rem' }}>Answer questions about your business</li>
                         </ul>
                         <p style={{

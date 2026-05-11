@@ -1,0 +1,37 @@
+{
+  "name": "Event",
+  "type": "object",
+  "properties": {
+    "projectId": {
+      "type": "string",
+      "description": "Associated project ID"
+    },
+    "name": {
+      "type": "string",
+      "description": "Event name (e.g., Client meeting, Project launch)"
+    },
+    "startDate": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the event starts"
+    },
+    "endDate": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the event ends"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Additional notes"
+    },
+    "checkInScheduledId": {
+      "type": "string",
+      "description": "ID of the scheduled check-in created for this event"
+    }
+  },
+  "required": [
+    "projectId",
+    "name",
+    "startDate"
+  ]
+}
