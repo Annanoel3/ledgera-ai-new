@@ -17,7 +17,7 @@ import toast from "react-hot-toast"; // Assuming react-hot-toast for toast notif
 
 export default function Dashboard() {
   const queryClient = useQueryClient();
-  const [selectedYear, setSelectedYear] = React.useState(new Date().getFullYear().toString());
+  const [selectedYear, setSelectedYear] = React.useState("2026");
 
   const handleRefresh = useCallback(async () => {
     await queryClient.invalidateQueries();
@@ -361,6 +361,20 @@ export default function Dashboard() {
       <div className="max-w-6xl mx-auto">
         <div className="flex items-center justify-between mb-8">
         <h1 className="text-3xl font-bold" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>Dashboard</h1>
+        <Select value={selectedYear} onValueChange={setSelectedYear}>
+          <SelectTrigger className="w-32" style={{
+            backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff',
+            border: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}`,
+            color: profile?.darkMode ? '#ffffff' : '#111827'
+          }}>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent style={{ backgroundColor: profile?.darkMode ? '#374151' : '#ffffff', border: `1px solid ${profile?.darkMode ? '#4b5563' : '#e5e7eb'}` }}>
+            {availableYears.map(year => (
+              <SelectItem key={year} value={year} style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>{year}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
         </div>
 
         {/* KPI Cards */}
