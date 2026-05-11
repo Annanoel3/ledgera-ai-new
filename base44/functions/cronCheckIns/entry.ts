@@ -68,7 +68,7 @@ Deno.serve(async (req) => {
 
         // Get pending check-ins for this user
         const now = new Date();
-        const fiveMinutesFromNow = new Date(now.getTime() + 5 * 60000);
+        const fifteenMinutesFromNow = new Date(now.getTime() + 15 * 60000);
 
         const pendingCheckIns = await base44.asServiceRole.entities.ScheduledCheckIn.filter({
           userEmail: user.email,
@@ -80,8 +80,8 @@ Deno.serve(async (req) => {
         for (const checkIn of pendingCheckIns) {
           const scheduledTime = new Date(checkIn.scheduledFor);
 
-          // Check if it's time to send (within next 5 minutes)
-          if (scheduledTime <= fiveMinutesFromNow) {
+          // Check if it's time to send (within next 15 minutes to match cron interval)
+          if (scheduledTime <= fifteenMinutesFromNow) {
             try {
               // Get user's profile for personalization
               const profiles = await base44.asServiceRole.entities.UserProfile.filter({
