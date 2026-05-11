@@ -11,7 +11,7 @@ const Textarea = React.forwardRef(({ className, style, ...props }, ref) => {
       )}
       style={{
         ...style,
-        '--placeholder-color': style?.['--placeholder-color'] || '#6b7280'
+        color: style?.color || 'inherit'
       }}
       ref={ref}
       {...props} />)

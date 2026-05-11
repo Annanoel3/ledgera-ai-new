@@ -87,6 +87,10 @@ button:focus-visible {
 
 
 
+textarea {
+  color: inherit !important;
+}
+
 textarea::placeholder {
   color: var(--placeholder-color, #6b7280) !important;
 }
