@@ -69,8 +69,8 @@ export default function Layout({ children }) {
       document.body.style.backgroundColor = '#0f0f0f';
     } else {
       htmlElement.classList.remove('dark');
-      htmlElement.style.backgroundColor = '';
-      document.body.style.backgroundColor = '';
+      htmlElement.style.backgroundColor = '#ffffff';
+      document.body.style.backgroundColor = '#ffffff';
     }
   }, [darkMode]);
 
