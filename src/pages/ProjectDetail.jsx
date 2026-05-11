@@ -528,7 +528,7 @@ export default function ProjectDetail() {
         <Tabs defaultValue="overview" className="space-y-6">
           <TabsList className="grid w-full grid-cols-4 dark:bg-gray-800 dark:border-gray-700">
             <TabsTrigger value="overview" className="dark:data-[state=active]:bg-gray-700 dark:data-[state=active]:text-white dark:text-gray-400">Overview</TabsTrigger>
-            <TabsTrigger value="subscriptions" className="dark:data-[state=active]:bg-gray-700 dark:data-[state=active]:text-white dark:text-gray-400">Subscriptions</TabsTrigger>
+            <TabsTrigger value="subscriptions" className="dark:data-[state=active]:bg-gray-700 dark:data-[state=active]:text-white dark:text-gray-400">Recurring</TabsTrigger>
             <TabsTrigger value="documents" className="dark:data-[state=active]:bg-gray-700 dark:data-[state=active]:text-white dark:text-gray-400">Documents</TabsTrigger>
             <TabsTrigger value="history" className="dark:data-[state=active]:bg-gray-700 dark:data-[state=active]:text-white dark:text-gray-400">History</TabsTrigger>
           </TabsList>
@@ -536,7 +536,7 @@ export default function ProjectDetail() {
           <TabsContent value="subscriptions">
             <Card className="dark:bg-gray-800 dark:border-gray-700">
               <CardHeader>
-                <CardTitle className="dark:text-white">Recurring Subscriptions</CardTitle>
+                <CardTitle className="dark:text-white">Recurring</CardTitle>
               </CardHeader>
               <CardContent>
                 <SubscriptionsTab projectId={projectId} darkMode={profile?.darkMode} />

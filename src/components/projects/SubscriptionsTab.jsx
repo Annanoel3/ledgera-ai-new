@@ -140,7 +140,7 @@ export default function SubscriptionsTab({ projectId, darkMode }) {
           }}>
             <DialogHeader>
               <DialogTitle style={{ color: darkMode ? '#ffffff' : '#111827' }}>
-                Add Recurring Subscription
+                Add Recurring
               </DialogTitle>
             </DialogHeader>
 
