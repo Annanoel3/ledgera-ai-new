@@ -160,22 +160,8 @@ const tools = [
     {
         type: "function",
         function: {
-            name: "update_user_profile",
-            description: "Updates the user's profile with professions or other settings",
-            parameters: {
-                type: "object",
-                properties: {
-                    professions: { type: "array", items: { type: "string" }, description: "List of user's professions or business types" }
-                },
-                required: []
-            }
-        }
-    },
-    {
-        type: "function",
-        function: {
             name: "get_user_profile",
-            description: "Retrieves the user's profile including professions and settings",
+            description: "Retrieves the user's profile including settings",
             parameters: {
                 type: "object",
                 properties: {},
@@ -520,30 +506,6 @@ async function executeTool(toolName, args, base44, userEmail) {
                 return { success: true, expenses };
             }
             
-            case "update_user_profile": {
-                const profiles = await base44.entities.UserProfile.filter({ created_by: userEmail });
-                if (profiles.length === 0) {
-                    // Create profile if it doesn't exist
-                    const newProfile = await base44.entities.UserProfile.create({
-                        professions: args.professions || [],
-                        currency: "USD",
-                        locale: "en-US",
-                        subscribed: false,
-                        trialStart: new Date().toISOString(),
-                        darkMode: false,
-                        funMode: false,
-                        created_by: userEmail
-                    });
-                    return { success: true, profile: newProfile };
-                } else {
-                    const updateData = {};
-                    if (args.professions) updateData.professions = args.professions;
-                    
-                    const updated = await base44.entities.UserProfile.update(profiles[0].id, updateData);
-                    return { success: true, profile: updated };
-                }
-            }
-            
             case "get_user_profile": {
                 const profiles = await base44.entities.UserProfile.filter({ created_by: userEmail });
                 if (profiles.length === 0) {
@@ -734,10 +696,10 @@ Deno.serve(async (req) => {
         let instructions = `You are Ledgera AI, a personal CPA and financial advisor. Only greet on first message if conversation is empty. Skip intro for returning users.
 
 IMPORTANT - FIRST MESSAGE LOGIC:
-- Check if UserProfile has professions array with items
 - Check if user has any existing Projects
-- If EITHER exists, DO NOT ask what they do - they've already told you! Just greet them warmly and ask how you can help today.
-- ONLY ask 'what do you do for work?' if UserProfile.professions is empty AND they have zero Projects.
+- If they have projects, DO NOT ask what they do - they've already set up their business types! Just greet them warmly and ask how you can help today.
+- ONLY ask 'what type of work do you do?' (e.g., graphic design, music, development, etc.) if they have zero Projects.
+- When they tell you, create a new Project with that as the title instead of storing it as a profession.
 
 If funMode is true in UserProfile, be conversational and friendly like talking to a friend about money - throw in a bad money pun or dad joke occasionally. Keep it light and relatable while still being helpful.
 
@@ -752,10 +714,9 @@ When user wants to add income/expenses and you need to assign them to a project:
 4. Offer option to create new project if none fit
 5. Once assigned/confirmed, create the income/expense item
 
-When user tells you what they do for work (ONLY if you didn't already know):
-1. Ask if they want to create a new project for this business or use an existing one
-2. List existing projects so they can choose
-3. Once confirmed, create Project and Update their UserProfile with the profession
+When user tells you what type of work they do (ONLY if they have no projects):
+1. Create a Project with that work type as the name (e.g., "Graphic Design", "Music Production")
+2. Confirm it's created and ask how you can help them manage finances for this business
 
 CRITICAL - INCOME VS EXPENSE DETECTION:
 When user mentions money coming IN or money they RECEIVED or EARNED:
@@ -814,9 +775,6 @@ TAX PREPARATION: Proactively help users categorize expenses correctly for tax pu
         if (profile) {
             instructions += `\n\nUser's currency: ${profile.currency || 'USD'}`;
             instructions += `\nUser's locale: ${profile.locale || 'en-US'}`;
-            if (profile.professions && profile.professions.length > 0) {
-                instructions += `\nUser's professions: ${profile.professions.join(', ')}`;
-            }
             if (profile.funMode) {
                 instructions += "\nFun mode is ENABLED - be playful and use money puns!";
             }
