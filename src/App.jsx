@@ -13,6 +13,7 @@ import { setupIframeMessaging } from './lib/iframe-messaging';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
+import PrivacyPolicy from './pages/PrivacyPolicy';
 
 const { Pages, Layout, mainPage } = pagesConfig;
 const mainPageKey = mainPage ?? Object.keys(Pages)[0];
@@ -49,6 +50,7 @@ function AnimatedRoutes({ mainPageKey, MainPage, Pages }) {
           {Object.entries(Pages).map(([path, Page]) => (
             <Route key={path} path={`/${path}`} element={<Page />} />
           ))}
+          <Route path="/PrivacyPolicy" element={<PrivacyPolicy />} />
           <Route path="*" element={<PageNotFound />} />
         </Routes>
       </motion.div>
