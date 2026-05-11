@@ -81,6 +81,8 @@ export default function Projects() {
   // Calculate year/month filtered totals
   const yearStart = startOfYear(new Date(parseInt(selectedYear), 0, 1));
   const yearEnd = endOfYear(new Date(parseInt(selectedYear), 0, 1));
+  const today = new Date();
+  const ytdEnd = selectedMonth === 'ytd' ? today : yearEnd;
   const monthStart = startOfMonth(new Date(parseInt(selectedYear), parseInt(selectedMonth), 1));
   const monthEnd = endOfMonth(new Date(parseInt(selectedYear), parseInt(selectedMonth), 1));
 
@@ -89,6 +91,9 @@ export default function Projects() {
     if (selectedMonth === 'all') {
       return itemDate >= yearStart && itemDate <= yearEnd;
     }
+    if (selectedMonth === 'ytd') {
+      return itemDate >= yearStart && itemDate <= ytdEnd;
+    }
     return itemDate >= monthStart && itemDate <= monthEnd;
   });
 
@@ -96,6 +101,9 @@ export default function Projects() {
     const itemDate = new Date(item.date);
     if (selectedMonth === 'all') {
       return itemDate >= yearStart && itemDate <= yearEnd;
+    }
+    if (selectedMonth === 'ytd') {
+      return itemDate >= yearStart && itemDate <= ytdEnd;
     }
     return itemDate >= monthStart && itemDate <= monthEnd;
   });
@@ -213,6 +221,7 @@ export default function Projects() {
                </SelectTrigger>
                <SelectContent style={{ backgroundColor: profile?.darkMode ? '#374151' : '#ffffff', border: `1px solid ${profile?.darkMode ? '#4b5563' : '#e5e7eb'}` }}>
                  <SelectItem value="all" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>All Months</SelectItem>
+                 <SelectItem value="ytd" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>Year to Date</SelectItem>
                  <SelectItem value="0" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>January</SelectItem>
                  <SelectItem value="1" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>February</SelectItem>
                  <SelectItem value="2" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>March</SelectItem>
