@@ -148,9 +148,19 @@ export default function RecurringSubscriptionModal({
 
           {relatedExpenses.length > 1 && (
             <div>
-              <Label style={{ color: darkMode ? '#d1d5db' : '#374151' }}>
-                Group with related transactions ({selectedExpenses.length} selected)
-              </Label>
+              <div className="flex items-center justify-between mb-2">
+                <Label style={{ color: darkMode ? '#d1d5db' : '#374151' }}>
+                  Group with related transactions ({selectedExpenses.length} selected)
+                </Label>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setSelectedExpenses(relatedExpenses.map(e => e.id))}
+                  style={{ color: '#22A699', fontSize: '12px', padding: '0 4px', height: 'auto' }}
+                >
+                  Select All
+                </Button>
+              </div>
               <div 
                 className="space-y-2 p-3 rounded border mt-1"
                 style={{
