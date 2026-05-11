@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Plus, Search, Folder, ArrowRight, Loader2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { startOfYear, endOfYear } from "date-fns";
+import { startOfYear, endOfYear, startOfMonth, endOfMonth } from "date-fns";
 import {
   Dialog,
   DialogContent,
@@ -23,6 +23,7 @@ export default function Projects() {
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("all");
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear().toString());
+  const [selectedMonth, setSelectedMonth] = useState("all");
   const [showNewDialog, setShowNewDialog] = useState(false);
   const [newProjectTitle, setNewProjectTitle] = useState("");
   const [newProjectStatus, setNewProjectStatus] = useState("active");
@@ -77,18 +78,26 @@ export default function Projects() {
     enabled: !!user,
   });
 
-  // Calculate year-filtered totals
+  // Calculate year/month filtered totals
   const yearStart = startOfYear(new Date(parseInt(selectedYear), 0, 1));
   const yearEnd = endOfYear(new Date(parseInt(selectedYear), 0, 1));
+  const monthStart = startOfMonth(new Date(parseInt(selectedYear), parseInt(selectedMonth), 1));
+  const monthEnd = endOfMonth(new Date(parseInt(selectedYear), parseInt(selectedMonth), 1));
 
   const yearIncome = allIncome.filter(item => {
     const itemDate = new Date(item.date);
-    return itemDate >= yearStart && itemDate <= yearEnd;
+    if (selectedMonth === 'all') {
+      return itemDate >= yearStart && itemDate <= yearEnd;
+    }
+    return itemDate >= monthStart && itemDate <= monthEnd;
   });
 
   const yearExpenses = allExpenses.filter(item => {
     const itemDate = new Date(item.date);
-    return itemDate >= yearStart && itemDate <= yearEnd;
+    if (selectedMonth === 'all') {
+      return itemDate >= yearStart && itemDate <= yearEnd;
+    }
+    return itemDate >= monthStart && itemDate <= monthEnd;
   });
 
   const allYears = [...new Set([
@@ -192,6 +201,30 @@ export default function Projects() {
                  {availableYears.map(year => (
                    <SelectItem key={year} value={year} style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>{year}</SelectItem>
                  ))}
+               </SelectContent>
+             </Select>
+             <Select value={selectedMonth} onValueChange={setSelectedMonth}>
+               <SelectTrigger className="w-32" style={{
+                 backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff',
+                 border: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}`,
+                 color: profile?.darkMode ? '#ffffff' : '#111827'
+               }}>
+                 <SelectValue />
+               </SelectTrigger>
+               <SelectContent style={{ backgroundColor: profile?.darkMode ? '#374151' : '#ffffff', border: `1px solid ${profile?.darkMode ? '#4b5563' : '#e5e7eb'}` }}>
+                 <SelectItem value="all" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>All Months</SelectItem>
+                 <SelectItem value="0" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>January</SelectItem>
+                 <SelectItem value="1" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>February</SelectItem>
+                 <SelectItem value="2" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>March</SelectItem>
+                 <SelectItem value="3" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>April</SelectItem>
+                 <SelectItem value="4" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>May</SelectItem>
+                 <SelectItem value="5" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>June</SelectItem>
+                 <SelectItem value="6" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>July</SelectItem>
+                 <SelectItem value="7" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>August</SelectItem>
+                 <SelectItem value="8" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>September</SelectItem>
+                 <SelectItem value="9" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>October</SelectItem>
+                 <SelectItem value="10" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>November</SelectItem>
+                 <SelectItem value="11" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>December</SelectItem>
                </SelectContent>
              </Select>
              <Button onClick={() => setShowNewDialog(true)} className="bg-[#22A699] hover:bg-[#1d8d82] gap-2">

@@ -8,7 +8,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { ArrowLeft, DollarSign, CreditCard, Wallet, TrendingUp, Plus, Pencil, Loader2, ChevronDown, ChevronUp, Clock, Trash2, Calendar, Trash } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { format } from "date-fns";
+import { format, startOfYear, endOfYear, startOfMonth, endOfMonth } from "date-fns";
 import EventsModal from "@/components/projects/EventsModal";
 import SubscriptionsTab from "@/components/projects/SubscriptionsTab";
 import {
@@ -37,6 +37,8 @@ export default function ProjectDetail() {
   const [showExpenseDetails, setShowExpenseDetails] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
   const [showEventsModal, setShowEventsModal] = useState(false);
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear().toString());
+  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth().toString());
 
   const { data: user, isLoading: userLoading } = useQuery({
     queryKey: ['user'],
@@ -293,8 +295,37 @@ export default function ProjectDetail() {
     );
   }
 
-  const actualIncome = incomeItems.reduce((sum, item) => sum + (item.amount || 0), 0);
-  const actualExpenses = expenseItems.reduce((sum, item) => sum + (item.amount || 0), 0);
+  // Calculate year/month filtered data
+  const yearStart = startOfYear(new Date(parseInt(selectedYear), 0, 1));
+  const yearEnd = endOfYear(new Date(parseInt(selectedYear), 0, 1));
+  const monthStart = startOfMonth(new Date(parseInt(selectedYear), parseInt(selectedMonth), 1));
+  const monthEnd = endOfMonth(new Date(parseInt(selectedYear), parseInt(selectedMonth), 1));
+
+  const allYears = [...new Set([
+    ...incomeItems.map(item => new Date(item.date).getFullYear()),
+    ...expenseItems.map(item => new Date(item.date).getFullYear()),
+    new Date().getFullYear()
+  ])].sort((a, b) => b - a);
+  const availableYears = allYears.map(y => y.toString());
+
+  const filteredIncomeItems = incomeItems.filter(item => {
+    const itemDate = new Date(item.date);
+    if (selectedMonth === 'all') {
+      return itemDate >= yearStart && itemDate <= yearEnd;
+    }
+    return itemDate >= monthStart && itemDate <= monthEnd;
+  });
+
+  const filteredExpenseItems = expenseItems.filter(item => {
+    const itemDate = new Date(item.date);
+    if (selectedMonth === 'all') {
+      return itemDate >= yearStart && itemDate <= yearEnd;
+    }
+    return itemDate >= monthStart && itemDate <= monthEnd;
+  });
+
+  const actualIncome = filteredIncomeItems.reduce((sum, item) => sum + (item.amount || 0), 0);
+  const actualExpenses = filteredExpenseItems.reduce((sum, item) => sum + (item.amount || 0), 0);
   const profit = actualIncome - actualExpenses;
   const margin = actualIncome > 0 ? (profit / actualIncome) * 100 : 0;
 
@@ -321,7 +352,45 @@ export default function ProjectDetail() {
               <h1 className="text-3xl font-bold mb-2" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>{project.title}</h1>
               <Badge className={statusColors[project.status]}>{project.status}</Badge>
             </div>
-            <div className="flex gap-2">
+            <div className="flex gap-2 flex-wrap">
+              <Select value={selectedYear} onValueChange={setSelectedYear}>
+                <SelectTrigger className="w-32" style={{
+                  backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff',
+                  border: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}`,
+                  color: profile?.darkMode ? '#ffffff' : '#111827'
+                }}>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent style={{ backgroundColor: profile?.darkMode ? '#374151' : '#ffffff', border: `1px solid ${profile?.darkMode ? '#4b5563' : '#e5e7eb'}` }}>
+                  {availableYears.map(year => (
+                    <SelectItem key={year} value={year} style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>{year}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Select value={selectedMonth} onValueChange={setSelectedMonth}>
+                <SelectTrigger className="w-32" style={{
+                  backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff',
+                  border: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}`,
+                  color: profile?.darkMode ? '#ffffff' : '#111827'
+                }}>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent style={{ backgroundColor: profile?.darkMode ? '#374151' : '#ffffff', border: `1px solid ${profile?.darkMode ? '#4b5563' : '#e5e7eb'}` }}>
+                  <SelectItem value="all" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>All Months</SelectItem>
+                  <SelectItem value="0" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>January</SelectItem>
+                  <SelectItem value="1" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>February</SelectItem>
+                  <SelectItem value="2" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>March</SelectItem>
+                  <SelectItem value="3" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>April</SelectItem>
+                  <SelectItem value="4" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>May</SelectItem>
+                  <SelectItem value="5" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>June</SelectItem>
+                  <SelectItem value="6" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>July</SelectItem>
+                  <SelectItem value="7" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>August</SelectItem>
+                  <SelectItem value="8" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>September</SelectItem>
+                  <SelectItem value="9" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>October</SelectItem>
+                  <SelectItem value="10" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>November</SelectItem>
+                  <SelectItem value="11" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>December</SelectItem>
+                </SelectContent>
+              </Select>
               <Button 
                 variant="outline" 
                 size="sm" 
@@ -373,7 +442,7 @@ export default function ProjectDetail() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>{formatCurrency(actualIncome)}</div>
-              <p className="text-xs mt-1" style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>{incomeItems.length} items • Click to view</p>
+              <p className="text-xs mt-1" style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>{filteredIncomeItems.length} items • Click to view</p>
             </CardContent>
           </Card>
 
@@ -388,7 +457,7 @@ export default function ProjectDetail() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>{formatCurrency(actualExpenses)}</div>
-              <p className="text-xs mt-1" style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>{expenseItems.length} items • Click to view</p>
+              <p className="text-xs mt-1" style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>{filteredExpenseItems.length} items • Click to view</p>
             </CardContent>
           </Card>
 
@@ -418,7 +487,7 @@ export default function ProjectDetail() {
         </div>
 
         {/* Income Details Dropdown */}
-        {showIncomeDetails && incomeItems.length > 0 && (
+        {showIncomeDetails && filteredIncomeItems.length > 0 && (
           <Card className="mb-6" style={{ backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff', border: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}` }}>
             <CardHeader>
               <CardTitle style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>Income Items</CardTitle>
@@ -436,7 +505,7 @@ export default function ProjectDetail() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {incomeItems.map((item) => (
+                  {filteredIncomeItems.map((item) => (
                     <TableRow key={item.id} className="dark:border-gray-700">
                       <TableCell className="dark:text-gray-300">{format(new Date(item.date), 'MMM d, yyyy')}</TableCell>
                       <TableCell className="dark:text-gray-300">{item.category}</TableCell>
@@ -487,7 +556,7 @@ export default function ProjectDetail() {
         )}
 
         {/* Expense Details Dropdown */}
-        {showExpenseDetails && expenseItems.length > 0 && (
+        {showExpenseDetails && filteredExpenseItems.length > 0 && (
           <Card className="mb-6" style={{ backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff', border: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}` }}>
             <CardHeader>
               <CardTitle style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>Expense Items</CardTitle>
@@ -506,7 +575,7 @@ export default function ProjectDetail() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {expenseItems.map((item) => (
+                  {filteredExpenseItems.map((item) => (
                     <TableRow key={item.id} className="dark:border-gray-700">
                       <TableCell className="dark:text-gray-300">{format(new Date(item.date), 'MMM d, yyyy')}</TableCell>
                       <TableCell className="dark:text-gray-300">{item.category}</TableCell>
