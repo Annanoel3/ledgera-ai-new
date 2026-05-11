@@ -244,7 +244,7 @@ const ChatInputArea = ({ profile, selectedFiles, removeFile, fileInputRef, handl
                 border: profile?.funMode ?
                   profile?.darkMode ? '1px solid #a855f7' : '1px solid #f9a8d4' :
                   profile?.darkMode ? '1px solid #374151' : '1px solid #e5e7eb',
-                color: profile?.darkMode ? '#ffffff' : '#111827'
+                color: profile?.darkMode ? '#ffffff !important' : '#111827 !important'
               }}
               disabled={sendingMessage || isRecording || uploadingFile} />
           </div>
