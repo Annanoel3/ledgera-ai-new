@@ -226,8 +226,7 @@ export default function Layout({ children }) {
         )}
 
         {/* Mobile Top Bar */}
-        <div className="mobile-top-bar md:hidden sticky top-0 z-10 flex flex-shrink-0 items-center border-b" style={{
-          borderColor: darkMode ? '#374151' : '#e5e7eb',
+        <div className="mobile-top-bar md:hidden sticky top-0 z-10 flex flex-shrink-0 items-center" style={{
           backgroundColor: darkMode ? '#1a1a1a' : '#ffffff',
           minHeight: '3.5rem'
         }}>
@@ -315,7 +314,6 @@ export default function Layout({ children }) {
 
         {/* Main Content */}
         <div className={isChat ? "" : "md:pl-64 flex flex-col flex-1"} style={{
-          paddingTop: 'env(safe-area-inset-top)',
           paddingBottom: isChat ? '0' : '5rem'
         }}>
           <main className={isChat ? "" : "flex-1"}>
