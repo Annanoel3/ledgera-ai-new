@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -6,10 +5,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { ArrowLeft, DollarSign, CreditCard, Wallet, TrendingUp, Plus, Pencil, Loader2, ChevronDown, ChevronUp, Clock, Trash2 } from "lucide-react";
+import { ArrowLeft, DollarSign, CreditCard, Wallet, TrendingUp, Plus, Pencil, Loader2, ChevronDown, ChevronUp, Clock, Trash2, Calendar } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { format } from "date-fns";
+import EventsModal from "@/components/projects/EventsModal";
 import {
   Table,
   TableBody,
@@ -35,6 +35,7 @@ export default function ProjectDetail() {
   const [showIncomeDetails, setShowIncomeDetails] = useState(false);
   const [showExpenseDetails, setShowExpenseDetails] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
+  const [showEventsModal, setShowEventsModal] = useState(false);
 
   const { data: user, isLoading: userLoading } = useQuery({
     queryKey: ['user'],
@@ -300,13 +301,28 @@ export default function ProjectDetail() {
               <h1 className="text-3xl font-bold mb-2" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>{project.title}</h1>
               <Badge className={statusColors[project.status]}>{project.status}</Badge>
             </div>
-            <Button variant="outline" size="sm" className="gap-2" style={{
-              backgroundColor: profile?.darkMode ? '#374151' : '#ffffff',
-              border: `1px solid ${profile?.darkMode ? '#4b5563' : '#e5e7eb'}`,
-              color: profile?.darkMode ? '#d1d5db' : '#374151'
-            }}>
-              <Pencil className="w-4 h-4" /> Edit
-            </Button>
+            <div className="flex gap-2">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="gap-2"
+                onClick={() => setShowEventsModal(true)}
+                style={{
+                  backgroundColor: profile?.darkMode ? '#374151' : '#ffffff',
+                  border: `1px solid ${profile?.darkMode ? '#4b5563' : '#e5e7eb'}`,
+                  color: profile?.darkMode ? '#d1d5db' : '#374151'
+                }}
+              >
+                <Calendar className="w-4 h-4" /> Events
+              </Button>
+              <Button variant="outline" size="sm" className="gap-2" style={{
+                backgroundColor: profile?.darkMode ? '#374151' : '#ffffff',
+                border: `1px solid ${profile?.darkMode ? '#4b5563' : '#e5e7eb'}`,
+                color: profile?.darkMode ? '#d1d5db' : '#374151'
+              }}>
+                <Pencil className="w-4 h-4" /> Edit
+              </Button>
+            </div>
           </div>
         </div>
 
@@ -613,8 +629,16 @@ export default function ProjectDetail() {
               </CardContent>
             </Card>
           </TabsContent>
-        </Tabs>
-      </div>
-    </div>
-  );
-}
+          </Tabs>
+
+          {/* Events Modal */}
+          <EventsModal 
+          projectId={projectId} 
+          isOpen={showEventsModal} 
+          onClose={() => setShowEventsModal(false)}
+          darkMode={profile?.darkMode}
+          />
+          </div>
+          </div>
+          );
+          }
