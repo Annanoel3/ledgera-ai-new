@@ -29,18 +29,20 @@ import ExpenseRow from "@/components/projects/ExpenseRow";
 import { useWindowSize } from "@/hooks/useWindowSize";
 
 export default function ProjectFinancials() {
-  const navigate = useNavigate();
-  const queryClient = useQueryClient();
-  const urlParams = new URLSearchParams(window.location.search);
-  const projectId = urlParams.get('id');
-  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear().toString());
-  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth().toString());
-  const [showRecurringModal, setShowRecurringModal] = useState(false);
-  const [selectedExpense, setSelectedExpense] = useState(null);
-  const [groupingMode, setGroupingMode] = useState(false);
-  const [selectedExpenseIds, setSelectedExpenseIds] = useState(new Set());
-  const windowSize = useWindowSize();
-  const isMobile = windowSize.width < 768;
+   const navigate = useNavigate();
+   const queryClient = useQueryClient();
+   const urlParams = new URLSearchParams(window.location.search);
+   const projectId = urlParams.get('id');
+   const tabParam = urlParams.get('tab');
+   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear().toString());
+   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth().toString());
+   const [showRecurringModal, setShowRecurringModal] = useState(false);
+   const [selectedExpense, setSelectedExpense] = useState(null);
+   const [groupingMode, setGroupingMode] = useState(false);
+   const [selectedExpenseIds, setSelectedExpenseIds] = useState(new Set());
+   const [defaultTab, setDefaultTab] = useState(tabParam === 'expenses' ? 'expenses' : 'income');
+   const windowSize = useWindowSize();
+   const isMobile = windowSize.width < 768;
 
   const { data: user } = useQuery({
     queryKey: ['user'],
@@ -352,7 +354,7 @@ export default function ProjectFinancials() {
           </div>
         </div>
 
-        <Tabs defaultValue="income" className="space-y-6">
+        <Tabs defaultValue={defaultTab} className="space-y-6">
           <TabsList className="grid w-full grid-cols-2" style={{ backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff' }}>
             <TabsTrigger value="income" style={{ color: profile?.darkMode ? '#d1d5db' : '#374151' }}>Income ({filteredIncomeItems.length})</TabsTrigger>
             <TabsTrigger value="expenses" style={{ color: profile?.darkMode ? '#d1d5db' : '#374151' }}>Expenses ({filteredExpenseItems.length})</TabsTrigger>
