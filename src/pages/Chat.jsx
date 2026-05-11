@@ -1023,9 +1023,54 @@ export default function Chat() {
             </div> :
 
             <>
-              {messages.filter((m) => m.role === 'user' || m.role === 'assistant').map((message, idx) =>
-                <MessageBubble key={idx} message={message} profile={profile} />
-              )}
+              {(() => {
+                const filtered = messages.filter((m) => m.role === 'user' || m.role === 'assistant');
+                const grouped = [];
+                let currentGroup = null;
+                
+                for (const msg of filtered) {
+                  if (msg.role === 'assistant') {
+                    if (!currentGroup) {
+                      currentGroup = { role: 'assistant', parts: [] };
+                    }
+                    currentGroup.parts.push(msg);
+                  } else {
+                    if (currentGroup) {
+                      grouped.push(currentGroup);
+                      currentGroup = null;
+                    }
+                    grouped.push(msg);
+                  }
+                }
+                if (currentGroup) grouped.push(currentGroup);
+                
+                return grouped.map((item, idx) => {
+                  if (item.role === 'assistant' && item.parts) {
+                    // Render grouped assistant messages with single avatar
+                    return (
+                      <div key={idx} className="flex gap-3 justify-start">
+                        <div className={`h-8 w-8 rounded-full flex items-center justify-center flex-shrink-0 shadow-lg mt-1`} style={{
+                          background: profile?.funMode
+                            ? 'linear-gradient(135deg, #f472b6, #a855f7)'
+                            : 'linear-gradient(135deg, #22A699, #1d8d82)'
+                        }}>
+                          <span style={{ color: '#ffffff', fontWeight: '600', fontSize: '0.75rem' }}>
+                            {profile?.funMode ? "💰" : "LA"}
+                          </span>
+                        </div>
+                        <div className="space-y-2 flex-1">
+                          {item.parts.map((msg, i) => (
+                            <div key={i} className="max-w-[80%]">
+                              <MessageBubble message={msg} profile={profile} hideAvatar={true} />
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  }
+                  return <MessageBubble key={idx} message={item} profile={profile} />;
+                });
+              })()}
 
               {backgroundProcessing &&
                 <div className="flex gap-3 justify-start">

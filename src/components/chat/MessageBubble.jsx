@@ -5,14 +5,14 @@ import { Copy } from 'lucide-react';
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
-export default function MessageBubble({ message, profile }) {
+export default function MessageBubble({ message, profile, hideAvatar = false }) {
     const isUser = message.role === 'user';
     const funMode = profile?.funMode;
     const darkMode = profile?.darkMode;
     
     return (
         <div className={cn("flex gap-3", isUser ? "justify-end" : "justify-start")}>
-            {!isUser && (
+            {!isUser && !hideAvatar && (
                 <div className={cn(
                     "h-8 w-8 rounded-full flex items-center justify-center flex-shrink-0 shadow-lg",
                     funMode
