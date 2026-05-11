@@ -238,7 +238,7 @@ const ChatInputArea = ({ profile, selectedFiles, removeFile, fileInputRef, handl
               onChange={(e) => setInput(e.target.value)}
               onKeyPress={handleKeyPress}
               placeholder={profile?.funMode ? "Spill the financial tea..." : "Type your message or speak..."}
-              className="px-3 py-2 text-base rounded-md flex w-full border shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm min-h-[48px] max-h-32 resize-none"
+              className="px-3 py-1 text-base rounded-md flex w-full border shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm min-h-[48px] max-h-32 resize-none"
               style={{
                 backgroundColor: profile?.darkMode ? '#1f2937 !important' : '#ffffff',
                 border: profile?.funMode ?
