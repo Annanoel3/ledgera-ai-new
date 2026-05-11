@@ -226,6 +226,94 @@ const tools = [
                 required: ["projectId"]
             }
         }
+    },
+    {
+        type: "function",
+        function: {
+            name: "delete_income",
+            description: "Deletes an income item",
+            parameters: {
+                type: "object",
+                properties: {
+                    incomeId: { type: "string", description: "The ID of the income item to delete" }
+                },
+                required: ["incomeId"]
+            }
+        }
+    },
+    {
+        type: "function",
+        function: {
+            name: "delete_expense",
+            description: "Deletes an expense item",
+            parameters: {
+                type: "object",
+                properties: {
+                    expenseId: { type: "string", description: "The ID of the expense item to delete" }
+                },
+                required: ["expenseId"]
+            }
+        }
+    },
+    {
+        type: "function",
+        function: {
+            name: "delete_subscription",
+            description: "Deletes a recurring subscription",
+            parameters: {
+                type: "object",
+                properties: {
+                    subscriptionId: { type: "string", description: "The ID of the subscription to delete" }
+                },
+                required: ["subscriptionId"]
+            }
+        }
+    },
+    {
+        type: "function",
+        function: {
+            name: "create_event",
+            description: "Creates a new event for a project",
+            parameters: {
+                type: "object",
+                properties: {
+                    projectId: { type: "string", description: "The project ID for this event" },
+                    name: { type: "string", description: "Event name (e.g., Client meeting, Project launch)" },
+                    startDate: { type: "string", description: "Event start date-time in ISO format" },
+                    endDate: { type: "string", description: "Event end date-time in ISO format" },
+                    notes: { type: "string", description: "Additional notes about the event" }
+                },
+                required: ["projectId", "name", "startDate"]
+            }
+        }
+    },
+    {
+        type: "function",
+        function: {
+            name: "delete_event",
+            description: "Deletes an event from a project",
+            parameters: {
+                type: "object",
+                properties: {
+                    eventId: { type: "string", description: "The ID of the event to delete" }
+                },
+                required: ["eventId"]
+            }
+        }
+    },
+    {
+        type: "function",
+        function: {
+            name: "get_events",
+            description: "Retrieves events for a specific project",
+            parameters: {
+                type: "object",
+                properties: {
+                    projectId: { type: "string", description: "The project ID to get events for" }
+                },
+                required: ["projectId"]
+            }
+        }
     }
 ];
 
@@ -478,6 +566,43 @@ async function executeTool(toolName, args, base44, userEmail) {
                 await base44.entities.Project.delete(args.projectId);
                 return { success: true, message: "Project deleted successfully" };
             }
+
+            case "delete_income": {
+                await base44.entities.IncomeItem.delete(args.incomeId);
+                return { success: true, message: "Income item deleted successfully" };
+            }
+
+            case "delete_expense": {
+                await base44.entities.ExpenseItem.delete(args.expenseId);
+                return { success: true, message: "Expense item deleted successfully" };
+            }
+
+            case "delete_subscription": {
+                await base44.entities.RecurringSubscription.delete(args.subscriptionId);
+                return { success: true, message: "Subscription deleted successfully" };
+            }
+
+            case "create_event": {
+                const event = await base44.entities.Event.create({
+                    projectId: args.projectId,
+                    name: args.name,
+                    startDate: args.startDate,
+                    endDate: args.endDate || null,
+                    notes: args.notes || "",
+                    created_by: userEmail
+                });
+                return { success: true, event };
+            }
+
+            case "delete_event": {
+                await base44.entities.Event.delete(args.eventId);
+                return { success: true, message: "Event deleted successfully" };
+            }
+
+            case "get_events": {
+                const events = await base44.entities.Event.filter({ projectId: args.projectId, created_by: userEmail }, '-startDate');
+                return { success: true, events };
+            }
             
             default:
                 return { success: false, error: `Unknown tool: ${toolName}` };
@@ -610,7 +735,11 @@ SMART EXPENSE CATEGORIZATION: When creating expenses, intelligently assign them 
 
 RECATEGORIZING EXPENSES: When user asks to change category or move expenses, you can UPDATE the ExpenseItem with a new category.
 
-For PROJECTS: Always create a project when user tells you their business. Create additional projects when requested. Track profitability. You CAN delete projects when user explicitly requests it.
+For PROJECTS: Always create a project when user tells you their business. Create additional projects when requested. Track profitability. You can delete projects, and all associated income/expense/subscription records when user explicitly requests it.
+
+For EVENTS: You can create and delete events, and list events for a project. When user mentions an upcoming event (gig, meeting, etc.), ask if they want to create an event record.
+
+DELETION OPERATIONS: You can now delete income items, expense items, subscriptions, events, and projects when the user requests it. Always confirm what's being deleted before doing so.
 
 CRITICAL FOR FINANCIAL CALCULATIONS:
 When calculating totals, profit, or any financial metrics, ALWAYS use Project.totalIncome and Project.totalExpense fields directly. NEVER sum up individual items. These fields are pre-calculated and guaranteed accurate.
