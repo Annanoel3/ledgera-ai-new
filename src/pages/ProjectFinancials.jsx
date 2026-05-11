@@ -160,6 +160,48 @@ export default function ProjectFinancials() {
     updateExpenseProjectMutation.mutate({ id: itemId, newProjectId });
   };
 
+  const convertToRecurringMutation = useMutation({
+    mutationFn: async (expenseId) => {
+      const expense = expenseItems.find(e => e.id === expenseId);
+      if (!expense) throw new Error("Expense not found");
+      
+      const vendor = expense.vendor || "Recurring Expense";
+      
+      // Find all expenses with same vendor
+      const similarExpenses = expenseItems.filter(item => item.vendor === vendor);
+      
+      // Calculate average amount
+      const avgAmount = similarExpenses.length > 0 
+        ? similarExpenses.reduce((sum, item) => sum + item.amount, 0) / similarExpenses.length
+        : expense.amount;
+      
+      // Get earliest date
+      const earliestDate = similarExpenses.length > 0
+        ? new Date(Math.min(...similarExpenses.map(item => new Date(item.date))))
+        : new Date(expense.date);
+      
+      return base44.entities.RecurringSubscription.create({
+        projectId: expense.projectId,
+        name: vendor,
+        amount: Math.round(avgAmount * 100) / 100,
+        frequency: "monthly",
+        startDate: earliestDate.toISOString().split('T')[0],
+        category: expense.category || "subscriptions",
+        notes: `Recurring from ${similarExpenses.length} ${vendor} payment(s)`,
+        active: true,
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(['subscriptions', projectId]);
+      queryClient.invalidateQueries(['expenseItems', projectId]);
+      toast.success("Created recurring subscription from grouped expenses");
+    },
+    onError: (error) => {
+      console.error('Convert error:', error);
+      toast.error("Failed to create recurring subscription");
+    }
+  });
+
   const formatCurrency = (amount) => {
     if (!profile) return `$${amount.toFixed(2)}`;
     return new Intl.NumberFormat(profile.locale || 'en-US', {
@@ -409,15 +451,27 @@ export default function ProjectFinancials() {
                               </Select>
                             </TableCell>
                             <TableCell>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={(e) => handleDeleteExpense(e, item.id)}
-                                className="hover:text-red-500"
-                                disabled={deleteExpenseMutation.isPending}
-                              >
-                                {deleteExpenseMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
-                              </Button>
+                              <div className="flex gap-1">
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => convertToRecurringMutation.mutate(item.id)}
+                                  disabled={convertToRecurringMutation.isPending}
+                                  style={{ color: '#22A699' }}
+                                  title="Convert to recurring subscription (groups similar vendors)"
+                                >
+                                  {convertToRecurringMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : "→"}
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={(e) => handleDeleteExpense(e, item.id)}
+                                  className="hover:text-red-500"
+                                  disabled={deleteExpenseMutation.isPending}
+                                >
+                                  {deleteExpenseMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                                </Button>
+                              </div>
                             </TableCell>
                           </TableRow>
                         ))}
