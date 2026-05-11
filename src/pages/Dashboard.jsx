@@ -209,8 +209,12 @@ export default function Dashboard() {
   };
 
   // Get all years from data
-  const allYears = [...new Set([...incomeItems, ...expenseItems].map(item => new Date(item.date).getFullYear()))].sort((a, b) => b - a);
-  const availableYears = allYears.length > 0 ? allYears.map(y => y.toString()) : [new Date().getFullYear().toString()];
+  const allYears = [...new Set([
+    ...incomeItems.map(item => new Date(item.date).getFullYear()),
+    ...expenseItems.map(item => new Date(item.date).getFullYear()),
+    new Date().getFullYear() // Always include current year
+  ])].sort((a, b) => b - a);
+  const availableYears = allYears.map(y => y.toString());
 
   // Filter by year
   const yearStart = startOfYear(new Date(parseInt(selectedYear), 0, 1));
