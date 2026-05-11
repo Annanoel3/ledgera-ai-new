@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -428,7 +427,10 @@ export default function Reports() {
     }
   };
 
-  const availableYears = ['2024', '2025'];
+  // Generate available years from actual data
+  const allYears = [...new Set([...incomeItems, ...expenseItems].map(item => new Date(item.date).getFullYear()))].sort((a, b) => b - a);
+  const availableYears = allYears.length > 0 ? allYears.map(y => y.toString()) : [new Date().getFullYear().toString()];
+  
   const months = [
     { value: "all", label: "Full Year" },
     { value: "1", label: "January" },

@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { usePullToRefresh } from "@/hooks/usePullToRefresh";
 import { Loader2 as RefreshIcon } from "lucide-react";
@@ -8,7 +8,8 @@ import { Button } from "@/components/ui/button";
 import { TrendingUp, TrendingDown, DollarSign, CreditCard, Wallet, ArrowRight, Loader2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { startOfMonth, endOfMonth, subMonths, format } from "date-fns";
+import { startOfMonth, endOfMonth, subMonths, format, startOfYear, endOfYear } from "date-fns";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
 import QuickEditItem from "../components/dashboard/QuickEditItem";
@@ -16,6 +17,7 @@ import toast from "react-hot-toast"; // Assuming react-hot-toast for toast notif
 
 export default function Dashboard() {
   const queryClient = useQueryClient();
+  const [selectedYear, setSelectedYear] = React.useState(new Date().getFullYear().toString());
 
   const handleRefresh = useCallback(async () => {
     await queryClient.invalidateQueries();
@@ -206,18 +208,36 @@ export default function Dashboard() {
     await convertMutation.mutateAsync({ id, fromType: 'expense', toType: 'income', data: newData });
   };
 
-  // Calculate MTD stats
+  // Get all years from data
+  const allYears = [...new Set([...incomeItems, ...expenseItems].map(item => new Date(item.date).getFullYear()))].sort((a, b) => b - a);
+  const availableYears = allYears.length > 0 ? allYears.map(y => y.toString()) : [new Date().getFullYear().toString()];
+
+  // Filter by year
+  const yearStart = startOfYear(new Date(parseInt(selectedYear), 0, 1));
+  const yearEnd = endOfYear(new Date(parseInt(selectedYear), 0, 1));
+
+  const yearIncomeItems = incomeItems.filter((item) => {
+    const itemDate = new Date(item.date);
+    return itemDate >= yearStart && itemDate <= yearEnd;
+  });
+
+  const yearExpenseItems = expenseItems.filter((item) => {
+    const itemDate = new Date(item.date);
+    return itemDate >= yearStart && itemDate <= yearEnd;
+  });
+
+  // Calculate MTD stats (current month of selected year)
   const monthStart = startOfMonth(new Date());
   const monthEnd = endOfMonth(new Date());
 
-  const mtdIncome = incomeItems.
+  const mtdIncome = yearIncomeItems.
   filter((item) => {
     const itemDate = new Date(item.date);
     return itemDate >= monthStart && itemDate <= monthEnd;
   }).
   reduce((sum, item) => sum + (item.amount || 0), 0);
 
-  const mtdExpenses = expenseItems.
+  const mtdExpenses = yearExpenseItems.
   filter((item) => {
     const itemDate = new Date(item.date);
     return itemDate >= monthStart && itemDate <= monthEnd;
@@ -226,21 +246,21 @@ export default function Dashboard() {
 
   const mtdProfit = mtdIncome - mtdExpenses;
 
-  // Calculate 6-month chart data
+  // Calculate 6-month chart data (within selected year)
   const chartData = [];
   for (let i = 5; i >= 0; i--) {
-    const monthDate = subMonths(new Date(), i);
+    const monthDate = subMonths(new Date(parseInt(selectedYear), new Date().getMonth()), i);
     const monthStartDate = startOfMonth(monthDate);
     const monthEndDate = endOfMonth(monthDate);
 
-    const income = incomeItems.
+    const income = yearIncomeItems.
     filter((item) => {
       const itemDate = new Date(item.date);
       return itemDate >= monthStartDate && itemDate <= monthEndDate;
     }).
     reduce((sum, item) => sum + (item.amount || 0), 0);
 
-    const expenses = expenseItems.
+    const expenses = yearExpenseItems.
     filter((item) => {
       const itemDate = new Date(item.date);
       return itemDate >= monthStartDate && itemDate <= monthEndDate;
@@ -255,20 +275,32 @@ export default function Dashboard() {
     });
   }
 
-  // Top projects by profit
+  // Top projects by profit (for selected year)
+  const yearProjectIncomeMap = yearIncomeItems.reduce((acc, item) => {
+    if (item.projectId) acc[item.projectId] = (acc[item.projectId] || 0) + item.amount;
+    return acc;
+  }, {});
+
+  const yearProjectExpenseMap = yearExpenseItems.reduce((acc, item) => {
+    if (item.projectId) acc[item.projectId] = (acc[item.projectId] || 0) + item.amount;
+    return acc;
+  }, {});
+
   const topProjects = projects.
   map((p) => ({
     ...p,
-    profit: (p.totalIncome || 0) - (p.totalExpense || 0),
-    margin: p.totalIncome > 0 ? ((p.totalIncome - p.totalExpense) / p.totalIncome * 100).toFixed(1) : 0
+    totalIncome: yearProjectIncomeMap[p.id] || 0,
+    totalExpense: yearProjectExpenseMap[p.id] || 0,
+    profit: (yearProjectIncomeMap[p.id] || 0) - (yearProjectExpenseMap[p.id] || 0),
+    margin: (yearProjectIncomeMap[p.id] || 0) > 0 ? (((yearProjectIncomeMap[p.id] || 0) - (yearProjectExpenseMap[p.id] || 0)) / (yearProjectIncomeMap[p.id] || 0) * 100).toFixed(1) : 0
   })).
   sort((a, b) => b.profit - a.profit).
   slice(0, 5);
 
-  const hasData = incomeItems.length > 0 || expenseItems.length > 0;
+  const hasData = yearIncomeItems.length > 0 || yearExpenseItems.length > 0;
 
-  const recentActivity = [...incomeItems.map((item) => ({ ...item, type: 'income', title: item.notes || `Income #${item.id}` })),
-  ...expenseItems.map((item) => ({ ...item, type: 'expense', title: item.notes || item.vendor || `Expense #${item.id}` }))].
+  const recentActivity = [...yearIncomeItems.map((item) => ({ ...item, type: 'income', title: item.notes || `Income #${item.id}` })),
+  ...yearExpenseItems.map((item) => ({ ...item, type: 'expense', title: item.notes || item.vendor || `Expense #${item.id}` }))].
   sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
 
@@ -284,9 +316,23 @@ export default function Dashboard() {
     return (
       <div className="p-6 md:p-8 pb-24 md:pb-8 min-h-screen" style={{ backgroundColor: profile?.darkMode ? '#0f0f0f' : '#f9fafb' }}>
         <div className="max-w-6xl mx-auto">
-          <div className="flex items-center justify-between mb-8">
-            <h1 className="text-3xl font-bold" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>Dashboard</h1>
-          </div>
+           <div className="flex items-center justify-between mb-8">
+             <h1 className="text-3xl font-bold" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>Dashboard</h1>
+             <Select value={selectedYear} onValueChange={setSelectedYear}>
+               <SelectTrigger className="w-32" style={{
+                 backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff',
+                 border: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}`,
+                 color: profile?.darkMode ? '#ffffff' : '#111827'
+               }}>
+                 <SelectValue />
+               </SelectTrigger>
+               <SelectContent style={{ backgroundColor: profile?.darkMode ? '#374151' : '#ffffff', border: `1px solid ${profile?.darkMode ? '#4b5563' : '#e5e7eb'}` }}>
+                 {availableYears.map(year => (
+                   <SelectItem key={year} value={year} style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>{year}</SelectItem>
+                 ))}
+               </SelectContent>
+             </Select>
+           </div>
           <Card style={{ backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff', border: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}` }}>
             <CardContent className="flex flex-col items-center justify-center py-16">
               <div className="w-16 h-16 rounded-full flex items-center justify-center mb-4" style={{ backgroundColor: profile?.darkMode ? '#374151' : '#f3f4f6' }}>
