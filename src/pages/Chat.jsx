@@ -238,13 +238,14 @@ const ChatInputArea = ({ profile, selectedFiles, removeFile, fileInputRef, handl
               onChange={(e) => setInput(e.target.value)}
               onKeyPress={handleKeyPress}
               placeholder={profile?.funMode ? "Spill the financial tea..." : "Type your message or speak..."}
-              className="my-1 px-3 py-1 text-base rounded-md flex w-full border shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm min-h-[48px] max-h-32 resize-none"
+              className="my-1 px-3 py-1 text-base rounded-md flex w-full border shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm min-h-[48px] max-h-32 resize-none"
               style={{
                 backgroundColor: profile?.darkMode ? '#1f2937 !important' : '#ffffff',
                 border: profile?.funMode ?
                   profile?.darkMode ? '1px solid #a855f7' : '1px solid #f9a8d4' :
                   profile?.darkMode ? '1px solid #374151' : '1px solid #e5e7eb',
-                color: profile?.darkMode ? '#ffffff !important' : '#111827 !important'
+                color: profile?.darkMode ? '#ffffff !important' : '#111827 !important',
+                '--placeholder-color': profile?.darkMode ? '#9ca3af' : '#6b7280'
               }}
               disabled={sendingMessage || isRecording || uploadingFile} />
           </div>

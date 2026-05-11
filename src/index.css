@@ -87,6 +87,10 @@ button:focus-visible {
 
 
 
+textarea::placeholder {
+  color: var(--placeholder-color, #6b7280) !important;
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;
