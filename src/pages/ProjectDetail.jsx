@@ -10,6 +10,7 @@ import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { format } from "date-fns";
 import EventsModal from "@/components/projects/EventsModal";
+import SubscriptionsTab from "@/components/projects/SubscriptionsTab";
 import {
   Table,
   TableBody,
@@ -525,11 +526,23 @@ export default function ProjectDetail() {
 
         {/* Rest of tabs */}
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3 dark:bg-gray-800 dark:border-gray-700">
+          <TabsList className="grid w-full grid-cols-4 dark:bg-gray-800 dark:border-gray-700">
             <TabsTrigger value="overview" className="dark:data-[state=active]:bg-gray-700 dark:data-[state=active]:text-white dark:text-gray-400">Overview</TabsTrigger>
+            <TabsTrigger value="subscriptions" className="dark:data-[state=active]:bg-gray-700 dark:data-[state=active]:text-white dark:text-gray-400">Subscriptions</TabsTrigger>
             <TabsTrigger value="documents" className="dark:data-[state=active]:bg-gray-700 dark:data-[state=active]:text-white dark:text-gray-400">Documents</TabsTrigger>
             <TabsTrigger value="history" className="dark:data-[state=active]:bg-gray-700 dark:data-[state=active]:text-white dark:text-gray-400">History</TabsTrigger>
           </TabsList>
+
+          <TabsContent value="subscriptions">
+            <Card className="dark:bg-gray-800 dark:border-gray-700">
+              <CardHeader>
+                <CardTitle className="dark:text-white">Recurring Subscriptions</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <SubscriptionsTab projectId={projectId} darkMode={profile?.darkMode} />
+              </CardContent>
+            </Card>
+          </TabsContent>
 
           <TabsContent value="overview">
             <Card className="dark:bg-gray-800 dark:border-gray-700">

@@ -145,7 +145,7 @@ export default function EventsModal({ projectId, isOpen, onClose, darkMode }) {
               </div>
             ) : (
               <p style={{ color: darkMode ? '#9ca3af' : '#6b7280' }} className="text-center py-4">
-                No events yet. Create one to get check-in reminders!
+                No events yet. Add one to get started!
               </p>
             )}
 

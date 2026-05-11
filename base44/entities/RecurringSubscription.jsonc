@@ -1,0 +1,69 @@
+{
+  "name": "RecurringSubscription",
+  "type": "object",
+  "properties": {
+    "projectId": {
+      "type": "string",
+      "description": "Associated project ID"
+    },
+    "name": {
+      "type": "string",
+      "description": "Subscription name (e.g., ChatGPT, Adobe Creative Cloud)"
+    },
+    "amount": {
+      "type": "number",
+      "description": "Cost per billing cycle"
+    },
+    "frequency": {
+      "type": "string",
+      "enum": [
+        "monthly",
+        "yearly",
+        "weekly",
+        "custom"
+      ],
+      "default": "monthly",
+      "description": "How often to charge"
+    },
+    "customDays": {
+      "type": "number",
+      "description": "For custom frequency, number of days between charges"
+    },
+    "category": {
+      "type": "string",
+      "default": "subscriptions",
+      "description": "Expense category"
+    },
+    "startDate": {
+      "type": "string",
+      "format": "date",
+      "description": "When subscription started"
+    },
+    "endDate": {
+      "type": "string",
+      "format": "date",
+      "description": "When subscription ends (if canceled)"
+    },
+    "lastChargeDate": {
+      "type": "string",
+      "format": "date",
+      "description": "Date of last auto-generated expense"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Additional notes"
+    },
+    "active": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether subscription is active"
+    }
+  },
+  "required": [
+    "projectId",
+    "name",
+    "amount",
+    "frequency",
+    "startDate"
+  ]
+}
