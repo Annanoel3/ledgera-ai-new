@@ -33,8 +33,6 @@ export default function ProjectDetail() {
   const queryClient = useQueryClient();
   const urlParams = new URLSearchParams(window.location.search);
   const projectId = urlParams.get('id');
-  const [showIncomeDetails, setShowIncomeDetails] = useState(false);
-  const [showExpenseDetails, setShowExpenseDetails] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
   const [showEventsModal, setShowEventsModal] = useState(false);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear().toString());
@@ -472,7 +470,7 @@ export default function ProjectDetail() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <Card
             className="cursor-pointer hover:shadow-lg transition-all"
-            onClick={() => setShowIncomeDetails(!showIncomeDetails)}
+            onClick={() => navigate(createPageUrl("ProjectFinancials") + `?id=${projectId}`)}
             style={{ backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff', border: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}` }}
           >
             <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -487,7 +485,7 @@ export default function ProjectDetail() {
 
           <Card
             className="cursor-pointer hover:shadow-lg transition-all"
-            onClick={() => setShowExpenseDetails(!showExpenseDetails)}
+            onClick={() => navigate(createPageUrl("ProjectFinancials") + `?id=${projectId}`)}
             style={{ backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff', border: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}` }}
           >
             <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -525,157 +523,9 @@ export default function ProjectDetail() {
           </Card>
         </div>
 
-        {/* Income Details Dropdown */}
-         {showIncomeDetails && filteredIncomeItems.length > 0 && (
-          <Card className="mb-6" style={{ backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff', border: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}` }}>
-            <CardHeader>
-              <CardTitle style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>Income Items</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow className="dark:border-gray-700">
-                    <TableHead className="dark:text-gray-300">Date</TableHead>
-                    <TableHead className="dark:text-gray-300">Category</TableHead>
-                    <TableHead className="dark:text-gray-300">Amount</TableHead>
-                    <TableHead className="dark:text-gray-300">Notes</TableHead>
-                    <TableHead className="dark:text-gray-300">Project</TableHead>
-                    <TableHead className="dark:text-gray-300 sr-only">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                   {filteredIncomeItems.map((item) => (
-                    <TableRow key={item.id} className="dark:border-gray-700">
-                      <TableCell className="dark:text-gray-300">{format(new Date(item.date), 'MMM d, yyyy')}</TableCell>
-                      <TableCell className="dark:text-gray-300">{item.category}</TableCell>
-                      <TableCell className="font-medium text-[#22A699]">{formatCurrency(item.amount)}</TableCell>
-                      <TableCell className="text-gray-500 dark:text-gray-400">{item.notes || '-'}</TableCell>
-                      <TableCell>
-                        <Select
-                          value={item.projectId}
-                          onValueChange={(newProjectId) => handleIncomeProjectChange(item.id, newProjectId)}
-                          disabled={updateIncomeProjectMutation.isPending}
-                        >
-                          <SelectTrigger className="w-40" style={{
-                            backgroundColor: profile?.darkMode ? '#374151' : '#ffffff',
-                            border: `1px solid ${profile?.darkMode ? '#4b5563' : '#e5e7eb'}`,
-                            color: profile?.darkMode ? '#ffffff' : '#111827'
-                          }}>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent style={{
-                            backgroundColor: profile?.darkMode ? '#374151' : '#ffffff',
-                            border: `1px solid ${profile?.darkMode ? '#4b5563' : '#e5e7eb'}`
-                          }}>
-                            {allProjects.map(proj => (
-                              <SelectItem key={proj.id} value={proj.id} style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>
-                                {proj.title}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </TableCell>
-                      <TableCell>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={(e) => handleDeleteIncome(e, item.id)}
-                          className="hover:text-red-500"
-                          disabled={deleteIncomeMutation.isPending}
-                        >
-                          {deleteIncomeMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-        )}
 
-        {/* Expense Details Dropdown */}
-         {showExpenseDetails && filteredExpenseItems.length > 0 && (
-          <Card className="mb-6" style={{ backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff', border: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}` }}>
-            <CardHeader>
-              <CardTitle style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>Expense Items</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow className="dark:border-gray-700">
-                    <TableHead className="dark:text-gray-300">Date</TableHead>
-                    <TableHead className="dark:text-gray-300">Category</TableHead>
-                    <TableHead className="dark:text-gray-300">Vendor</TableHead>
-                    <TableHead className="dark:text-gray-300">Amount</TableHead>
-                    <TableHead className="dark:text-gray-300">Notes</TableHead>
-                    <TableHead className="dark:text-gray-300">Project</TableHead>
-                    <TableHead className="dark:text-gray-300 sr-only">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                   {filteredExpenseItems.map((item) => (
-                    <TableRow key={item.id} className="dark:border-gray-700">
-                         <TableCell className="dark:text-gray-300">{format(new Date(item.date), 'MMM d, yyyy')}</TableCell>
-                         <TableCell className="dark:text-gray-300">{item.category}</TableCell>
-                         <TableCell className="text-gray-500 dark:text-gray-400">{item.vendor || '-'}</TableCell>
-                         <TableCell className="font-medium text-red-500">{formatCurrency(item.amount)}</TableCell>
-                         <TableCell className="text-gray-500 dark:text-gray-400">{item.notes || '-'}</TableCell>
-                         <TableCell>
-                           <Select
-                             value={item.projectId}
-                             onValueChange={(newProjectId) => handleExpenseProjectChange(item.id, newProjectId)}
-                             disabled={updateExpenseProjectMutation.isPending}
-                           >
-                             <SelectTrigger className="w-40" style={{
-                               backgroundColor: profile?.darkMode ? '#374151' : '#ffffff',
-                               border: `1px solid ${profile?.darkMode ? '#4b5563' : '#e5e7eb'}`,
-                               color: profile?.darkMode ? '#ffffff' : '#111827'
-                             }}>
-                               <SelectValue />
-                             </SelectTrigger>
-                             <SelectContent style={{
-                               backgroundColor: profile?.darkMode ? '#374151' : '#ffffff',
-                               border: `1px solid ${profile?.darkMode ? '#4b5563' : '#e5e7eb'}`
-                             }}>
-                               {allProjects.map(proj => (
-                                 <SelectItem key={proj.id} value={proj.id} style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>
-                                   {proj.title}
-                                 </SelectItem>
-                               ))}
-                             </SelectContent>
-                           </Select>
-                         </TableCell>
-                         <TableCell>
-                           <div className="flex gap-1">
-                             <Button
-                               variant="ghost"
-                               size="sm"
-                               onClick={() => convertToRecurringMutation.mutate(item.id)}
-                               disabled={convertToRecurringMutation.isPending}
-                               style={{ color: '#22A699' }}
-                               title="Convert to recurring"
-                             >
-                               {convertToRecurringMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : "→"}
-                             </Button>
-                             <Button
-                               variant="ghost"
-                               size="icon"
-                               onClick={(e) => handleDeleteExpense(e, item.id)}
-                               className="hover:text-red-500"
-                               disabled={deleteExpenseMutation.isPending}
-                             >
-                               {deleteExpenseMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
-                             </Button>
-                           </div>
-                         </TableCell>
-                       </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-        )}
+
+
 
         {/* Rest of tabs */}
         <Tabs defaultValue="overview" className="space-y-6">

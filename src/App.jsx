@@ -14,6 +14,7 @@ import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import PrivacyPolicy from './pages/PrivacyPolicy';
+import ProjectFinancials from './pages/ProjectFinancials';
 
 const { Pages, Layout, mainPage } = pagesConfig;
 const mainPageKey = mainPage ?? Object.keys(Pages)[0];
@@ -105,6 +106,7 @@ function App() {
           <NavigationTracker />
           <Routes>
             <Route path="/PrivacyPolicy" element={<PrivacyPolicy />} />
+            <Route path="/ProjectFinancials" element={<LayoutWrapper currentPageName="ProjectFinancials"><ProjectFinancials /></LayoutWrapper>} />
             <Route path="*" element={<AuthenticatedApp />} />
           </Routes>
         </Router>
