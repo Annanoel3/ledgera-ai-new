@@ -597,7 +597,7 @@ export default function Settings() {
                 variant="outline" 
                 onClick={handleResetApp}
                 disabled={deleteAllDataMutation.isPending}
-                className="w-full gap-2 justify-start hover:bg-red-50 dark:hover:bg-red-900/20 h-auto py-3" 
+                className="w-full gap-2 justify-start"
                 style={{
                   backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff',
                   border: `2px solid ${profile?.darkMode ? '#991b1b' : '#dc2626'}`,
@@ -607,12 +607,12 @@ export default function Settings() {
                 {deleteAllDataMutation.isPending ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin flex-shrink-0" />
-                    <span className="text-left">Erasing All Financial Data...</span>
+                    Erasing Data...
                   </>
                 ) : (
                   <>
                     <Trash2 className="w-4 h-4 flex-shrink-0" />
-                    <span className="text-left leading-tight">Reset Financial Data (Keep Chat History)</span>
+                    Reset Financial Data (Keep Chat History)
                   </>
                 )}
               </Button>
