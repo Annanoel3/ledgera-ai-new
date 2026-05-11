@@ -50,7 +50,6 @@ function AnimatedRoutes({ mainPageKey, MainPage, Pages }) {
           {Object.entries(Pages).map(([path, Page]) => (
             <Route key={path} path={`/${path}`} element={<Page />} />
           ))}
-          <Route path="/PrivacyPolicy" element={<PrivacyPolicy />} />
           <Route path="*" element={<PageNotFound />} />
         </Routes>
       </motion.div>
@@ -61,7 +60,6 @@ function AnimatedRoutes({ mainPageKey, MainPage, Pages }) {
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, isAuthenticated, navigateToLogin } = useAuth();
 
-  // Show loading spinner while checking app public settings or auth
   if (isLoadingPublicSettings || isLoadingAuth) {
     return (
       <div className="fixed inset-0 flex items-center justify-center">
@@ -70,18 +68,15 @@ const AuthenticatedApp = () => {
     );
   }
 
-  // Handle authentication errors
   if (authError) {
     if (authError.type === 'user_not_registered') {
       return <UserNotRegisteredError />;
     } else if (authError.type === 'auth_required') {
-      // Redirect to login automatically
       navigateToLogin();
       return null;
     }
   }
 
-  // Render the main app
   return (
     <LayoutWrapper currentPageName={mainPageKey}>
       <AnimatedRoutes mainPageKey={mainPageKey} MainPage={MainPage} Pages={Pages} />
@@ -100,7 +95,10 @@ function App() {
       <QueryClientProvider client={queryClientInstance}>
         <Router>
           <NavigationTracker />
-          <AuthenticatedApp />
+          <Routes>
+            <Route path="/PrivacyPolicy" element={<PrivacyPolicy />} />
+            <Route path="*" element={<AuthenticatedApp />} />
+          </Routes>
         </Router>
         <Toaster />
         <VisualEditAgent />
