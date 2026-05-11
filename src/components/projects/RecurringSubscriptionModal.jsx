@@ -4,19 +4,22 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 
 export default function RecurringSubscriptionModal({ 
   isOpen, 
   onClose, 
   expense, 
   onConfirm,
-  darkMode
+  darkMode,
+  relatedExpenses = []
 }) {
   const [frequency, setFrequency] = useState("monthly");
   const [customDays, setCustomDays] = useState("");
   const [name, setName] = useState(expense?.vendor || "");
   const [notes, setNotes] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedExpenses, setSelectedExpenses] = useState([expense?.id] || []);
 
   const handleConfirm = async () => {
     setIsLoading(true);
@@ -26,6 +29,7 @@ export default function RecurringSubscriptionModal({
         frequency,
         customDays: frequency === "custom" ? parseInt(customDays) : undefined,
         notes,
+        selectedExpenseIds: selectedExpenses,
       });
       handleClose();
     } finally {
@@ -38,7 +42,16 @@ export default function RecurringSubscriptionModal({
     setCustomDays("");
     setName(expense?.vendor || "");
     setNotes("");
+    setSelectedExpenses([expense?.id] || []);
     onClose();
+  };
+
+  const toggleExpenseSelection = (expenseId) => {
+    setSelectedExpenses(prev =>
+      prev.includes(expenseId)
+        ? prev.filter(id => id !== expenseId)
+        : [...prev, expenseId]
+    );
   };
 
   return (
@@ -53,7 +66,7 @@ export default function RecurringSubscriptionModal({
           </DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-4">
+        <div className="space-y-4 max-h-96 overflow-y-auto">
           <div>
             <Label style={{ color: darkMode ? '#d1d5db' : '#374151' }}>
               Subscription Name
@@ -132,6 +145,33 @@ export default function RecurringSubscriptionModal({
               className="mt-1"
             />
           </div>
+
+          {relatedExpenses.length > 1 && (
+            <div>
+              <Label style={{ color: darkMode ? '#d1d5db' : '#374151' }}>
+                Group with related transactions ({selectedExpenses.length} selected)
+              </Label>
+              <div 
+                className="space-y-2 p-3 rounded border mt-1"
+                style={{
+                  backgroundColor: darkMode ? '#374151' : '#f9fafb',
+                  borderColor: darkMode ? '#4b5563' : '#e5e7eb'
+                }}
+              >
+                {relatedExpenses.map(exp => (
+                  <div key={exp.id} className="flex items-center gap-2">
+                    <Checkbox
+                      checked={selectedExpenses.includes(exp.id)}
+                      onCheckedChange={() => toggleExpenseSelection(exp.id)}
+                    />
+                    <span style={{ color: darkMode ? '#d1d5db' : '#111827' }} className="text-sm">
+                      {new Date(exp.date).toLocaleDateString()} - ${exp.amount.toFixed(2)}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         <DialogFooter>

@@ -25,6 +25,8 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import RecurringSubscriptionModal from "@/components/projects/RecurringSubscriptionModal";
+import ExpenseRow from "@/components/projects/ExpenseRow";
+import { useWindowSize } from "@/hooks/useWindowSize";
 
 export default function ProjectFinancials() {
   const navigate = useNavigate();
@@ -35,6 +37,10 @@ export default function ProjectFinancials() {
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth().toString());
   const [showRecurringModal, setShowRecurringModal] = useState(false);
   const [selectedExpense, setSelectedExpense] = useState(null);
+  const [groupingMode, setGroupingMode] = useState(false);
+  const [selectedExpenseIds, setSelectedExpenseIds] = useState(new Set());
+  const windowSize = useWindowSize();
+  const isMobile = windowSize.width < 768;
 
   const { data: user } = useQuery({
     queryKey: ['user'],
@@ -164,21 +170,23 @@ export default function ProjectFinancials() {
   };
 
   const convertToRecurringMutation = useMutation({
-    mutationFn: async ({ expenseId, frequency, customDays, name, notes }) => {
+    mutationFn: async ({ expenseId, frequency, customDays, name, notes, selectedExpenseIds }) => {
       const expense = expenseItems.find(e => e.id === expenseId);
       if (!expense) throw new Error("Expense not found");
       
-      // Find all expenses with same vendor
-      const similarExpenses = expenseItems.filter(item => item.vendor === expense.vendor);
+      // Use selected expenses for grouping, or fall back to same vendor
+      const selectedExpenses = selectedExpenseIds && selectedExpenseIds.length > 0
+        ? expenseItems.filter(e => selectedExpenseIds.includes(e.id))
+        : expenseItems.filter(item => item.vendor === expense.vendor);
       
       // Calculate average amount
-      const avgAmount = similarExpenses.length > 0 
-        ? similarExpenses.reduce((sum, item) => sum + item.amount, 0) / similarExpenses.length
+      const avgAmount = selectedExpenses.length > 0 
+        ? selectedExpenses.reduce((sum, item) => sum + item.amount, 0) / selectedExpenses.length
         : expense.amount;
       
       // Get earliest date
-      const earliestDate = similarExpenses.length > 0
-        ? new Date(Math.min(...similarExpenses.map(item => new Date(item.date))))
+      const earliestDate = selectedExpenses.length > 0
+        ? new Date(Math.min(...selectedExpenses.map(item => new Date(item.date))))
         : new Date(expense.date);
       
       return base44.entities.RecurringSubscription.create({
@@ -189,7 +197,7 @@ export default function ProjectFinancials() {
         customDays: frequency === "custom" ? customDays : undefined,
         startDate: earliestDate.toISOString().split('T')[0],
         category: expense.category || "subscriptions",
-        notes: notes || (similarExpenses.length > 1 ? `Recurring from ${similarExpenses.length} payments` : ""),
+        notes: notes || (selectedExpenses.length > 1 ? `Recurring from ${selectedExpenses.length} payments` : ""),
         active: true,
       });
     },
@@ -206,14 +214,29 @@ export default function ProjectFinancials() {
 
   const handleStartRecurring = (expense) => {
     setSelectedExpense(expense);
+    setGroupingMode(true);
+    setSelectedExpenseIds(new Set([expense.id]));
     setShowRecurringModal(true);
   };
 
   const handleConfirmRecurring = (settings) => {
     convertToRecurringMutation.mutate({
       expenseId: selectedExpense.id,
+      selectedExpenseIds: Array.from(selectedExpenseIds),
       ...settings
     });
+    setGroupingMode(false);
+    setSelectedExpenseIds(new Set());
+  };
+
+  const toggleExpenseSelect = (expenseId) => {
+    const newSet = new Set(selectedExpenseIds);
+    if (newSet.has(expenseId)) {
+      newSet.delete(expenseId);
+    } else {
+      newSet.add(expenseId);
+    }
+    setSelectedExpenseIds(newSet);
   };
 
   const formatCurrency = (amount) => {
@@ -417,82 +440,63 @@ export default function ProjectFinancials() {
               <CardContent>
                 {filteredExpenseItems.length === 0 ? (
                   <p style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }} className="text-center py-8">No expense items for this period</p>
-                ) : (
-                  <div className="overflow-x-auto">
-                    <Table>
-                      <TableHeader>
-                        <TableRow style={{ borderColor: profile?.darkMode ? '#374151' : '#e5e7eb' }}>
-                          <TableHead style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>Date</TableHead>
-                          <TableHead style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>Category</TableHead>
-                          <TableHead style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>Vendor</TableHead>
-                          <TableHead style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>Amount</TableHead>
-                          <TableHead style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>Notes</TableHead>
-                          <TableHead style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>Project</TableHead>
-                          <TableHead style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }} className="sr-only">Actions</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {filteredExpenseItems.map((item) => (
-                          <TableRow key={item.id} style={{ borderColor: profile?.darkMode ? '#374151' : '#e5e7eb' }}>
-                            <TableCell style={{ color: profile?.darkMode ? '#d1d5db' : '#111827' }}>{format(new Date(item.date), 'MMM d, yyyy')}</TableCell>
-                            <TableCell style={{ color: profile?.darkMode ? '#d1d5db' : '#111827' }}>{item.category}</TableCell>
-                            <TableCell style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>{item.vendor || '-'}</TableCell>
-                            <TableCell className="font-medium text-red-500">{formatCurrency(item.amount)}</TableCell>
-                            <TableCell style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>{item.notes || '-'}</TableCell>
-                            <TableCell>
-                              <Select
-                                value={item.projectId}
-                                onValueChange={(newProjectId) => handleExpenseProjectChange(item.id, newProjectId)}
-                                disabled={updateExpenseProjectMutation.isPending}
-                              >
-                                <SelectTrigger className="w-40" style={{
-                                  backgroundColor: profile?.darkMode ? '#374151' : '#ffffff',
-                                  border: `1px solid ${profile?.darkMode ? '#4b5563' : '#e5e7eb'}`,
-                                  color: profile?.darkMode ? '#ffffff' : '#111827'
-                                }}>
-                                  <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent style={{
-                                  backgroundColor: profile?.darkMode ? '#374151' : '#ffffff',
-                                  border: `1px solid ${profile?.darkMode ? '#4b5563' : '#e5e7eb'}`
-                                }}>
-                                  {allProjects.map(proj => (
-                                    <SelectItem key={proj.id} value={proj.id} style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>
-                                      {proj.title}
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                            </TableCell>
-                            <TableCell>
-                              <div className="flex gap-1">
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => handleStartRecurring(item)}
-                                  disabled={convertToRecurringMutation.isPending}
-                                  style={{ color: '#22A699' }}
-                                  title="Convert to recurring subscription"
-                                >
-                                  {convertToRecurringMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : "→"}
-                                </Button>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  onClick={(e) => handleDeleteExpense(e, item.id)}
-                                  className="hover:text-red-500"
-                                  disabled={deleteExpenseMutation.isPending}
-                                >
-                                  {deleteExpenseMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
-                                </Button>
-                              </div>
-                            </TableCell>
+                ) : isMobile ? (
+                    <div>
+                      {filteredExpenseItems.map((item) => (
+                        <ExpenseRow
+                          key={item.id}
+                          item={item}
+                          onDelete={handleDeleteExpense}
+                          onProjectChange={handleExpenseProjectChange}
+                          onMakeRecurring={handleStartRecurring}
+                          darkMode={profile?.darkMode}
+                          allProjects={allProjects}
+                          isDeleteLoading={deleteExpenseMutation.isPending}
+                          isRecurringLoading={convertToRecurringMutation.isPending}
+                          isMobile={true}
+                          isSelected={selectedExpenseIds.has(item.id)}
+                          onToggleSelect={groupingMode ? toggleExpenseSelect : undefined}
+                          showCheckbox={groupingMode}
+                        />
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="overflow-x-auto">
+                      <Table>
+                        <TableHeader>
+                          <TableRow style={{ borderColor: profile?.darkMode ? '#374151' : '#e5e7eb' }}>
+                            {groupingMode && <TableHead style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }} className="w-8"></TableHead>}
+                            <TableHead style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>Date</TableHead>
+                            <TableHead style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>Category</TableHead>
+                            <TableHead style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>Vendor</TableHead>
+                            <TableHead style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>Amount</TableHead>
+                            <TableHead style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>Notes</TableHead>
+                            <TableHead style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>Project</TableHead>
+                            <TableHead style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }} className="sr-only">Actions</TableHead>
                           </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </div>
-                )}
+                        </TableHeader>
+                        <TableBody>
+                          {filteredExpenseItems.map((item) => (
+                            <ExpenseRow
+                              key={item.id}
+                              item={item}
+                              onDelete={handleDeleteExpense}
+                              onProjectChange={handleExpenseProjectChange}
+                              onMakeRecurring={handleStartRecurring}
+                              darkMode={profile?.darkMode}
+                              allProjects={allProjects}
+                              isDeleteLoading={deleteExpenseMutation.isPending}
+                              isRecurringLoading={convertToRecurringMutation.isPending}
+                              isMobile={false}
+                              isSelected={selectedExpenseIds.has(item.id)}
+                              onToggleSelect={groupingMode ? toggleExpenseSelect : undefined}
+                              showCheckbox={groupingMode}
+                            />
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  )}
               </CardContent>
             </Card>
           </TabsContent>
@@ -500,10 +504,15 @@ export default function ProjectFinancials() {
 
         <RecurringSubscriptionModal
           isOpen={showRecurringModal}
-          onClose={() => setShowRecurringModal(false)}
+          onClose={() => {
+            setShowRecurringModal(false);
+            setGroupingMode(false);
+            setSelectedExpenseIds(new Set());
+          }}
           expense={selectedExpense}
           onConfirm={handleConfirmRecurring}
           darkMode={profile?.darkMode}
+          relatedExpenses={selectedExpense ? expenseItems.filter(e => e.vendor === selectedExpense.vendor) : []}
         />
       </div>
     </div>
