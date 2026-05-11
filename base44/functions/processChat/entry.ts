@@ -314,6 +314,28 @@ const tools = [
                 required: ["projectId"]
             }
         }
+    },
+    {
+        type: "function",
+        function: {
+            name: "create_recurring_expense",
+            description: "Creates a recurring subscription/expense that repeats at a set interval. Use this when user requests a subscription or recurring expense.",
+            parameters: {
+                type: "object",
+                properties: {
+                    projectId: { type: "string", description: "The project ID this subscription belongs to" },
+                    name: { type: "string", description: "Name of the subscription (e.g., 'Claude Subscription', 'Netflix')" },
+                    amount: { type: "number", description: "Amount per billing cycle" },
+                    frequency: { type: "string", enum: ["monthly", "yearly", "weekly", "custom"], description: "How often to charge" },
+                    customDays: { type: "number", description: "For custom frequency, number of days between charges" },
+                    startDate: { type: "string", description: "Start date in YYYY-MM-DD format" },
+                    endDate: { type: "string", description: "End date in YYYY-MM-DD format (optional)" },
+                    category: { type: "string", description: "Expense category" },
+                    notes: { type: "string", description: "Additional notes" }
+                },
+                required: ["projectId", "name", "amount", "frequency", "startDate"]
+            }
+        }
     }
 ];
 
@@ -603,6 +625,23 @@ async function executeTool(toolName, args, base44, userEmail) {
                 const events = await base44.entities.Event.filter({ projectId: args.projectId, created_by: userEmail }, '-startDate');
                 return { success: true, events };
             }
+
+            case "create_recurring_expense": {
+                const subscription = await base44.entities.RecurringSubscription.create({
+                    projectId: args.projectId,
+                    name: args.name,
+                    amount: args.amount,
+                    frequency: args.frequency,
+                    customDays: args.customDays || null,
+                    startDate: args.startDate,
+                    endDate: args.endDate || null,
+                    category: args.category || "subscriptions",
+                    notes: args.notes || "",
+                    active: true,
+                    created_by: userEmail
+                });
+                return { success: true, subscription };
+            }
             
             default:
                 return { success: false, error: `Unknown tool: ${toolName}` };
@@ -738,6 +777,14 @@ RECATEGORIZING EXPENSES: When user asks to change category or move expenses, you
 For PROJECTS: Always create a project when user tells you their business. Create additional projects when requested. Track profitability. You can delete projects, and all associated income/expense/subscription records when user explicitly requests it.
 
 For EVENTS: You can create and delete events, and list events for a project. When user mentions an upcoming event (gig, meeting, etc.), ask if they want to create an event record.
+
+For RECURRING EXPENSES: When user wants to set up a recurring subscription or expense:
+1. Use create_recurring_expense to schedule monthly/yearly charges
+2. For frequency="yearly", set startDate to the first occurrence and the system will repeat it
+3. For frequency="monthly", set startDate to the first month it occurs (e.g., March 1st) and it repeats monthly
+4. If user says "2026" year and "started in March 2026", set startDate="2026-03-01" with frequency="monthly"
+5. If user specifies an end date or says "for the rest of 2026", calculate endDate (e.g., "2026-12-31")
+6. This creates a single recurring record - the system will handle generating individual expense entries
 
 DELETION OPERATIONS: You can now delete income items, expense items, subscriptions, events, and projects when the user requests it. Always confirm what's being deleted before doing so.
 
