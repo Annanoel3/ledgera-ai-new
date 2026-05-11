@@ -71,7 +71,7 @@ export default function Projects() {
       // Ensure user is available before attempting to filter by user.email
       if (!user?.email) return [];
 
-      const allProjects = await base44.entities.Project.filter({ created_by: user.email }, '-created_date');
+      const allProjects = await base44.entities.Project.filter({ created_by: user.email }, '-updated_date');
       return allProjects;
     },
     initialData: [],
@@ -194,53 +194,53 @@ export default function Projects() {
   return (
     <div className="p-6 md:p-8 pb-24 md:pb-8 min-h-screen" style={{ backgroundColor: profile?.darkMode ? '#0f0f0f' : '#f9fafb' }}>
       <div className="max-w-6xl mx-auto">
-         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
-           <h1 className="text-3xl font-bold" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>Projects</h1>
-           <div className="flex gap-3">
-             <Select value={selectedYear} onValueChange={setSelectedYear}>
-               <SelectTrigger className="w-32" style={{
-                 backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff',
-                 border: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}`,
-                 color: profile?.darkMode ? '#ffffff' : '#111827'
-               }}>
-                 <SelectValue />
-               </SelectTrigger>
-               <SelectContent style={{ backgroundColor: profile?.darkMode ? '#374151' : '#ffffff', border: `1px solid ${profile?.darkMode ? '#4b5563' : '#e5e7eb'}` }}>
-                 {availableYears.map(year => (
-                   <SelectItem key={year} value={year} style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>{year}</SelectItem>
-                 ))}
-               </SelectContent>
-             </Select>
-             <Select value={selectedMonth} onValueChange={setSelectedMonth}>
-               <SelectTrigger className="w-32" style={{
-                 backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff',
-                 border: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}`,
-                 color: profile?.darkMode ? '#ffffff' : '#111827'
-               }}>
-                 <SelectValue />
-               </SelectTrigger>
-               <SelectContent style={{ backgroundColor: profile?.darkMode ? '#374151' : '#ffffff', border: `1px solid ${profile?.darkMode ? '#4b5563' : '#e5e7eb'}` }}>
-                 <SelectItem value="all" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>All Months</SelectItem>
-                 <SelectItem value="ytd" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>Year to Date</SelectItem>
-                 <SelectItem value="0" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>January</SelectItem>
-                 <SelectItem value="1" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>February</SelectItem>
-                 <SelectItem value="2" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>March</SelectItem>
-                 <SelectItem value="3" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>April</SelectItem>
-                 <SelectItem value="4" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>May</SelectItem>
-                 <SelectItem value="5" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>June</SelectItem>
-                 <SelectItem value="6" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>July</SelectItem>
-                 <SelectItem value="7" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>August</SelectItem>
-                 <SelectItem value="8" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>September</SelectItem>
-                 <SelectItem value="9" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>October</SelectItem>
-                 <SelectItem value="10" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>November</SelectItem>
-                 <SelectItem value="11" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>December</SelectItem>
-               </SelectContent>
-             </Select>
-             <Button onClick={() => setShowNewDialog(true)} className="bg-[#22A699] hover:bg-[#1d8d82] gap-2">
-               <Plus className="w-5 h-5" /> New Project
-             </Button>
-           </div>
-         </div>
+         <div className="mb-8">
+            <h1 className="text-3xl font-bold mb-4" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>Projects</h1>
+            <div className="flex gap-3 mb-4">
+              <Select value={selectedYear} onValueChange={setSelectedYear}>
+                <SelectTrigger className="w-32" style={{
+                  backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff',
+                  border: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}`,
+                  color: profile?.darkMode ? '#ffffff' : '#111827'
+                }}>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent style={{ backgroundColor: profile?.darkMode ? '#374151' : '#ffffff', border: `1px solid ${profile?.darkMode ? '#4b5563' : '#e5e7eb'}` }}>
+                  {availableYears.map(year => (
+                    <SelectItem key={year} value={year} style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>{year}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Select value={selectedMonth} onValueChange={setSelectedMonth}>
+                <SelectTrigger className="w-32" style={{
+                  backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff',
+                  border: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}`,
+                  color: profile?.darkMode ? '#ffffff' : '#111827'
+                }}>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent style={{ backgroundColor: profile?.darkMode ? '#374151' : '#ffffff', border: `1px solid ${profile?.darkMode ? '#4b5563' : '#e5e7eb'}` }}>
+                  <SelectItem value="all" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>All Months</SelectItem>
+                  <SelectItem value="ytd" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>Year to Date</SelectItem>
+                  <SelectItem value="0" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>January</SelectItem>
+                  <SelectItem value="1" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>February</SelectItem>
+                  <SelectItem value="2" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>March</SelectItem>
+                  <SelectItem value="3" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>April</SelectItem>
+                  <SelectItem value="4" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>May</SelectItem>
+                  <SelectItem value="5" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>June</SelectItem>
+                  <SelectItem value="6" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>July</SelectItem>
+                  <SelectItem value="7" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>August</SelectItem>
+                  <SelectItem value="8" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>September</SelectItem>
+                  <SelectItem value="9" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>October</SelectItem>
+                  <SelectItem value="10" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>November</SelectItem>
+                  <SelectItem value="11" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>December</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <Button onClick={() => setShowNewDialog(true)} className="bg-[#22A699] hover:bg-[#1d8d82] gap-2 w-full md:w-auto">
+              <Plus className="w-5 h-5" /> New Project
+            </Button>
+          </div>
 
         {/* Search and Filter */}
         <div className="flex flex-col md:flex-row gap-4 mb-6">

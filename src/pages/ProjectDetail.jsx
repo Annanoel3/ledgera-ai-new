@@ -29,14 +29,16 @@ import {
 import { toast } from "sonner";
 
 export default function ProjectDetail() {
-  const navigate = useNavigate();
-  const queryClient = useQueryClient();
-  const urlParams = new URLSearchParams(window.location.search);
-  const projectId = urlParams.get('id');
-  const [showHistory, setShowHistory] = useState(false);
-  const [showEventsModal, setShowEventsModal] = useState(false);
-  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear().toString());
-  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth().toString());
+   const navigate = useNavigate();
+   const queryClient = useQueryClient();
+   const urlParams = new URLSearchParams(window.location.search);
+   const projectId = urlParams.get('id');
+   const tabParam = urlParams.get('tab');
+   const [showHistory, setShowHistory] = useState(false);
+   const [showEventsModal, setShowEventsModal] = useState(false);
+   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear().toString());
+   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth().toString());
+   const [defaultTab, setDefaultTab] = useState(tabParam === 'expenses' ? 'expenses' : tabParam === 'income' ? 'income' : 'overview');
 
   const { data: user, isLoading: userLoading } = useQuery({
     queryKey: ['user'],
@@ -470,7 +472,7 @@ export default function ProjectDetail() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <Card
             className="cursor-pointer hover:shadow-lg transition-all"
-            onClick={() => navigate(createPageUrl("ProjectFinancials") + `?id=${projectId}`)}
+            onClick={() => navigate(createPageUrl("ProjectFinancials") + `?id=${projectId}&tab=income`)}
             style={{ backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff', border: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}` }}
           >
             <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -485,7 +487,7 @@ export default function ProjectDetail() {
 
           <Card
             className="cursor-pointer hover:shadow-lg transition-all"
-            onClick={() => navigate(createPageUrl("ProjectFinancials") + `?id=${projectId}`)}
+            onClick={() => navigate(createPageUrl("ProjectFinancials") + `?id=${projectId}&tab=expenses`)}
             style={{ backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff', border: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}` }}
           >
             <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -528,13 +530,13 @@ export default function ProjectDetail() {
 
 
         {/* Rest of tabs */}
-        <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4 dark:bg-gray-800 dark:border-gray-700">
-            <TabsTrigger value="overview" className="dark:data-[state=active]:bg-gray-700 dark:data-[state=active]:text-white dark:text-gray-400">Overview</TabsTrigger>
-            <TabsTrigger value="subscriptions" className="dark:data-[state=active]:bg-gray-700 dark:data-[state=active]:text-white dark:text-gray-400">Recurring</TabsTrigger>
-            <TabsTrigger value="documents" className="dark:data-[state=active]:bg-gray-700 dark:data-[state=active]:text-white dark:text-gray-400">Documents</TabsTrigger>
-            <TabsTrigger value="history" className="dark:data-[state=active]:bg-gray-700 dark:data-[state=active]:text-white dark:text-gray-400">History</TabsTrigger>
-          </TabsList>
+         <Tabs defaultValue={defaultTab} className="space-y-6">
+           <TabsList className="grid w-full grid-cols-4 dark:bg-gray-800 dark:border-gray-700">
+             <TabsTrigger value="overview" className="dark:data-[state=active]:bg-gray-700 dark:data-[state=active]:text-white dark:text-gray-400">Overview</TabsTrigger>
+             <TabsTrigger value="subscriptions" className="dark:data-[state=active]:bg-gray-700 dark:data-[state=active]:text-white dark:text-gray-400">Recurring</TabsTrigger>
+             <TabsTrigger value="documents" className="dark:data-[state=active]:bg-gray-700 dark:data-[state=active]:text-white dark:text-gray-400">Documents</TabsTrigger>
+             <TabsTrigger value="history" className="dark:data-[state=active]:bg-gray-700 dark:data-[state=active]:text-white dark:text-gray-400">History</TabsTrigger>
+           </TabsList>
 
           <TabsContent value="subscriptions">
             <Card className="dark:bg-gray-800 dark:border-gray-700">
