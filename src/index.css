@@ -88,11 +88,11 @@ button:focus-visible {
 
 
 textarea {
-  color: inherit !important;
+  color: hsl(var(--foreground)) !important;
 }
 
 textarea::placeholder {
-  color: var(--placeholder-color, #6b7280) !important;
+  color: hsl(var(--muted-foreground)) !important;
 }
 
 @layer base {
