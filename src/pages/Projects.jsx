@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -9,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Plus, Search, Folder, ArrowRight, Loader2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
+import { startOfYear, endOfYear } from "date-fns";
 import {
   Dialog,
   DialogContent,
@@ -22,6 +22,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 export default function Projects() {
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("all");
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear().toString());
   const [showNewDialog, setShowNewDialog] = useState(false);
   const [newProjectTitle, setNewProjectTitle] = useState("");
   const [newProjectStatus, setNewProjectStatus] = useState("active");
@@ -49,6 +50,20 @@ export default function Projects() {
     enabled: !!user,
   });
 
+  const { data: allIncome } = useQuery({
+    queryKey: ['incomeItems'],
+    queryFn: () => base44.entities.IncomeItem.filter({ created_by: user.email }),
+    initialData: [],
+    enabled: !!user,
+  });
+
+  const { data: allExpenses } = useQuery({
+    queryKey: ['expenseItems'],
+    queryFn: () => base44.entities.ExpenseItem.filter({ created_by: user.email }),
+    initialData: [],
+    enabled: !!user,
+  });
+
   const { data: projects } = useQuery({
     queryKey: ['projects'],
     queryFn: async () => {
@@ -56,28 +71,47 @@ export default function Projects() {
       if (!user?.email) return [];
 
       const allProjects = await base44.entities.Project.filter({ created_by: user.email }, '-created_date');
-      const allIncome = await base44.entities.IncomeItem.filter({ created_by: user.email });
-      const allExpenses = await base44.entities.ExpenseItem.filter({ created_by: user.email });
-      
-      // Calculate actual totals from income and expense items
-      return allProjects.map(project => {
-        const projectIncome = allIncome
-          .filter(item => item.projectId === project.id)
-          .reduce((sum, item) => sum + (item.amount || 0), 0);
-        
-        const projectExpenses = allExpenses
-          .filter(item => item.projectId === project.id)
-          .reduce((sum, item) => sum + (item.amount || 0), 0);
-        
-        return {
-          ...project,
-          totalIncome: projectIncome,
-          totalExpense: projectExpenses,
-        };
-      });
+      return allProjects;
     },
     initialData: [],
-    enabled: !!user, // This query should only run when the user data is available
+    enabled: !!user,
+  });
+
+  // Calculate year-filtered totals
+  const yearStart = startOfYear(new Date(parseInt(selectedYear), 0, 1));
+  const yearEnd = endOfYear(new Date(parseInt(selectedYear), 0, 1));
+
+  const yearIncome = allIncome.filter(item => {
+    const itemDate = new Date(item.date);
+    return itemDate >= yearStart && itemDate <= yearEnd;
+  });
+
+  const yearExpenses = allExpenses.filter(item => {
+    const itemDate = new Date(item.date);
+    return itemDate >= yearStart && itemDate <= yearEnd;
+  });
+
+  const allYears = [...new Set([
+    ...allIncome.map(item => new Date(item.date).getFullYear()),
+    ...allExpenses.map(item => new Date(item.date).getFullYear()),
+    new Date().getFullYear()
+  ])].sort((a, b) => b - a);
+  const availableYears = allYears.map(y => y.toString());
+
+  const projectsWithYearData = projects.map(project => {
+    const projectIncome = yearIncome
+      .filter(item => item.projectId === project.id)
+      .reduce((sum, item) => sum + (item.amount || 0), 0);
+    
+    const projectExpenses = yearExpenses
+      .filter(item => item.projectId === project.id)
+      .reduce((sum, item) => sum + (item.amount || 0), 0);
+    
+    return {
+      ...project,
+      totalIncome: projectIncome,
+      totalExpense: projectExpenses,
+    };
   });
 
   const createProjectMutation = useMutation({
@@ -101,7 +135,7 @@ export default function Projects() {
     }).format(amount);
   };
 
-  const filteredProjects = projects
+  const filteredProjects = projectsWithYearData
     .filter(p => {
       const matchesSearch = p.title.toLowerCase().includes(search.toLowerCase());
       const matchesFilter = filter === "all" || p.status === filter;
@@ -109,7 +143,6 @@ export default function Projects() {
     })
     .map(p => ({
       ...p,
-      // Recalculate profit and margin based on potentially updated totalIncome/totalExpense from the query
       profit: (p.totalIncome || 0) - (p.totalExpense || 0),
       margin: p.totalIncome > 0 ? (((p.totalIncome - p.totalExpense) / p.totalIncome) * 100).toFixed(1) : 0
     }));
@@ -144,12 +177,28 @@ export default function Projects() {
   return (
     <div className="p-6 md:p-8 pb-24 md:pb-8 min-h-screen" style={{ backgroundColor: profile?.darkMode ? '#0f0f0f' : '#f9fafb' }}>
       <div className="max-w-6xl mx-auto">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
-          <h1 className="text-3xl font-bold" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>Projects</h1>
-          <Button onClick={() => setShowNewDialog(true)} className="bg-[#22A699] hover:bg-[#1d8d82] gap-2">
-            <Plus className="w-5 h-5" /> New Project
-          </Button>
-        </div>
+         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+           <h1 className="text-3xl font-bold" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>Projects</h1>
+           <div className="flex gap-3">
+             <Select value={selectedYear} onValueChange={setSelectedYear}>
+               <SelectTrigger className="w-32" style={{
+                 backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff',
+                 border: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}`,
+                 color: profile?.darkMode ? '#ffffff' : '#111827'
+               }}>
+                 <SelectValue />
+               </SelectTrigger>
+               <SelectContent style={{ backgroundColor: profile?.darkMode ? '#374151' : '#ffffff', border: `1px solid ${profile?.darkMode ? '#4b5563' : '#e5e7eb'}` }}>
+                 {availableYears.map(year => (
+                   <SelectItem key={year} value={year} style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>{year}</SelectItem>
+                 ))}
+               </SelectContent>
+             </Select>
+             <Button onClick={() => setShowNewDialog(true)} className="bg-[#22A699] hover:bg-[#1d8d82] gap-2">
+               <Plus className="w-5 h-5" /> New Project
+             </Button>
+           </div>
+         </div>
 
         {/* Search and Filter */}
         <div className="flex flex-col md:flex-row gap-4 mb-6">
