@@ -17,7 +17,7 @@ import toast from "react-hot-toast"; // Assuming react-hot-toast for toast notif
 
 export default function Dashboard() {
   const queryClient = useQueryClient();
-  const [selectedYear, setSelectedYear] = React.useState("2026");
+  const [selectedYear, setSelectedYear] = React.useState(new Date().getFullYear().toString());
 
   const handleRefresh = useCallback(async () => {
     await queryClient.invalidateQueries();
