@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { FileText, Search, ExternalLink, Loader2, FolderOpen, Trash2 } from "lucide-react";
 import { format } from "date-fns";
 import { Link } from "react-router-dom";
@@ -14,6 +15,7 @@ import { createPageUrl } from "@/utils";
 
 export default function Documents() {
   const [search, setSearch] = useState("");
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear().toString());
   const queryClient = useQueryClient();
 
   const handleRefresh = useCallback(async () => {
@@ -74,10 +76,16 @@ export default function Documents() {
     }
   };
 
-  const filteredDocuments = documents.filter(doc =>
-    doc.fileName.toLowerCase().includes(search.toLowerCase()) ||
-    doc.notes?.toLowerCase().includes(search.toLowerCase())
-  );
+  const allYears = [...new Set([...documents.map(doc => new Date(doc.uploadDate).getFullYear()), new Date().getFullYear()])].sort((a, b) => b - a);
+  const availableYears = allYears.map(y => y.toString());
+
+  const filteredDocuments = documents.filter(doc => {
+    const docYear = new Date(doc.uploadDate).getFullYear().toString();
+    const matchesSearch = doc.fileName.toLowerCase().includes(search.toLowerCase()) ||
+      doc.notes?.toLowerCase().includes(search.toLowerCase());
+    const matchesYear = docYear === selectedYear;
+    return matchesSearch && matchesYear;
+  });
 
   const documentsByMonth = filteredDocuments.reduce((acc, doc) => {
     const month = format(new Date(doc.uploadDate), 'MMMM yyyy');
@@ -109,10 +117,28 @@ export default function Documents() {
         </div>
       )}
       <div className="max-w-6xl mx-auto">
-        <h1 className="text-3xl font-bold mb-2" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>Documents</h1>
-        <p className="mb-8" style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>All your invoices, contracts, and receipts in one place</p>
+         <div className="flex items-center justify-between mb-8">
+           <div>
+             <h1 className="text-3xl font-bold mb-2" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>Documents</h1>
+             <p style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>All your invoices, contracts, and receipts in one place</p>
+           </div>
+           <Select value={selectedYear} onValueChange={setSelectedYear}>
+             <SelectTrigger className="w-32" style={{
+               backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff',
+               border: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}`,
+               color: profile?.darkMode ? '#ffffff' : '#111827'
+             }}>
+               <SelectValue />
+             </SelectTrigger>
+             <SelectContent style={{ backgroundColor: profile?.darkMode ? '#374151' : '#ffffff', border: `1px solid ${profile?.darkMode ? '#4b5563' : '#e5e7eb'}` }}>
+               {availableYears.map(year => (
+                 <SelectItem key={year} value={year} style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>{year}</SelectItem>
+               ))}
+             </SelectContent>
+           </Select>
+         </div>
 
-        <div className="relative mb-6">
+         <div className="relative mb-6">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
           <Input
             value={search}
