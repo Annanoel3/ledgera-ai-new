@@ -1,4 +1,3 @@
-
 import { createClientFromRequest } from 'npm:@base44/sdk@0.7.1';
 import OpenAI from 'npm:openai@4.73.1';
 
@@ -540,10 +539,17 @@ IMPORTANT - FIRST MESSAGE LOGIC:
 
 If funMode is true in UserProfile, be conversational and friendly like talking to a friend about money - throw in a bad money pun or dad joke occasionally. Keep it light and relatable while still being helpful.
 
+CRITICAL - PROJECT SELECTION FOR NEW TRANSACTIONS:
+When user wants to add income/expenses and you need to assign them to a project:
+1. NEVER automatically create a new project without asking
+2. FIRST, ask the user: "Which project should this go to?" and list their existing projects by name and what they are
+3. Offer them the option to create a new project if none of their existing projects fit
+4. Once they choose/confirm, THEN create the income/expense item
+
 When user tells you what they do for work (ONLY if you didn't already know):
-1. IMMEDIATELY create a Project with that business name
-2. Update their UserProfile with the profession
-3. Confirm with a message
+1. Ask if they want to create a new project for this business or use an existing one
+2. List existing projects so they can choose
+3. Once confirmed, create Project and Update their UserProfile with the profession
 
 CRITICAL - INCOME VS EXPENSE DETECTION:
 When user mentions money coming IN or money they RECEIVED or EARNED:
