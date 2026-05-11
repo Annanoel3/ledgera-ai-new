@@ -1,4 +1,3 @@
-
 import React from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
@@ -284,6 +283,52 @@ export default function Terms() {
                   Contact Us
                 </Button>
               </Link>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Contact & Copyright Section */}
+        <Card className="mb-6" style={{ backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff', border: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}` }}>
+          <CardContent className="pt-6 space-y-6">
+            <div>
+              <p style={{ color: profile?.darkMode ? '#d1d5db' : '#374151' }}>
+                If you have questions about this policy, contact us at{' '}
+                <a href="mailto:annabairdballew@gmail.com" style={{ color: '#22A699', textDecoration: 'underline' }}>
+                  annabairdballew@gmail.com
+                </a>
+              </p>
+            </div>
+
+            <hr style={{ borderColor: profile?.darkMode ? '#374151' : '#e5e7eb' }} />
+
+            <div>
+              <h3 className="text-lg font-semibold mb-3" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>
+                © Copyright & Intellectual Property
+              </h3>
+              <p className="font-semibold mb-2" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>
+                © {new Date().getFullYear()} Ledgera AI. All rights reserved.
+              </p>
+              <p className="mb-3" style={{ color: profile?.darkMode ? '#d1d5db' : '#374151' }}>
+                The Ledgera AI application, including its design, code, branding, and user interface, is the intellectual property of Ledgera AI and is protected by applicable copyright, trademark, and intellectual property laws.
+              </p>
+            </div>
+
+            <div>
+              <h3 className="font-semibold mb-2" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>
+                Your Content
+              </h3>
+              <p style={{ color: profile?.darkMode ? '#d1d5db' : '#374151' }}>
+                You retain full ownership of all content you upload to Ledgera AI, including financial documents and transaction data. By using the app, you grant Ledgera AI a limited, non-exclusive license to store, display, and process your content solely for the purpose of providing the service to you.
+              </p>
+            </div>
+
+            <div>
+              <h3 className="font-semibold mb-2" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>
+                Restrictions
+              </h3>
+              <p style={{ color: profile?.darkMode ? '#d1d5db' : '#374151' }}>
+                You may not copy, reproduce, distribute, modify, or create derivative works from any part of the Ledgera AI application without prior written consent. Unauthorized use of Ledgera AI's proprietary materials may violate copyright, trademark, and other applicable laws.
+              </p>
             </div>
           </CardContent>
         </Card>
