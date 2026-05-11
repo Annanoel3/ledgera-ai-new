@@ -466,6 +466,29 @@ async function executeTool(toolName, args, base44, userEmail) {
                     created_by: userEmail
                 });
                 
+                // If vendor/description suggests recurring, create a subscription too
+                const recurringKeywords = ['subscription', 'monthly', 'yearly', 'recurring', 'claude', 'chatgpt', 'adobe', 'figma', 'slack', 'github', 'netlify', 'aws', 'stripe'];
+                const description = (args.vendor || args.notes || "").toLowerCase();
+                const isRecurring = recurringKeywords.some(keyword => description.includes(keyword));
+                
+                if (isRecurring) {
+                    try {
+                        await base44.entities.RecurringSubscription.create({
+                            projectId: args.projectId,
+                            name: args.vendor || args.notes || "Subscription",
+                            amount: args.amount,
+                            frequency: "monthly",
+                            startDate: args.date,
+                            category: args.category || "subscriptions",
+                            notes: args.notes || "",
+                            active: true,
+                            created_by: userEmail
+                        });
+                    } catch (error) {
+                        console.log('Could not create recurring subscription:', error.message);
+                    }
+                }
+                
                 // Update project totals
                 await updateProjectTotals(base44, args.projectId, userEmail);
                 
