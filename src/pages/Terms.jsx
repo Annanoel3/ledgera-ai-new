@@ -293,8 +293,8 @@ export default function Terms() {
             <div>
               <p style={{ color: profile?.darkMode ? '#d1d5db' : '#374151' }}>
                 If you have questions about this policy, contact us at{' '}
-                <a href="mailto:annabairdballew@gmail.com" style={{ color: '#22A699', textDecoration: 'underline' }}>
-                  annabairdballew@gmail.com
+                <a href="mailto:mediocreatbestdev@outlook.com" style={{ color: '#22A699', textDecoration: 'underline' }}>
+                  mediocreatbestdev@outlook.com
                 </a>
               </p>
             </div>
