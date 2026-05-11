@@ -24,6 +24,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
+import RecurringSubscriptionModal from "@/components/projects/RecurringSubscriptionModal";
 
 export default function ProjectFinancials() {
   const navigate = useNavigate();
@@ -32,6 +33,8 @@ export default function ProjectFinancials() {
   const projectId = urlParams.get('id');
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear().toString());
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth().toString());
+  const [showRecurringModal, setShowRecurringModal] = useState(false);
+  const [selectedExpense, setSelectedExpense] = useState(null);
 
   const { data: user } = useQuery({
     queryKey: ['user'],
@@ -161,14 +164,12 @@ export default function ProjectFinancials() {
   };
 
   const convertToRecurringMutation = useMutation({
-    mutationFn: async (expenseId) => {
+    mutationFn: async ({ expenseId, frequency, customDays, name, notes }) => {
       const expense = expenseItems.find(e => e.id === expenseId);
       if (!expense) throw new Error("Expense not found");
       
-      const vendor = expense.vendor || "Recurring Expense";
-      
       // Find all expenses with same vendor
-      const similarExpenses = expenseItems.filter(item => item.vendor === vendor);
+      const similarExpenses = expenseItems.filter(item => item.vendor === expense.vendor);
       
       // Calculate average amount
       const avgAmount = similarExpenses.length > 0 
@@ -182,25 +183,38 @@ export default function ProjectFinancials() {
       
       return base44.entities.RecurringSubscription.create({
         projectId: expense.projectId,
-        name: vendor,
+        name,
         amount: Math.round(avgAmount * 100) / 100,
-        frequency: "monthly",
+        frequency,
+        customDays: frequency === "custom" ? customDays : undefined,
         startDate: earliestDate.toISOString().split('T')[0],
         category: expense.category || "subscriptions",
-        notes: `Recurring from ${similarExpenses.length} ${vendor} payment(s)`,
+        notes: notes || (similarExpenses.length > 1 ? `Recurring from ${similarExpenses.length} payments` : ""),
         active: true,
       });
     },
     onSuccess: () => {
       queryClient.invalidateQueries(['subscriptions', projectId]);
       queryClient.invalidateQueries(['expenseItems', projectId]);
-      toast.success("Created recurring subscription from grouped expenses");
+      toast.success("Created recurring subscription");
     },
     onError: (error) => {
       console.error('Convert error:', error);
       toast.error("Failed to create recurring subscription");
     }
   });
+
+  const handleStartRecurring = (expense) => {
+    setSelectedExpense(expense);
+    setShowRecurringModal(true);
+  };
+
+  const handleConfirmRecurring = (settings) => {
+    convertToRecurringMutation.mutate({
+      expenseId: selectedExpense.id,
+      ...settings
+    });
+  };
 
   const formatCurrency = (amount) => {
     if (!profile) return `$${amount.toFixed(2)}`;
@@ -455,10 +469,10 @@ export default function ProjectFinancials() {
                                 <Button
                                   variant="ghost"
                                   size="sm"
-                                  onClick={() => convertToRecurringMutation.mutate(item.id)}
+                                  onClick={() => handleStartRecurring(item)}
                                   disabled={convertToRecurringMutation.isPending}
                                   style={{ color: '#22A699' }}
-                                  title="Convert to recurring subscription (groups similar vendors)"
+                                  title="Convert to recurring subscription"
                                 >
                                   {convertToRecurringMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : "→"}
                                 </Button>
@@ -483,6 +497,14 @@ export default function ProjectFinancials() {
             </Card>
           </TabsContent>
         </Tabs>
+
+        <RecurringSubscriptionModal
+          isOpen={showRecurringModal}
+          onClose={() => setShowRecurringModal(false)}
+          expense={selectedExpense}
+          onConfirm={handleConfirmRecurring}
+          darkMode={profile?.darkMode}
+        />
       </div>
     </div>
   );
