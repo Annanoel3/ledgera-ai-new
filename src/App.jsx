@@ -50,6 +50,8 @@ function AnimatedRoutes({ mainPageKey, MainPage, Pages }) {
       >
         <Routes location={location}>
           <Route path="/" element={<MainPage />} />
+          <Route path="/DeleteAccount" element={<DeleteAccount />} />
+          <Route path="/DeleteData" element={<DeleteData />} />
           {Object.entries(Pages).map(([path, Page]) => (
             <Route key={path} path={`/${path}`} element={<Page />} />
           ))}
@@ -108,8 +110,6 @@ function App() {
           <NavigationTracker />
           <Routes>
             <Route path="/PrivacyPolicy" element={<PrivacyPolicy />} />
-            <Route path="/DeleteAccount" element={<DeleteAccount />} />
-            <Route path="/DeleteData" element={<DeleteData />} />
             <Route path="/ProjectFinancials" element={<LayoutWrapper currentPageName="ProjectFinancials"><ProjectFinancials /></LayoutWrapper>} />
             <Route path="*" element={<AuthenticatedApp />} />
           </Routes>
