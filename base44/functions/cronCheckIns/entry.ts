@@ -31,10 +31,10 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Method not allowed' }, { status: 405 });
     }
 
-    // Accept either CRON_SECRET in body (manual trigger) or Base44 automation header
-    const isAutomation = req.headers.get('x-base44-automation') === 'true';
-    if (!isAutomation) {
-      const body = await req.json();
+    // Accept CRON_SECRET in body (manual trigger) or empty body (automation scheduler)
+    const bodyText = await req.text();
+    if (bodyText) {
+      const body = JSON.parse(bodyText);
       if (body.secret !== CRON_SECRET) {
         return Response.json({ error: 'Unauthorized' }, { status: 401 });
       }
