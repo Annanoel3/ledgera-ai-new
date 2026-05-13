@@ -449,14 +449,37 @@ export default function Layout({ children }) {
         {/* Main Content */}
         <div className={isChat ? "" : "md:pl-64 flex flex-col flex-1"} style={{
           backgroundColor: darkMode ? '#0f0f0f' : '#ffffff',
-          paddingBottom: isChat ? '0' : '5rem'
+          paddingBottom: isChat ? '4rem' : '5rem'
         }}>
           <main className={isChat ? "" : "flex-1"}>
             {children}
           </main>
         </div>
 
-        {/* Mobile Bottom Navigation - Empty since all items in sidebar */}
+        {/* Chat Page Bottom Navigation */}
+        {isChat && (
+          <div className="fixed bottom-0 left-0 right-0 md:hidden z-50 flex items-center justify-around p-3 border-t" style={{
+            backgroundColor: darkMode ? '#1a1a1a' : '#ffffff',
+            borderColor: darkMode ? '#374151' : '#e5e7eb'
+          }}>
+            <Link to={createPageUrl("Dashboard")} className="flex flex-col items-center gap-1">
+              <LayoutDashboard className="w-5 h-5" style={{ color: currentPath === createPageUrl("Dashboard") ? primaryColor : (darkMode ? '#9ca3af' : '#6b7280') }} />
+              <span className="text-xs font-medium" style={{ color: currentPath === createPageUrl("Dashboard") ? primaryColor : (darkMode ? '#9ca3af' : '#6b7280') }}>Dashboard</span>
+            </Link>
+            <Link to={createPageUrl("Projects")} className="flex flex-col items-center gap-1">
+              <FolderKanban className="w-5 h-5" style={{ color: currentPath === createPageUrl("Projects") ? primaryColor : (darkMode ? '#9ca3af' : '#6b7280') }} />
+              <span className="text-xs font-medium" style={{ color: currentPath === createPageUrl("Projects") ? primaryColor : (darkMode ? '#9ca3af' : '#6b7280') }}>Projects</span>
+            </Link>
+            <Link to={createPageUrl("Reports")} className="flex flex-col items-center gap-1">
+              <TrendingUp className="w-5 h-5" style={{ color: currentPath === createPageUrl("Reports") ? primaryColor : (darkMode ? '#9ca3af' : '#6b7280') }} />
+              <span className="text-xs font-medium" style={{ color: currentPath === createPageUrl("Reports") ? primaryColor : (darkMode ? '#9ca3af' : '#6b7280') }}>Reports</span>
+            </Link>
+            <Link to={createPageUrl("Settings")} className="flex flex-col items-center gap-1">
+              <Settings className="w-5 h-5" style={{ color: currentPath === createPageUrl("Settings") ? primaryColor : (darkMode ? '#9ca3af' : '#6b7280') }} />
+              <span className="text-xs font-medium" style={{ color: currentPath === createPageUrl("Settings") ? primaryColor : (darkMode ? '#9ca3af' : '#6b7280') }}>Settings</span>
+            </Link>
+          </div>
+        )}
       </div>
     </>
   );
