@@ -27,14 +27,17 @@ function isInQuietHours(user) {
 
 Deno.serve(async (req) => {
   try {
-    // Validate cron secret
     if (req.method !== 'POST') {
       return Response.json({ error: 'Method not allowed' }, { status: 405 });
     }
 
-    const { secret } = await req.json();
-    if (secret !== CRON_SECRET) {
-      return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    // Accept either CRON_SECRET in body (manual trigger) or Base44 automation header
+    const isAutomation = req.headers.get('x-base44-automation') === 'true';
+    if (!isAutomation) {
+      const body = await req.json();
+      if (body.secret !== CRON_SECRET) {
+        return Response.json({ error: 'Unauthorized' }, { status: 401 });
+      }
     }
 
     const base44 = createClient({

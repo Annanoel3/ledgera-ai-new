@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { base44 } from "@/api/base44Client";
+import { notifySend } from "@/functions/notifySend";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 
 import { Textarea } from "@/components/ui/textarea";
-import { Download, Trash2, Loader2, FileText, Plus, X, Sparkles, CheckCircle2, AlertTriangle } from "lucide-react";
+import { Download, Trash2, Loader2, FileText, Plus, X, Sparkles, CheckCircle2, AlertTriangle, Bell } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { format } from "date-fns";
 import { Link } from "react-router-dom";
@@ -331,6 +332,25 @@ export default function Settings() {
   const [showDeleteAccountDialog, setShowDeleteAccountDialog] = useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState('');
 
+  const handleTestNotification = async () => {
+    try {
+      const result = await notifySend({
+        title: '🔔 Test Notification',
+        body: "Ledgera AI notifications are working! You'll receive check-in reminders here.",
+        data: { type: 'test' }
+      });
+      if (result?.data?.success) {
+        toast.success("Test notification sent! Check your device.");
+      } else if (result?.data?.message?.includes('No player IDs')) {
+        toast.error("No device registered. Open the app on your mobile device first.");
+      } else {
+        toast.error("Failed to send: " + (result?.data?.error || 'Unknown error'));
+      }
+    } catch (error) {
+      toast.error("Failed to send test notification: " + error.message);
+    }
+  };
+
   const handleResetApp = () => setShowResetDialog(true);
 
   const handleDeleteAccount = async () => {
@@ -490,6 +510,26 @@ export default function Settings() {
           </Card>
 
 
+
+          {/* Notifications Section */}
+          <Card style={{ backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff', border: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}` }}>
+            <CardHeader>
+              <CardTitle style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>Notifications</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <p className="text-sm" style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>
+                You'll receive check-in reminders after events and weekly financial summaries. Notifications are delivered to your registered mobile device via push notification.
+              </p>
+              <Button variant="outline" onClick={handleTestNotification} className="w-full gap-2 justify-start" style={{
+                backgroundColor: profile?.darkMode ? '#374151' : '#ffffff',
+                border: `1px solid ${profile?.darkMode ? '#4b5563' : '#e5e7eb'}`,
+                color: profile?.darkMode ? '#ffffff' : '#111827'
+              }}>
+                <Bell className="w-4 h-4" />
+                Send Test Notification
+              </Button>
+            </CardContent>
+          </Card>
 
           {/* Data Section */}
           <Card style={{ backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff', border: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}` }}>
