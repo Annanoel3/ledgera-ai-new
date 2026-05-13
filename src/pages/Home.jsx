@@ -63,10 +63,17 @@ export default function Home() {
           Sign In
         </Button>
 
-        <div className="pt-4 border-t border-slate-300">
-          <Link to="/PrivacyPolicy" className="text-sm text-[#22A699] hover:underline">
-            Privacy Policy
-          </Link>
+        <div className="pt-6 border-t border-slate-300 space-y-3">
+          <p className="text-xs text-slate-600">By signing in, you agree to our:</p>
+          <div className="flex gap-4 justify-center text-sm">
+            <Link to="/PrivacyPolicy" className="text-[#22A699] hover:underline font-medium">
+              Privacy Policy
+            </Link>
+            <span className="text-slate-300">•</span>
+            <Link to="/Terms" className="text-[#22A699] hover:underline font-medium">
+              Terms of Service
+            </Link>
+          </div>
         </div>
       </div>
     </div>
