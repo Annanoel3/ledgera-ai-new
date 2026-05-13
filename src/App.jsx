@@ -32,11 +32,11 @@ const LayoutWrapper = ({ children, currentPageName }) => Layout ?
   : <>{children}</>;
 
 const pageVariants = {
-  initial: { x: '100%', opacity: 0 },
-  in: { x: 0, opacity: 1 },
-  out: { x: '-30%', opacity: 0 },
+  initial: { opacity: 0 },
+  in: { opacity: 1 },
+  out: { opacity: 0 },
 };
-const pageTransition = { type: 'tween', ease: 'easeInOut', duration: 0.4 };
+const pageTransition = { type: 'tween', ease: 'easeInOut', duration: 0.3 };
 
 function AnimatedRoutes({ mainPageKey, MainPage, Pages }) {
   const location = useLocation();
@@ -55,7 +55,7 @@ function AnimatedRoutes({ mainPageKey, MainPage, Pages }) {
           <Route path="/" element={<MainPage />} />
           <Route path="/DeleteAccount" element={<DeleteAccount />} />
           <Route path="/DeleteData" element={<DeleteData />} />
-          <Route path="/Calendar" element={<LayoutWrapper currentPageName="Calendar"><Calendar /></LayoutWrapper>} />
+          <Route path="/Calendar" element={<Calendar />} />
           {Object.entries(Pages).map(([path, Page]) => (
             <Route key={path} path={`/${path}`} element={<Page />} />
           ))}
