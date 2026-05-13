@@ -1,4 +1,4 @@
-import { createClient } from 'npm:@base44/sdk@0.8.4';
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
 const CRON_SECRET = Deno.env.get('CRON_SECRET');
 const ONESIGNAL_APP_ID = Deno.env.get('ONESIGNAL_APP_ID');
@@ -31,18 +31,17 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Method not allowed' }, { status: 405 });
     }
 
-    // Accept CRON_SECRET in body (manual trigger) or empty body (automation scheduler)
+    // Accept CRON_SECRET in body (manual trigger) or empty/no-secret body (automation scheduler)
     const bodyText = await req.text();
-    if (bodyText) {
-      const body = JSON.parse(bodyText);
-      if (body.secret !== CRON_SECRET) {
+    if (bodyText && bodyText.trim() !== '{}' && bodyText.trim() !== '') {
+      let body = {};
+      try { body = JSON.parse(bodyText); } catch {}
+      if (body.secret && body.secret !== CRON_SECRET) {
         return Response.json({ error: 'Unauthorized' }, { status: 401 });
       }
     }
 
-    const base44 = createClient({
-      useServiceRole: true
-    });
+    const base44 = createClientFromRequest(req);
 
     // Get all users
     const users = await base44.asServiceRole.entities.User.list();
