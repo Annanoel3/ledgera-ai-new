@@ -308,9 +308,10 @@ export default function Layout({ children }) {
         }
 
         {/* Mobile Top Bar */}
-        {!isCalendar && <div className="mobile-top-bar md:hidden sticky top-0 z-10 flex flex-shrink-0 items-center" style={{
+        <div className="mobile-top-bar md:hidden sticky top-0 z-10 flex flex-shrink-0 items-center" style={{
           backgroundColor: darkMode ? '#1a1a1a' : '#ffffff',
-          minHeight: '3.5rem'
+          minHeight: '3.5rem',
+          display: isCalendar ? 'none' : 'flex'
         }}>
           <button
             type="button"
@@ -331,7 +332,6 @@ export default function Layout({ children }) {
             </div>
           </div>
         </div>
-        }
 
         {/* Mobile Menu Overlay */}
         {mobileMenuOpen &&
@@ -451,7 +451,8 @@ export default function Layout({ children }) {
         {/* Main Content */}
         <div className={isChat ? "" : "md:pl-64 flex flex-col flex-1"} style={{
           backgroundColor: darkMode ? '#0f0f0f' : '#ffffff',
-          paddingBottom: isChat ? '5.5rem' : '5rem'
+          paddingBottom: isChat ? '5.5rem' : '5rem',
+          paddingTop: isCalendar ? '0' : 'auto'
         }}>
           <main className={isChat ? "" : "flex-1"}>
             {children}
