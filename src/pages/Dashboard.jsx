@@ -19,7 +19,7 @@ export default function Dashboard() {
   const queryClient = useQueryClient();
   const [selectedYear, setSelectedYear] = React.useState(new Date().getFullYear().toString());
   const [selectedMonth, setSelectedMonth] = React.useState(new Date().getMonth());
-  const [recentActivityOpen, setRecentActivityOpen] = React.useState(true);
+  const [recentActivityOpen, setRecentActivityOpen] = React.useState(false);
 
   const handleRefresh = useCallback(async () => {
     await queryClient.invalidateQueries();
