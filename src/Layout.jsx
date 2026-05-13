@@ -11,6 +11,10 @@ import OneSignalInit from "@/components/shared/OneSignalInit";
 const navItems = [
   { title: "Chat", url: createPageUrl("Chat"), icon: MessageSquare },
   { title: "Dashboard", url: createPageUrl("Dashboard"), icon: LayoutDashboard },
+  { title: "Projects", url: createPageUrl("Projects"), icon: FolderKanban },
+  { title: "Calendar", url: "/Calendar", icon: CalendarDays },
+  { title: "Reports", url: createPageUrl("Reports"), icon: TrendingUp },
+  { title: "Documents", url: createPageUrl("Documents"), icon: FileText },
   { title: "Settings", url: createPageUrl("Settings"), icon: Settings },
 ];
 
@@ -319,30 +323,7 @@ export default function Layout({ children }) {
           </main>
         </div>
 
-        {/* Mobile Bottom Navigation */}
-        <nav className="md:hidden fixed bottom-0 left-0 right-0 z-10 flex border-t" style={{
-          borderColor: darkMode ? '#374151' : '#e5e7eb',
-          backgroundColor: darkMode ? '#1a1a1a' : '#ffffff',
-          paddingBottom: 'max(2rem, env(safe-area-inset-bottom))',
-          paddingTop: '1rem',
-          minHeight: '5.5rem'
-        }}>
-          {navItems.map((item) => {
-            const isActive = currentPath === item.url || currentPath.startsWith(item.url + '/');
-            return (
-              <Link
-                key={item.title}
-                to={item.url}
-                className="flex flex-1 flex-col items-center justify-start text-xs font-medium"
-                style={{ color: isActive ? primaryColor : (darkMode ? '#9ca3af' : '#6b7280') }}
-                aria-current={isActive ? "page" : undefined}
-              >
-                <item.icon className="h-6 w-6 mb-1" />
-                {item.title}
-              </Link>
-            );
-          })}
-        </nav>
+        {/* Mobile Bottom Navigation - Empty since all items in sidebar */}
       </div>
     </>
   );

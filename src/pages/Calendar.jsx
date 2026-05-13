@@ -164,23 +164,13 @@ export default function Calendar() {
   return (
     <div className="min-h-screen p-4 md:p-6" style={{ backgroundColor: bg }}>
       <div className="max-w-5xl mx-auto">
-        {/* Header */}
+        {/* Header Actions */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
-          <div className="flex items-center gap-3">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => navigate(createPageUrl("Dashboard"))}
-              style={{ color: textMuted }}
-            >
-              <ChevronLeft className="w-5 h-5" />
-            </Button>
-            <div>
-              <h1 className="text-2xl font-bold" style={{ color: textPrimary }}>Calendar</h1>
-              <p className="text-sm mt-0.5" style={{ color: textMuted }}>
-                Schedule events and track your financial activity
-              </p>
-            </div>
+          <div>
+            <h1 className="text-2xl font-bold" style={{ color: textPrimary }}>Calendar</h1>
+            <p className="text-sm mt-0.5" style={{ color: textMuted }}>
+              Schedule events and track your financial activity
+            </p>
           </div>
           <div className="flex flex-wrap gap-2">
             <Button
