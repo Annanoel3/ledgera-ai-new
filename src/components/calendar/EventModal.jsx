@@ -45,16 +45,19 @@ export default function EventModal({ event, defaultDate, profile, onSave, onDele
     if (!name.trim() || !startDate) return;
     setSaving(true);
     
-    // datetime-local is in user's local time, add :00 seconds and Z for UTC interpretation
-    // This ensures Google Calendar stores it in the user's local time zone
+    // Convert local datetime to UTC ISO string
+    // datetime-local input gives "2026-05-13T09:00" in the user's local timezone
+    // We need to convert to UTC for storage
     const formatDate = (dateStr) => {
       if (!dateStr) return null;
-      // datetime-local format: "2026-05-13T09:00"
-      // Add seconds and Z to make it RFC 3339
-      if (!dateStr.includes(':')) return dateStr;
-      const parts = dateStr.split(':');
-      if (parts.length === 2) return dateStr + ':00Z';
-      return dateStr + 'Z';
+      const [datePart, timePart] = dateStr.split('T');
+      const [year, month, day] = datePart.split('-').map(Number);
+      const [hours, minutes] = timePart.split(':').map(Number);
+      
+      // Create date in local timezone
+      const localDate = new Date(year, month - 1, day, hours, minutes, 0);
+      // Convert to UTC ISO string
+      return localDate.toISOString();
     };
     
     await onSave({ 
