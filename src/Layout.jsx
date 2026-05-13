@@ -475,7 +475,7 @@ export default function Layout({ children }) {
               <span className="text-xs font-medium" style={{ color: currentPath === createPageUrl("Reports") ? primaryColor : darkMode ? '#9ca3af' : '#6b7280' }}>Reports</span>
             </Link>
             <Link to={createPageUrl("Settings")} className="flex flex-col items-center gap-1">
-              <Settings className="w-5 h-5 px-4" style={{ color: currentPath === createPageUrl("Settings") ? primaryColor : darkMode ? '#9ca3af' : '#6b7280' }} />
+              <Settings className="w-5 h-5" style={{ color: currentPath === createPageUrl("Settings") ? primaryColor : darkMode ? '#9ca3af' : '#6b7280' }} />
               <span className="text-xs font-medium" style={{ color: currentPath === createPageUrl("Settings") ? primaryColor : darkMode ? '#9ca3af' : '#6b7280' }}>Settings</span>
             </Link>
           </div>
