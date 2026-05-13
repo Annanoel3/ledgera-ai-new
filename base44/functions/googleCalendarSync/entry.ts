@@ -114,7 +114,13 @@ Deno.serve(async (req) => {
           if (dateStr.includes('+') || dateStr.includes('Z') || /\-\d{2}:\d{2}$/.test(dateStr)) {
             return dateStr;
           }
-          // Add UTC timezone
+          // Ensure format includes seconds, then add UTC timezone
+          const parts = dateStr.split('T');
+          if (parts[1] && !parts[1].includes(':')) return dateStr + 'Z';
+          // Add seconds if only HH:MM present
+          if (parts[1] && parts[1].split(':').length === 2) {
+            return dateStr + ':00Z';
+          }
           return dateStr + 'Z';
         };
 
