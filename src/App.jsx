@@ -107,21 +107,28 @@ function App() {
   }, []);
 
   return (
-    <AuthProvider>
-      <QueryClientProvider client={queryClientInstance}>
-        <Router>
-          <NavigationTracker />
-          <Routes>
-            <Route path="/PrivacyPolicy" element={<PrivacyPolicy />} />
-            <Route path="/Terms" element={<Terms />} />
-            <Route path="/ProjectFinancials" element={<LayoutWrapper currentPageName="ProjectFinancials"><ProjectFinancials /></LayoutWrapper>} />
-            <Route path="*" element={<AuthenticatedApp />} />
-          </Routes>
-        </Router>
-        <Toaster />
-        <VisualEditAgent />
-      </QueryClientProvider>
-    </AuthProvider>
+    <Router>
+      <Routes>
+        <Route path="/PrivacyPolicy" element={<PrivacyPolicy />} />
+        <Route path="/Terms" element={<Terms />} />
+        <Route
+          path="*"
+          element={
+            <AuthProvider>
+              <QueryClientProvider client={queryClientInstance}>
+                <NavigationTracker />
+                <Routes>
+                  <Route path="/ProjectFinancials" element={<LayoutWrapper currentPageName="ProjectFinancials"><ProjectFinancials /></LayoutWrapper>} />
+                  <Route path="*" element={<AuthenticatedApp />} />
+                </Routes>
+                <Toaster />
+                <VisualEditAgent />
+              </QueryClientProvider>
+            </AuthProvider>
+          }
+        />
+      </Routes>
+    </Router>
   )
 }
 
