@@ -192,7 +192,20 @@ export default function Calendar() {
   return (
     <div className="p-4 md:p-6" style={{ backgroundColor: bg }}>
       <div className="max-w-5xl mx-auto">
-        {/* Header Actions */}
+        {/* Header with back button */}
+        <div className="flex items-center gap-4 mb-6">
+          <button
+            onClick={() => navigate(-1)}
+            className="p-2 hover:bg-opacity-80 transition-colors"
+            style={{ color: textPrimary }}
+            aria-label="Go back"
+          >
+            <ChevronLeft className="w-6 h-6" />
+          </button>
+          <h1 className="text-3xl font-bold" style={{ color: textPrimary }}>Calendar</h1>
+        </div>
+
+         {/* Header Actions */}
         <div className="flex flex-wrap gap-2 mb-6">
             {googleConnected ? (
               <>
