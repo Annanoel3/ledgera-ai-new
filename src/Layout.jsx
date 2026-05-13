@@ -458,7 +458,7 @@ export default function Layout({ children }) {
 
         {/* Chat Page Bottom Navigation */}
         {isChat &&
-        <div className="mobile-bottom-nav fixed bottom-0 left-0 right-0 md:hidden z-50 flex items-center justify-around border-t py-8 px-3 my-2" style={{
+        <div className="mobile-bottom-nav fixed bottom-0 left-0 right-0 md:hidden z-50 flex items-center justify-around border-t px-3 py-10" style={{
           backgroundColor: darkMode ? '#1a1a1a' : '#ffffff',
           borderColor: darkMode ? '#374151' : '#e5e7eb'
         }}>
@@ -475,7 +475,7 @@ export default function Layout({ children }) {
               <span className="text-xs font-medium" style={{ color: currentPath === createPageUrl("Reports") ? primaryColor : darkMode ? '#9ca3af' : '#6b7280' }}>Reports</span>
             </Link>
             <Link to={createPageUrl("Settings")} className="flex flex-col items-center gap-1">
-              <Settings className="w-5 h-5" style={{ color: currentPath === createPageUrl("Settings") ? primaryColor : darkMode ? '#9ca3af' : '#6b7280' }} />
+              <Settings className="w-5 h-5 px-1" style={{ color: currentPath === createPageUrl("Settings") ? primaryColor : darkMode ? '#9ca3af' : '#6b7280' }} />
               <span className="text-xs font-medium" style={{ color: currentPath === createPageUrl("Settings") ? primaryColor : darkMode ? '#9ca3af' : '#6b7280' }}>Settings</span>
             </Link>
           </div>

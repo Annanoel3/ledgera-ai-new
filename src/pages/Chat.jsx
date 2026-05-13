@@ -199,7 +199,7 @@ const ChatInputArea = ({ profile, selectedFiles, removeFile, fileInputRef, handl
       </div>
   }
 
-    <div className="fixed left-0 right-0 z-20 px-4 py-1" style={{
+    <div className="fixed left-0 right-0 z-20 px-4 py-1 my-1" style={{
     bottom: '5.5rem',
     borderTop: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}`,
     boxShadow: profile?.funMode ? '0 -10px 15px -3px rgba(0, 0, 0, 0.1)' : '0 -4px 6px -1px rgba(0, 0, 0, 0.1)',
