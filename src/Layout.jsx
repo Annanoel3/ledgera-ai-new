@@ -458,11 +458,11 @@ export default function Layout({ children }) {
 
         {/* Chat Page Bottom Navigation */}
         {isChat &&
-        <div className="mobile-bottom-nav fixed bottom-0 left-0 right-0 md:hidden z-50 flex items-center justify-around border-t px-3 py-10" style={{
+        <div className="mobile-bottom-nav fixed bottom-0 left-0 right-0 md:hidden z-50 flex items-center justify-around border-t px-3 py-8" style={{
           backgroundColor: darkMode ? '#1a1a1a' : '#ffffff',
           borderColor: darkMode ? '#374151' : '#e5e7eb'
         }}>
-            <Link to={createPageUrl("Dashboard")} className="flex flex-col items-center gap-1 my-1">
+            <Link to={createPageUrl("Dashboard")} className="flex flex-col items-center gap-1 my-8">
               <LayoutDashboard className="w-5 h-5" style={{ color: currentPath === createPageUrl("Dashboard") ? primaryColor : darkMode ? '#9ca3af' : '#6b7280' }} />
               <span className="text-xs font-medium" style={{ color: currentPath === createPageUrl("Dashboard") ? primaryColor : darkMode ? '#9ca3af' : '#6b7280' }}>Dashboard</span>
             </Link>
