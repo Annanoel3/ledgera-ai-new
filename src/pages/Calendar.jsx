@@ -4,6 +4,8 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, Plus, Calendar as CalendarIcon, RefreshCw, Upload } from "lucide-react";
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, startOfWeek, endOfWeek, isSameMonth, isSameDay, isToday, parseISO } from "date-fns";
+import { useNavigate } from "react-router-dom";
+import { createPageUrl } from "@/utils";
 import { toast } from "sonner";
 import EventModal from "@/components/calendar/EventModal";
 import { manageEventCheckIn } from "@/functions/manageEventCheckIn";
@@ -12,6 +14,7 @@ import { googleCalendarSync } from "@/functions/googleCalendarSync";
 const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 export default function Calendar() {
+  const navigate = useNavigate();
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [showEventModal, setShowEventModal] = useState(false);
@@ -163,11 +166,21 @@ export default function Calendar() {
       <div className="max-w-5xl mx-auto">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
-          <div>
-            <h1 className="text-2xl font-bold" style={{ color: textPrimary }}>Calendar</h1>
-            <p className="text-sm mt-0.5" style={{ color: textMuted }}>
-              Schedule events and track your financial activity
-            </p>
+          <div className="flex items-center gap-3">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => navigate(createPageUrl("Dashboard"))}
+              style={{ color: textMuted }}
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </Button>
+            <div>
+              <h1 className="text-2xl font-bold" style={{ color: textPrimary }}>Calendar</h1>
+              <p className="text-sm mt-0.5" style={{ color: textMuted }}>
+                Schedule events and track your financial activity
+              </p>
+            </div>
           </div>
           <div className="flex flex-wrap gap-2">
             <Button

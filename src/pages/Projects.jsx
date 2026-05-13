@@ -5,8 +5,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Search, Folder, ArrowRight, Loader2 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Plus, Search, Folder, ArrowRight, Loader2, ChevronLeft } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { startOfYear, endOfYear, startOfMonth, endOfMonth } from "date-fns";
 import {
@@ -20,6 +20,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export default function Projects() {
+  const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("all");
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear().toString());
@@ -194,8 +195,19 @@ export default function Projects() {
   return (
     <div className="p-6 md:p-8 pb-24 md:pb-8 min-h-screen" style={{ backgroundColor: profile?.darkMode ? '#0f0f0f' : '#f9fafb' }}>
       <div className="max-w-6xl mx-auto">
+         <div className="flex items-center gap-3 mb-8">
+           <Button
+             variant="ghost"
+             size="icon"
+             onClick={() => navigate(createPageUrl("Dashboard"))}
+             style={{ color: profile?.darkMode ? '#d1d5db' : '#374151' }}
+           >
+             <ChevronLeft className="w-5 h-5" />
+           </Button>
+           <h1 className="text-3xl font-bold" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>Projects</h1>
+         </div>
          <div className="mb-8">
-            <h1 className="text-3xl font-bold mb-4" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>Projects</h1>
+            <div style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}></div>
             <div className="flex gap-3 mb-4">
               <Select value={selectedYear} onValueChange={setSelectedYear}>
                 <SelectTrigger className="w-32" style={{

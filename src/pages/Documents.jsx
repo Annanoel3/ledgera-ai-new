@@ -8,12 +8,13 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { FileText, Search, ExternalLink, Loader2, FolderOpen, Trash2 } from "lucide-react";
+import { FileText, Search, ExternalLink, Loader2, FolderOpen, Trash2, ChevronLeft } from "lucide-react";
 import { format } from "date-fns";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 
 export default function Documents() {
+  const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear().toString());
   const queryClient = useQueryClient();
@@ -118,11 +119,21 @@ export default function Documents() {
       )}
       <div className="max-w-6xl mx-auto">
          <div className="flex items-center justify-between mb-8">
-           <div>
-             <h1 className="text-3xl font-bold mb-2" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>Documents</h1>
+            <div className="flex items-center gap-3">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => navigate(createPageUrl("Dashboard"))}
+                style={{ color: profile?.darkMode ? '#d1d5db' : '#374151' }}
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </Button>
+              <div>
+                <h1 className="text-3xl font-bold mb-2" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>Documents</h1>
              <p style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>All your invoices, contracts, and receipts in one place</p>
-           </div>
-           <Select value={selectedYear} onValueChange={setSelectedYear}>
+             </div>
+             </div>
+             <Select value={selectedYear} onValueChange={setSelectedYear}>
              <SelectTrigger className="w-32" style={{
                backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff',
                border: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}`,

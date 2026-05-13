@@ -5,7 +5,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Download, Loader2, ChevronRight, RotateCcw, Trash2 } from "lucide-react";
+import { Download, Loader2, ChevronRight, RotateCcw, Trash2, ChevronLeft } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { createPageUrl } from "@/utils";
 import { startOfYear, endOfYear, startOfMonth, endOfMonth, format } from "date-fns";
 import {
   Table,
@@ -26,6 +28,7 @@ import {
 
 
 export default function Reports() {
+  const navigate = useNavigate();
   const initialYear = new Date().getFullYear().toString();
   const initialMonth = "all";
   const [selectedYear, setSelectedYear] = useState(initialYear);
@@ -459,9 +462,19 @@ export default function Reports() {
     <div className="p-6 md:p-8 pb-24 md:pb-8 min-h-screen" style={{ backgroundColor: profile?.darkMode ? '#0f0f0f' : '#f9fafb' }}>
       <div className="max-w-6xl mx-auto">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
-          <div>
-            <h1 className="text-3xl font-bold mb-2" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>Financial Reports</h1>
-            <p style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>Professional accounting reports for your business</p>
+          <div className="flex items-center gap-3">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => navigate(createPageUrl("Dashboard"))}
+              style={{ color: profile?.darkMode ? '#d1d5db' : '#374151' }}
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </Button>
+            <div>
+              <h1 className="text-3xl font-bold mb-2" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>Financial Reports</h1>
+              <p style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>Professional accounting reports for your business</p>
+            </div>
           </div>
           <div className="flex gap-3 flex-wrap">
             <Select value={selectedYear} onValueChange={setSelectedYear}>

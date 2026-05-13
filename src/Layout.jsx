@@ -11,10 +11,6 @@ import OneSignalInit from "@/components/shared/OneSignalInit";
 const navItems = [
   { title: "Chat", url: createPageUrl("Chat"), icon: MessageSquare },
   { title: "Dashboard", url: createPageUrl("Dashboard"), icon: LayoutDashboard },
-  { title: "Projects", url: createPageUrl("Projects"), icon: FolderKanban },
-  { title: "Calendar", url: createPageUrl("Calendar"), icon: CalendarDays },
-  { title: "Reports", url: createPageUrl("Reports"), icon: TrendingUp },
-  { title: "Documents", url: createPageUrl("Documents"), icon: FileText },
   { title: "Settings", url: createPageUrl("Settings"), icon: Settings },
 ];
 
