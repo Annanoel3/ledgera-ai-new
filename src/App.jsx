@@ -14,6 +14,7 @@ import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import PrivacyPolicy from './pages/PrivacyPolicy';
+import Terms from './pages/Terms';
 import ProjectFinancials from './pages/ProjectFinancials';
 import DeleteAccount from './pages/DeleteAccount';
 import DeleteData from './pages/DeleteData';
@@ -112,6 +113,7 @@ function App() {
           <NavigationTracker />
           <Routes>
             <Route path="/PrivacyPolicy" element={<PrivacyPolicy />} />
+            <Route path="/Terms" element={<Terms />} />
             <Route path="/ProjectFinancials" element={<LayoutWrapper currentPageName="ProjectFinancials"><ProjectFinancials /></LayoutWrapper>} />
             <Route path="*" element={<AuthenticatedApp />} />
           </Routes>
