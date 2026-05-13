@@ -5,7 +5,7 @@ import { Loader2 as RefreshIcon } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { TrendingUp, TrendingDown, DollarSign, CreditCard, Wallet, ArrowRight, Loader2 } from "lucide-react";
+import { TrendingUp, TrendingDown, DollarSign, CreditCard, Wallet, ArrowRight, Loader2, FolderKanban, CalendarDays, TrendingUp as TrendingUpIcon, FileText } from "lucide-react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { startOfMonth, endOfMonth, subMonths, format, startOfYear, endOfYear } from "date-fns";
@@ -411,6 +411,42 @@ export default function Dashboard() {
             ))}
           </SelectContent>
         </Select>
+        </div>
+
+        {/* Quick Navigation */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          <Link to={createPageUrl("Projects")}>
+            <Card className="hover:shadow-md transition-all cursor-pointer h-full" style={{ backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff', border: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}` }}>
+              <CardContent className="p-4 flex flex-col items-center justify-center text-center">
+                <FolderKanban className="w-8 h-8 mb-2" style={{ color: '#22A699' }} />
+                <p className="font-medium text-sm" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>Projects</p>
+              </CardContent>
+            </Card>
+          </Link>
+          <Link to={createPageUrl("Calendar")}>
+            <Card className="hover:shadow-md transition-all cursor-pointer h-full" style={{ backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff', border: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}` }}>
+              <CardContent className="p-4 flex flex-col items-center justify-center text-center">
+                <CalendarDays className="w-8 h-8 mb-2" style={{ color: '#22A699' }} />
+                <p className="font-medium text-sm" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>Calendar</p>
+              </CardContent>
+            </Card>
+          </Link>
+          <Link to={createPageUrl("Reports")}>
+            <Card className="hover:shadow-md transition-all cursor-pointer h-full" style={{ backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff', border: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}` }}>
+              <CardContent className="p-4 flex flex-col items-center justify-center text-center">
+                <TrendingUpIcon className="w-8 h-8 mb-2" style={{ color: '#22A699' }} />
+                <p className="font-medium text-sm" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>Reports</p>
+              </CardContent>
+            </Card>
+          </Link>
+          <Link to={createPageUrl("Documents")}>
+            <Card className="hover:shadow-md transition-all cursor-pointer h-full" style={{ backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff', border: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}` }}>
+              <CardContent className="p-4 flex flex-col items-center justify-center text-center">
+                <FileText className="w-8 h-8 mb-2" style={{ color: '#22A699' }} />
+                <p className="font-medium text-sm" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>Documents</p>
+              </CardContent>
+            </Card>
+          </Link>
         </div>
 
         {/* KPI Cards */}
