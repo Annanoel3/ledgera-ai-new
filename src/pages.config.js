@@ -1,3 +1,4 @@
+import Home from './pages/Home';
 import Chat from './pages/Chat';
 import Dashboard from './pages/Dashboard';
 import Projects from './pages/Projects';
@@ -12,6 +13,7 @@ import Layout from './Layout.jsx';
 
 
 export const PAGES = {
+    "Home": Home,
     "Chat": Chat,
     "Dashboard": Dashboard,
     "Projects": Projects,
@@ -25,7 +27,7 @@ export const PAGES = {
 }
 
 export const pagesConfig = {
-    mainPage: "Chat",
+    mainPage: "Home",
     Pages: PAGES,
     Layout: Layout,
 };
