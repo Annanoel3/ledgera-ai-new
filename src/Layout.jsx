@@ -308,10 +308,10 @@ export default function Layout({ children }) {
         }
 
         {/* Mobile Top Bar */}
+        {!isChat && 
         <div className="mobile-top-bar md:hidden sticky top-0 z-10 flex flex-shrink-0 items-center" style={{
           backgroundColor: darkMode ? '#1a1a1a' : '#ffffff',
-          minHeight: '3.5rem',
-          display: isCalendar ? 'none' : 'flex'
+          minHeight: '3.5rem'
         }}>
           <button
             type="button"
@@ -332,6 +332,7 @@ export default function Layout({ children }) {
             </div>
           </div>
         </div>
+        }
 
         {/* Mobile Menu Overlay */}
         {mobileMenuOpen &&
