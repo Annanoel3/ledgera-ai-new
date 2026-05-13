@@ -17,6 +17,7 @@ import PrivacyPolicy from './pages/PrivacyPolicy';
 import ProjectFinancials from './pages/ProjectFinancials';
 import DeleteAccount from './pages/DeleteAccount';
 import DeleteData from './pages/DeleteData';
+import Calendar from './pages/Calendar';
 
 const { Pages, Layout, mainPage } = pagesConfig;
 const mainPageKey = mainPage ?? Object.keys(Pages)[0];
@@ -52,6 +53,7 @@ function AnimatedRoutes({ mainPageKey, MainPage, Pages }) {
           <Route path="/" element={<MainPage />} />
           <Route path="/DeleteAccount" element={<DeleteAccount />} />
           <Route path="/DeleteData" element={<DeleteData />} />
+          <Route path="/Calendar" element={<LayoutWrapper currentPageName="Calendar"><Calendar /></LayoutWrapper>} />
           {Object.entries(Pages).map(([path, Page]) => (
             <Route key={path} path={`/${path}`} element={<Page />} />
           ))}

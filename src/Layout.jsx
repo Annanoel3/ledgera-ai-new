@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { MessageSquare, LayoutDashboard, FolderKanban, Settings, Menu, X, FileText, TrendingUp, LogOut } from "lucide-react";
+import { MessageSquare, LayoutDashboard, FolderKanban, Settings, Menu, X, FileText, TrendingUp, LogOut, CalendarDays } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
@@ -12,6 +12,7 @@ const navItems = [
   { title: "Chat", url: createPageUrl("Chat"), icon: MessageSquare },
   { title: "Dashboard", url: createPageUrl("Dashboard"), icon: LayoutDashboard },
   { title: "Projects", url: createPageUrl("Projects"), icon: FolderKanban },
+  { title: "Calendar", url: createPageUrl("Calendar"), icon: CalendarDays },
   { title: "Reports", url: createPageUrl("Reports"), icon: TrendingUp },
   { title: "Documents", url: createPageUrl("Documents"), icon: FileText },
   { title: "Settings", url: createPageUrl("Settings"), icon: Settings },

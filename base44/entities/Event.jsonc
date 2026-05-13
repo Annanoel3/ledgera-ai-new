@@ -27,10 +27,13 @@
     "checkInScheduledId": {
       "type": "string",
       "description": "ID of the scheduled check-in created for this event"
+    },
+    "googleEventId": {
+      "type": "string",
+      "description": "Google Calendar event ID for sync tracking"
     }
   },
   "required": [
-    "projectId",
     "name",
     "startDate"
   ]

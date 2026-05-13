@@ -7,6 +7,7 @@ import Documents from './pages/Documents';
 import Reports from './pages/Reports';
 import Terms from './pages/Terms';
 import Contact from './pages/Contact';
+import Calendar from './pages/Calendar';
 import Layout from './Layout.jsx';
 
 
@@ -20,6 +21,7 @@ export const PAGES = {
     "Reports": Reports,
     "Terms": Terms,
     "Contact": Contact,
+    "Calendar": Calendar,
 }
 
 export const pagesConfig = {
