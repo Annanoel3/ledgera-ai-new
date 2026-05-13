@@ -458,7 +458,7 @@ export default function Layout({ children }) {
 
         {/* Chat Page Bottom Navigation */}
         {isChat &&
-        <div className="mobile-bottom-nav fixed bottom-0 left-0 right-0 md:hidden z-50 flex items-center justify-around border-t px-3 py-8" style={{
+        <div className="mobile-bottom-nav fixed bottom-0 left-0 right-0 md:hidden z-50 flex items-center justify-around border-t px-3 py-8 my-1" style={{
           backgroundColor: darkMode ? '#1a1a1a' : '#ffffff',
           borderColor: darkMode ? '#374151' : '#e5e7eb'
         }}>
