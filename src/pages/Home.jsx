@@ -66,13 +66,13 @@ export default function Home() {
         <div className="pt-6 border-t border-slate-300 space-y-3">
           <p className="text-xs text-slate-600">By signing in, you agree to our:</p>
           <div className="flex gap-4 justify-center text-sm">
-            <Link to="/PrivacyPolicy" className="text-[#22A699] hover:underline font-medium">
+            <a href="/PrivacyPolicy" className="text-[#22A699] hover:underline font-medium">
               Privacy Policy
-            </Link>
+            </a>
             <span className="text-slate-300">•</span>
-            <Link to="/Terms" className="text-[#22A699] hover:underline font-medium">
+            <a href="/Terms" className="text-[#22A699] hover:underline font-medium">
               Terms of Service
-            </Link>
+            </a>
           </div>
         </div>
       </div>
