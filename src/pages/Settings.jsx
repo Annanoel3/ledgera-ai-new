@@ -637,7 +637,7 @@ export default function Settings() {
                 variant="outline" 
                 onClick={handleResetApp}
                 disabled={deleteAllDataMutation.isPending}
-                className="w-full gap-2 justify-start"
+                className="w-full gap-2 justify-start h-auto py-2 whitespace-normal text-left"
                 style={{
                   backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff',
                   border: `2px solid ${profile?.darkMode ? '#991b1b' : '#dc2626'}`,
