@@ -16,7 +16,7 @@ import { format } from "date-fns";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import toast from 'react-hot-toast';
-import { exportFinancialData } from "@/functions/exportFinancialData";
+
 
 const currencies = ["USD", "EUR", "GBP", "CAD", "AUD"];
 const locales = ["en-US", "en-GB", "fr-FR", "de-DE", "es-ES"];
@@ -205,22 +205,22 @@ export default function Settings() {
 
   const handleExportPDF = async () => {
     try {
-      toast.info("Generating comprehensive PDF report...");
+      toast.info("Generating PDF report...");
       
-      const response = await exportFinancialData({
-        projects: allProjects,
-        income: allIncome,
-        expenses: allExpenses,
-        currency: profile?.currency || 'USD',
-        locale: profile?.locale || 'en-US',
-        selectedYear: new Date().getFullYear().toString()
+      const response = await base44.functions.fetch('exportFinancialData', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          projects: allProjects,
+          income: allIncome,
+          expenses: allExpenses,
+          currency: profile?.currency || 'USD',
+          locale: profile?.locale || 'en-US',
+          selectedYear: new Date().getFullYear().toString()
+        })
       });
       
-      if (!response || !response.data) {
-        throw new Error('No data received from server');
-      }
-      
-      const blob = new Blob([response.data], { type: 'application/pdf' });
+      const blob = await response.blob();
       
       if (blob.size === 0) {
         throw new Error('Generated PDF is empty');
@@ -238,7 +238,7 @@ export default function Settings() {
         window.URL.revokeObjectURL(url);
       }, 100);
       
-      toast.success("Professional financial report downloaded!");
+      toast.success("Report downloaded!");
     } catch (error) {
       console.error('PDF export error:', error);
       toast.error("Failed to export PDF: " + (error.message || 'Unknown error'));

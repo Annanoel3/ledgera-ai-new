@@ -23,7 +23,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { exportFinancialData } from "@/functions/exportFinancialData";
+
 
 export default function Reports() {
   const initialYear = new Date().getFullYear().toString();
@@ -382,23 +382,23 @@ export default function Reports() {
 
   const handleExportPDF = async () => {
     try {
-      toast.info("Generating comprehensive PDF report...");
+      toast.info("Generating PDF report...");
       
-      const response = await exportFinancialData({
-        projects: projects,
-        income: allYearIncomeItems,
-        expenses: allYearExpenseItems,
-        currency: profile?.currency || 'USD',
-        locale: profile?.locale || 'en-US',
-        selectedYear: selectedYear,
-        selectedMonth: selectedMonth !== "all" ? parseInt(selectedMonth) : null
+      const response = await base44.functions.fetch('exportFinancialData', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          projects: projects,
+          income: allYearIncomeItems,
+          expenses: allYearExpenseItems,
+          currency: profile?.currency || 'USD',
+          locale: profile?.locale || 'en-US',
+          selectedYear: selectedYear,
+          selectedMonth: selectedMonth !== "all" ? parseInt(selectedMonth) : null
+        })
       });
       
-      if (!response || !response.data) {
-        throw new Error('No data received from server');
-      }
-      
-      const blob = new Blob([response.data], { type: 'application/pdf' });
+      const blob = await response.blob();
       
       if (blob.size === 0) {
         throw new Error('Generated PDF is empty');
@@ -420,7 +420,7 @@ export default function Reports() {
         window.URL.revokeObjectURL(url);
       }, 100);
       
-      toast.success("Professional financial report downloaded!");
+      toast.success("Report downloaded!");
     } catch (error) {
       console.error('PDF export error:', error);
       toast.error("Failed to export PDF: " + (error.message || 'Unknown error'));
