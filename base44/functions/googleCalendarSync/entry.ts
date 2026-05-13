@@ -19,6 +19,16 @@ Deno.serve(async (req) => {
 
     const authHeader = { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' };
 
+    if (action === 'check') {
+      // Just verify we can get the access token and make a simple API call
+      try {
+        await fetch('https://www.googleapis.com/calendar/v3/calendars/primary', { headers: authHeader });
+        return Response.json({ success: true, connected: true });
+      } catch {
+        return Response.json({ success: false, connected: false }, { status: 400 });
+      }
+    }
+
     if (action === 'import') {
       // Fetch upcoming events from Google Calendar (next 90 days)
       const timeMin = new Date().toISOString();
