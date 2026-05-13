@@ -462,7 +462,7 @@ export default function Layout({ children }) {
           backgroundColor: darkMode ? '#1a1a1a' : '#ffffff',
           borderColor: darkMode ? '#374151' : '#e5e7eb'
         }}>
-            <Link to={createPageUrl("Dashboard")} className="flex flex-col items-center gap-1 my-2 py-1">
+            <Link to={createPageUrl("Dashboard")} className="flex flex-col items-center gap-1 my-2 py-3">
               <LayoutDashboard className="w-5 h-5" style={{ color: currentPath === createPageUrl("Dashboard") ? primaryColor : darkMode ? '#9ca3af' : '#6b7280' }} />
               <span className="text-xs font-medium" style={{ color: currentPath === createPageUrl("Dashboard") ? primaryColor : darkMode ? '#9ca3af' : '#6b7280' }}>Dashboard</span>
             </Link>
