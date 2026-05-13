@@ -205,8 +205,23 @@ export default function QuickEditItem({ item, type, projects, onUpdate, onDelete
             )}
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowEdit(false)}>Cancel</Button>
-            <Button onClick={handleFullUpdate}>Save Changes</Button>
+            <Button 
+              variant="outline" 
+              onClick={() => setShowEdit(false)}
+              style={{
+                backgroundColor: profile?.darkMode ? '#374151' : '#ffffff',
+                border: `1px solid ${profile?.darkMode ? '#4b5563' : '#e5e7eb'}`,
+                color: profile?.darkMode ? '#ffffff' : '#111827'
+              }}
+            >
+              Cancel
+            </Button>
+            <Button 
+              onClick={handleFullUpdate}
+              className="bg-[#22A699] hover:bg-[#1d8d82] text-white"
+            >
+              Save Changes
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -226,8 +241,23 @@ export default function QuickEditItem({ item, type, projects, onUpdate, onDelete
             This will convert this {type} of {formatCurrency(item.amount)} to an {type === 'income' ? 'expense' : 'income'}.
           </p>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowConvertConfirm(false)}>Cancel</Button>
-            <Button onClick={handleConvert}>Convert</Button>
+            <Button 
+              variant="outline" 
+              onClick={() => setShowConvertConfirm(false)}
+              style={{
+                backgroundColor: profile?.darkMode ? '#374151' : '#ffffff',
+                border: `1px solid ${profile?.darkMode ? '#4b5563' : '#e5e7eb'}`,
+                color: profile?.darkMode ? '#ffffff' : '#111827'
+              }}
+            >
+              Cancel
+            </Button>
+            <Button 
+              onClick={handleConvert}
+              className="bg-[#22A699] hover:bg-[#1d8d82] text-white"
+            >
+              Convert
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
