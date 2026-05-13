@@ -84,6 +84,7 @@ export default function Layout({ children }) {
 
   const currentPath = location.pathname;
   const isChat = currentPath === createPageUrl("Chat");
+  const isCalendar = currentPath === "/Calendar";
 
   const primaryColor = funMode ? '#FF6B9D' : '#22A699';
   const primaryHover = funMode ? '#FF4D7D' : '#1d8d82';
@@ -307,7 +308,7 @@ export default function Layout({ children }) {
         }
 
         {/* Mobile Top Bar */}
-        <div className="mobile-top-bar md:hidden sticky top-0 z-10 flex flex-shrink-0 items-center" style={{
+        {!isCalendar && <div className="mobile-top-bar md:hidden sticky top-0 z-10 flex flex-shrink-0 items-center" style={{
           backgroundColor: darkMode ? '#1a1a1a' : '#ffffff',
           minHeight: '3.5rem'
         }}>
@@ -330,6 +331,7 @@ export default function Layout({ children }) {
             </div>
           </div>
         </div>
+        }
 
         {/* Mobile Menu Overlay */}
         {mobileMenuOpen &&
