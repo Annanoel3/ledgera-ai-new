@@ -19,6 +19,8 @@ Deno.serve(async (req) => {
 
     const authHeader = { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' };
 
+    console.log(`[SYNC] Action: ${action}, User: ${user.email}`);
+
     if (action === 'check') {
       // Just verify we can get the access token and make a simple API call
       try {
@@ -91,20 +93,39 @@ Deno.serve(async (req) => {
     if (action === 'export') {
       // Export Ledgera events to Google Calendar (events only, not income/expenses)
       const ledgeraEvents = await base44.entities.Event.list();
-      const userEvents = ledgeraEvents.filter(ev => ev.created_by === user.email || !ev.created_by);
+      const userEvents = ledgeraEvents.filter(ev => ev.created_by === user.email);
+      
+      console.log(`[EXPORT] Found ${userEvents.length} user events`);
+      const toExport = userEvents.filter(ev => !ev.googleEventId && ev.startDate);
+      console.log(`[EXPORT] Ready to export: ${toExport.length} events`);
 
       let exported = 0;
-      for (const ev of userEvents) {
-        if (ev.googleEventId) continue; // already from Google or already exported
-        if (!ev.startDate) continue; // skip events without start date
+      for (const ev of toExport) {
+
+        if (!ev.name) {
+          console.log(`[EXPORT] Skipping event with empty name`);
+          continue;
+        }
+
+        // Ensure RFC 3339 format with timezone for Google Calendar
+        const toRFC3339 = (dateStr) => {
+          if (!dateStr) return null;
+          // If already has timezone (+ or Z), return as-is
+          if (dateStr.includes('+') || dateStr.includes('Z') || /\-\d{2}:\d{2}$/.test(dateStr)) {
+            return dateStr;
+          }
+          // Add UTC timezone
+          return dateStr + 'Z';
+        };
 
         const gEvent = {
           summary: ev.name,
-          description: ev.notes || 'Event from Ledgera AI',
-          start: { dateTime: ev.startDate, timeZone: 'America/Chicago' },
-          end: { dateTime: ev.endDate || ev.startDate, timeZone: 'America/Chicago' },
+          start: { dateTime: toRFC3339(ev.startDate) },
+          end: { dateTime: toRFC3339(ev.endDate || ev.startDate) },
         };
+        if (ev.notes) gEvent.description = ev.notes;
 
+        console.log(`[EXPORT] Creating event: ${ev.name}`);
         const createRes = await fetch(
           'https://www.googleapis.com/calendar/v3/calendars/primary/events',
           { method: 'POST', headers: authHeader, body: JSON.stringify(gEvent) }
@@ -114,19 +135,23 @@ Deno.serve(async (req) => {
           const created = await createRes.json();
           await base44.entities.Event.update(ev.id, { googleEventId: created.id });
           exported++;
+          console.log(`[EXPORT] Success: ${ev.name} (Google ID: ${created.id})`);
         } else {
           const err = await createRes.text();
-          console.error(`Failed to export event ${ev.id}:`, err);
+          console.error(`[EXPORT] Failed to export ${ev.id} (${ev.name}), status=${createRes.status}`);
+          console.error(`[EXPORT] Response: ${err}`);
+          console.error(`[EXPORT] Sent payload: ${JSON.stringify(gEvent)}`);
         }
       }
 
+      console.log(`[EXPORT] Total exported: ${exported}`);
       return Response.json({ success: true, exported });
     }
 
     return Response.json({ error: 'Invalid action' }, { status: 400 });
 
   } catch (error) {
-    console.error('Google Calendar sync error:', error);
-    return Response.json({ error: error.message }, { status: 500 });
+    console.error('Google Calendar sync error:', error.message, error.stack);
+    return Response.json({ error: error.message, stack: error.stack }, { status: 500 });
   }
 });
