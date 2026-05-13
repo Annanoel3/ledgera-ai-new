@@ -44,7 +44,26 @@ export default function EventModal({ event, defaultDate, profile, onSave, onDele
   const handleSave = async () => {
     if (!name.trim() || !startDate) return;
     setSaving(true);
-    await onSave({ name: name.trim(), startDate, endDate: endDate || null, notes, projectId: projectId || null });
+    
+    // datetime-local is in user's local time, add :00 seconds and Z for UTC interpretation
+    // This ensures Google Calendar stores it in the user's local time zone
+    const formatDate = (dateStr) => {
+      if (!dateStr) return null;
+      // datetime-local format: "2026-05-13T09:00"
+      // Add seconds and Z to make it RFC 3339
+      if (!dateStr.includes(':')) return dateStr;
+      const parts = dateStr.split(':');
+      if (parts.length === 2) return dateStr + ':00Z';
+      return dateStr + 'Z';
+    };
+    
+    await onSave({ 
+      name: name.trim(), 
+      startDate: formatDate(startDate), 
+      endDate: endDate ? formatDate(endDate) : null, 
+      notes, 
+      projectId: projectId || null 
+    });
     setSaving(false);
   };
 
