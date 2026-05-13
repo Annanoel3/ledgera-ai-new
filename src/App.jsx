@@ -108,15 +108,15 @@ function App() {
   }, []);
 
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/PrivacyPolicy" element={<PrivacyPolicy />} />
-        <Route path="/Terms" element={<Terms />} />
-        <Route
-          path="*"
-          element={
-            <AuthProvider>
+    <AuthProvider>
+      <Router>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/PrivacyPolicy" element={<PrivacyPolicy />} />
+          <Route path="/Terms" element={<Terms />} />
+          <Route
+            path="*"
+            element={
               <QueryClientProvider client={queryClientInstance}>
                 <NavigationTracker />
                 <Routes>
@@ -126,11 +126,11 @@ function App() {
                 <Toaster />
                 <VisualEditAgent />
               </QueryClientProvider>
-            </AuthProvider>
-          }
-        />
-      </Routes>
-    </Router>
+            }
+          />
+        </Routes>
+      </Router>
+    </AuthProvider>
   )
 }
 
