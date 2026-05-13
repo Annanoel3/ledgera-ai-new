@@ -190,9 +190,18 @@ export default function Calendar() {
   const textMuted = dark ? "#9ca3af" : "#6b7280";
 
   return (
-    <div className="p-4 md:p-6" style={{ backgroundColor: bg }}>
-      <div className="max-w-5xl mx-auto">
-        {/* Header Actions */}
+    <div style={{ backgroundColor: bg, minHeight: '100vh' }}>
+      {/* Header with Back Button */}
+      <div className="sticky top-0 z-20 md:hidden flex items-center gap-3 px-4 py-3" style={{ backgroundColor: dark ? '#1a1a1a' : '#ffffff', borderBottom: `1px solid ${border}` }}>
+        <button onClick={() => navigate(-1)} className="flex items-center" style={{ color: textPrimary }}>
+          <ChevronLeft className="w-6 h-6" />
+        </button>
+        <h1 className="text-xl font-bold" style={{ color: textPrimary }}>Calendar</h1>
+      </div>
+
+      <div className="p-4 md:p-6">
+        <div className="max-w-5xl mx-auto">
+          {/* Header Actions */}
         <div className="flex flex-wrap gap-2 mb-6">
             {googleConnected ? (
               <>
@@ -398,6 +407,7 @@ export default function Calendar() {
               No events this month. Click any day to add one!
             </p>
           )}
+        </div>
         </div>
       </div>
 
