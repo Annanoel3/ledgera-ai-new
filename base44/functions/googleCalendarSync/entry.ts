@@ -11,7 +11,7 @@ Deno.serve(async (req) => {
     // Get Google Calendar access token from app user connector
     let accessToken;
     try {
-      const conn = await base44.asServiceRole.connectors.getCurrentAppUserConnection('6a048dedf01204ab3851c9a5');
+      const conn = await base44.asServiceRole.connectors.getCurrentAppUserConnection('6a04df00e62b57f635e00b0f');
       accessToken = conn.accessToken;
     } catch (e) {
       return Response.json({ error: 'Google Calendar not connected. Please connect it first.' }, { status: 400 });

@@ -170,7 +170,7 @@ export default function Calendar() {
 
   const handleConnectGoogle = async () => {
     try {
-      const url = await base44.connectors.connectAppUser("6a048dedf01204ab3851c9a5");
+      const url = await base44.connectors.connectAppUser("6a04df00e62b57f635e00b0f");
       const popup = window.open(url, "_blank");
       const timer = setInterval(() => {
         if (!popup || popup.closed) {
