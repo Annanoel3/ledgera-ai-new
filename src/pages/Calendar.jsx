@@ -64,6 +64,19 @@ export default function Calendar() {
     enabled: !!user,
   });
 
+  const { data: googleConnected = false } = useQuery({
+    queryKey: ["googleCalendarConnected"],
+    queryFn: async () => {
+      try {
+        await googleCalendarSync({ action: "check" });
+        return true;
+      } catch {
+        return false;
+      }
+    },
+    enabled: !!user,
+  });
+
   // Build a map: dateStr -> { hasIncome, hasExpense, events[] }
   const dayData = useMemo(() => {
     const map = {};
@@ -155,6 +168,21 @@ export default function Calendar() {
     }
   };
 
+  const handleConnectGoogle = async () => {
+    try {
+      const url = await base44.connectors.connectAppUser("6a048dedf01204ab3851c9a5");
+      const popup = window.open(url, "_blank");
+      const timer = setInterval(() => {
+        if (!popup || popup.closed) {
+          clearInterval(timer);
+          queryClient.invalidateQueries(["googleCalendarConnected"]);
+        }
+      }, 500);
+    } catch (err) {
+      toast.error("Failed to connect: " + err.message);
+    }
+  };
+
   const bg = dark ? "#0f0f0f" : "#f9fafb";
   const cardBg = dark ? "#1a1a1a" : "#ffffff";
   const border = dark ? "#374151" : "#e5e7eb";
@@ -162,39 +190,46 @@ export default function Calendar() {
   const textMuted = dark ? "#9ca3af" : "#6b7280";
 
   return (
-    <div className="min-h-screen p-4 md:p-6" style={{ backgroundColor: bg }}>
+    <div className="p-4 md:p-6" style={{ backgroundColor: bg }}>
       <div className="max-w-5xl mx-auto">
         {/* Header Actions */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
-          <div>
-            <h1 className="text-2xl font-bold" style={{ color: textPrimary }}>Calendar</h1>
-            <p className="text-sm mt-0.5" style={{ color: textMuted }}>
-              Schedule events and track your financial activity
-            </p>
-          </div>
           <div className="flex flex-wrap gap-2">
-            <Button
-              onClick={handleImportFromGoogle}
-              disabled={syncing}
-              variant="outline"
-              size="sm"
-              className="gap-2"
-              style={{ backgroundColor: cardBg, border: `1px solid ${border}`, color: textPrimary }}
-            >
-              {syncing ? <RefreshCw className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
-              Import from Google
-            </Button>
-            <Button
-              onClick={handleExportToGoogle}
-              disabled={exporting}
-              variant="outline"
-              size="sm"
-              className="gap-2"
-              style={{ backgroundColor: cardBg, border: `1px solid ${border}`, color: textPrimary }}
-            >
-              {exporting ? <Upload className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
-              Export to Google
-            </Button>
+            {googleConnected ? (
+              <>
+                <Button
+                  onClick={handleImportFromGoogle}
+                  disabled={syncing}
+                  variant="outline"
+                  size="sm"
+                  className="gap-2"
+                  style={{ backgroundColor: cardBg, border: `1px solid ${border}`, color: textPrimary }}
+                >
+                  {syncing ? <RefreshCw className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
+                  Import from Google
+                </Button>
+                <Button
+                  onClick={handleExportToGoogle}
+                  disabled={exporting}
+                  variant="outline"
+                  size="sm"
+                  className="gap-2"
+                  style={{ backgroundColor: cardBg, border: `1px solid ${border}`, color: textPrimary }}
+                >
+                  {exporting ? <Upload className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+                  Export to Google
+                </Button>
+              </>
+            ) : (
+              <Button
+                onClick={handleConnectGoogle}
+                size="sm"
+                className="gap-2"
+                style={{ backgroundColor: "#22A699", color: "#ffffff" }}
+              >
+                <CalendarIcon className="w-4 h-4" /> Connect Google Calendar
+              </Button>
+            )}
             <Button
               onClick={() => { setSelectedEvent(null); setSelectedDate(new Date()); setShowEventModal(true); }}
               size="sm"
