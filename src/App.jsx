@@ -19,6 +19,7 @@ import ProjectFinancials from './pages/ProjectFinancials';
 import DeleteAccount from './pages/DeleteAccount';
 import DeleteData from './pages/DeleteData';
 import Calendar from './pages/Calendar';
+import Home from './pages/Home';
 
 const { Pages, Layout, mainPage } = pagesConfig;
 const mainPageKey = mainPage ?? Object.keys(Pages)[0];
@@ -109,6 +110,7 @@ function App() {
   return (
     <Router>
       <Routes>
+        <Route path="/" element={<Home />} />
         <Route path="/PrivacyPolicy" element={<PrivacyPolicy />} />
         <Route path="/Terms" element={<Terms />} />
         <Route
