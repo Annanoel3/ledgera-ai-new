@@ -1,29 +1,29 @@
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/lib/AuthContext";
 
 export default function Home() {
-  const [isAuthenticated, setIsAuthenticated] = useState(null);
   const navigate = useNavigate();
+  const { isAuthenticated, isLoadingAuth } = useAuth();
 
   useEffect(() => {
-    base44.auth.isAuthenticated().then((authed) => {
-      if (authed) {
-        navigate("/Dashboard", { replace: true });
-      } else {
-        setIsAuthenticated(false);
-      }
-    });
-  }, [navigate]);
+    if (!isLoadingAuth && isAuthenticated) {
+      navigate("/Dashboard", { replace: true });
+    }
+  }, [isAuthenticated, isLoadingAuth, navigate]);
 
-  if (isAuthenticated === null) {
+  if (isLoadingAuth) {
     return (
       <div className="fixed inset-0 flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100">
         <div className="w-8 h-8 border-4 border-slate-200 border-t-slate-800 rounded-full animate-spin"></div>
       </div>
     );
+  }
+
+  if (isAuthenticated) {
+    return null;
   }
 
   return (
