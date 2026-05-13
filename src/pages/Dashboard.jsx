@@ -5,7 +5,7 @@ import { Loader2 as RefreshIcon } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { TrendingUp, TrendingDown, DollarSign, CreditCard, Wallet, ArrowRight, Loader2, FolderKanban, CalendarDays, TrendingUp as TrendingUpIcon, FileText } from "lucide-react";
+import { TrendingUp, TrendingDown, DollarSign, CreditCard, Wallet, ArrowRight, Loader2, FolderKanban, CalendarDays, TrendingUp as TrendingUpIcon, FileText, ChevronDown } from "lucide-react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { startOfMonth, endOfMonth, subMonths, format, startOfYear, endOfYear } from "date-fns";
@@ -19,6 +19,7 @@ export default function Dashboard() {
   const queryClient = useQueryClient();
   const [selectedYear, setSelectedYear] = React.useState(new Date().getFullYear().toString());
   const [selectedMonth, setSelectedMonth] = React.useState(new Date().getMonth());
+  const [recentActivityOpen, setRecentActivityOpen] = React.useState(true);
 
   const handleRefresh = useCallback(async () => {
     await queryClient.invalidateQueries();
@@ -620,38 +621,50 @@ export default function Dashboard() {
 
         {/* Recent Activity with Quick Edit */}
         <Card className="mb-8" style={{ backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff', border: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}` }}>
-          <CardHeader>
+          <CardHeader 
+            className="cursor-pointer flex flex-row items-center justify-between"
+            onClick={() => setRecentActivityOpen(!recentActivityOpen)}
+          >
             <CardTitle style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>
               Recent Activity
               <span className="text-sm font-normal ml-2" style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>
                 Quick edit, move, or convert any item
               </span>
             </CardTitle>
+            <ChevronDown 
+              className="w-5 h-5 transition-transform" 
+              style={{ 
+                color: profile?.darkMode ? '#9ca3af' : '#6b7280',
+                transform: recentActivityOpen ? 'rotate(0deg)' : 'rotate(-90deg)'
+              }} 
+            />
           </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {recentActivity.length === 0 ?
-              <p className="text-center py-8" style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>
-                  No activity yet. Start by chatting with Ledgera AI!
-                </p> :
+          {recentActivityOpen && (
+            <CardContent>
+              <div className="space-y-3">
+                {recentActivity.length === 0 ?
+                <p className="text-center py-8" style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>
+                    No activity yet. Start by chatting with Ledgera AI!
+                  </p> :
 
-              recentActivity.slice(0, 10).map((item) =>
-              <QuickEditItem
-                key={`${item.type}-${item.id}`}
-                item={item}
-                type={item.type}
-                projects={projects}
-                onUpdate={item.type === 'income' ? handleUpdateIncome : handleUpdateExpense}
-                onDelete={item.type === 'income' ? handleDeleteIncome : handleDeleteExpense}
-                onConvert={item.type === 'income' ? handleConvertIncome : handleConvertExpense}
-                formatCurrency={formatCurrency}
-                profile={profile}
-                isSaving={updateIncomeMutation.isLoading || updateExpenseMutation.isLoading || deleteIncomeMutation.isLoading || deleteExpenseMutation.isLoading || convertMutation.isLoading} />
+                recentActivity.slice(0, 10).map((item) =>
+                <QuickEditItem
+                  key={`${item.type}-${item.id}`}
+                  item={item}
+                  type={item.type}
+                  projects={projects}
+                  onUpdate={item.type === 'income' ? handleUpdateIncome : handleUpdateExpense}
+                  onDelete={item.type === 'income' ? handleDeleteIncome : handleDeleteExpense}
+                  onConvert={item.type === 'income' ? handleConvertIncome : handleConvertExpense}
+                  formatCurrency={formatCurrency}
+                  profile={profile}
+                  isSaving={updateIncomeMutation.isLoading || updateExpenseMutation.isLoading || deleteIncomeMutation.isLoading || deleteExpenseMutation.isLoading || convertMutation.isLoading} />
 
-              )
-              }
-            </div>
-          </CardContent>
+                )
+                }
+              </div>
+            </CardContent>
+          )}
         </Card>
 
         {/* Top Projects */}
