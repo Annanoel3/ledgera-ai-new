@@ -36,7 +36,7 @@ const pageVariants = {
   in: { x: 0, opacity: 1 },
   out: { x: '-30%', opacity: 0 },
 };
-const pageTransition = { type: 'tween', ease: 'easeInOut', duration: 0.22 };
+const pageTransition = { type: 'tween', ease: 'easeInOut', duration: 0.4 };
 
 function AnimatedRoutes({ mainPageKey, MainPage, Pages }) {
   const location = useLocation();
