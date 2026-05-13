@@ -193,8 +193,7 @@ export default function Calendar() {
     <div className="p-4 md:p-6" style={{ backgroundColor: bg }}>
       <div className="max-w-5xl mx-auto">
         {/* Header Actions */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
-          <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2 mb-6">
             {googleConnected ? (
               <>
                 <Button
@@ -238,7 +237,6 @@ export default function Calendar() {
             >
               <Plus className="w-4 h-4" /> New Event
             </Button>
-          </div>
         </div>
 
         {/* Legend */}
