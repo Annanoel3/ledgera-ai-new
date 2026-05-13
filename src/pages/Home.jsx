@@ -42,6 +42,20 @@ export default function Home() {
           Manage your projects, track income and expenses, sync with Google Calendar, and get AI-powered financial insights.
         </p>
 
+        <div className="bg-slate-100 rounded-lg p-4 text-left space-y-3 text-sm text-slate-700">
+          <div>
+            <p className="font-semibold text-slate-900 mb-1">Why we need access to your data:</p>
+            <ul className="list-disc list-inside space-y-1">
+              <li>Google Calendar integration to sync your events with financial data</li>
+              <li>Secure authentication to protect your financial information</li>
+              <li>AI analysis to provide personalized financial insights</li>
+            </ul>
+          </div>
+          <p className="text-xs text-slate-600">
+            Your data is encrypted and never shared with third parties. We use it solely to improve your bookkeeping experience.
+          </p>
+        </div>
+
         <Button
           onClick={() => base44.auth.redirectToLogin()}
           className="w-full bg-[#22A699] hover:bg-[#1d8d82] text-white py-3 rounded-lg font-medium text-lg"
