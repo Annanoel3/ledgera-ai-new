@@ -90,10 +90,11 @@ Deno.serve(async (req) => {
 
     if (action === 'export') {
       // Export Ledgera events to Google Calendar (events only, not income/expenses)
-      const ledgeraEvents = await base44.entities.Event.filter({ created_by: user.email });
+      const ledgeraEvents = await base44.entities.Event.list();
+      const userEvents = ledgeraEvents.filter(ev => ev.created_by === user.email || !ev.created_by);
 
       let exported = 0;
-      for (const ev of ledgeraEvents) {
+      for (const ev of userEvents) {
         if (ev.googleEventId) continue; // already from Google or already exported
         if (!ev.startDate) continue; // skip events without start date
 
