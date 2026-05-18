@@ -18,6 +18,7 @@ import { createPageUrl } from "@/utils";
 import { processFinancialData } from "@/functions/processFinancialData";
 import { processChat } from "@/functions/processChat";
 import { speechToText } from "@/functions/speechToText";
+import { setMicActive } from "@/lib/admob";
 
 // Move component definitions OUTSIDE to prevent re-mounting on every render
 const ChatHeader = ({ profile, showChatList, setShowChatList, handleNewChat, setShowCapabilities }) =>
@@ -662,6 +663,7 @@ export default function Chat() {
       recorder.start();
       setMediaRecorder(recorder);
       setIsRecording(true);
+      setMicActive(true);
     } catch (error) {
       console.error('Recording error:', error);
       toast.error("Could not access microphone. Please check permissions.");
@@ -673,6 +675,7 @@ export default function Chat() {
       mediaRecorder.stop();
       setIsRecording(false);
       setMediaRecorder(null);
+      setMicActive(false);
     }
   };
 
