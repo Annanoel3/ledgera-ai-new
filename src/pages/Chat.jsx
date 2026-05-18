@@ -19,6 +19,7 @@ import { processFinancialData } from "@/functions/processFinancialData";
 import { processChat } from "@/functions/processChat";
 import { speechToText } from "@/functions/speechToText";
 import { setMicActive } from "@/lib/admob";
+import { VoiceRecorder } from 'capacitor-voice-recorder';
 
 // Move component definitions OUTSIDE to prevent re-mounting on every render
 const ChatHeader = ({ profile, showChatList, setShowChatList, handleNewChat, setShowCapabilities }) =>
@@ -322,7 +323,6 @@ export default function Chat() {
   const [conversationId, setConversationId] = useState(null);
   const [messages, setMessages] = useState([]);
   const [isRecording, setIsRecording] = useState(false);
-  const [mediaRecorder, setMediaRecorder] = useState(null);
   const [uploadingFile, setUploadingFile] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [showChatList, setShowChatList] = useState(false);
@@ -631,51 +631,53 @@ export default function Chat() {
 
   const startRecording = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const recorder = new MediaRecorder(stream);
-      const chunks = [];
-
-      recorder.ondataavailable = (e) => chunks.push(e.data);
-
-      recorder.onstop = async () => {
-        const blob = new Blob(chunks, { type: 'audio/webm' });
-
-        try {
-          toast.info("Transcribing...");
-
-          const file = new File([blob], 'recording.webm', { type: 'audio/webm' });
-          const uploadResponse = await base44.integrations.Core.UploadFile({ file });
-
-          const response = await speechToText({ file_url: uploadResponse.file_url });
-
-          if (response.data.text) {
-            toast.success("Transcription complete!");
-            setInput(response.data.text);
-          }
-        } catch (error) {
-          console.error('Transcription error:', error);
-          toast.error("Could not transcribe audio. Please try again.");
+      const { value: hasPermission } = await VoiceRecorder.hasAudioRecordingPermission();
+      if (!hasPermission) {
+        const { value: granted } = await VoiceRecorder.requestAudioRecordingPermission();
+        if (!granted) {
+          toast.error("Microphone permission denied.");
+          return;
         }
-
-        stream.getTracks().forEach((track) => track.stop());
-      };
-
-      recorder.start();
-      setMediaRecorder(recorder);
+      }
+      await VoiceRecorder.startRecording();
       setIsRecording(true);
       setMicActive(true);
     } catch (error) {
       console.error('Recording error:', error);
-      toast.error("Could not access microphone. Please check permissions.");
+      toast.error("Could not start recording. Please try again.");
     }
   };
 
-  const stopRecording = () => {
-    if (mediaRecorder && isRecording) {
-      mediaRecorder.stop();
+  const stopRecording = async () => {
+    if (!isRecording) return;
+    try {
+      const result = await VoiceRecorder.stopRecording();
       setIsRecording(false);
-      setMediaRecorder(null);
       setMicActive(false);
+
+      const { recordDataBase64, mimeType } = result.value;
+      const dataUrl = `data:${mimeType};base64,${recordDataBase64}`;
+
+      toast.info("Transcribing...");
+
+      // Convert dataUrl to a File for upload
+      const res = await fetch(dataUrl);
+      const blob = await res.blob();
+      const ext = mimeType.includes('aac') ? 'm4a' : 'webm';
+      const file = new File([blob], `recording.${ext}`, { type: mimeType });
+
+      const uploadResponse = await base44.integrations.Core.UploadFile({ file });
+      const response = await speechToText({ file_url: uploadResponse.file_url });
+
+      if (response.data.text) {
+        toast.success("Transcription complete!");
+        setInput(response.data.text);
+      }
+    } catch (error) {
+      console.error('Stop recording error:', error);
+      setIsRecording(false);
+      setMicActive(false);
+      toast.error("Could not process recording. Please try again.");
     }
   };
 
