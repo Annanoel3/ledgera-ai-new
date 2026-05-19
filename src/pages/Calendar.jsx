@@ -2,7 +2,7 @@ import React, { useState, useMemo } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, Plus, Calendar as CalendarIcon, RefreshCw, Upload } from "lucide-react";
+import { ChevronLeft, ChevronRight, Plus, Calendar as CalendarIcon, RefreshCw, Upload, Unlink } from "lucide-react";
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, startOfWeek, endOfWeek, isSameMonth, isSameDay, isToday, parseISO } from "date-fns";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -183,6 +183,16 @@ export default function Calendar() {
     }
   };
 
+  const handleDisconnectGoogle = async () => {
+    try {
+      await base44.connectors.disconnectAppUser("6a04df00e62b57f635e00b0f");
+      queryClient.invalidateQueries(["googleCalendarConnected"]);
+      toast.success("Google Calendar disconnected");
+    } catch (err) {
+      toast.error("Failed to disconnect: " + err.message);
+    }
+  };
+
   const bg = dark ? "#0f0f0f" : "#f9fafb";
   const cardBg = dark ? "#1a1a1a" : "#ffffff";
   const border = dark ? "#374151" : "#e5e7eb";
@@ -230,6 +240,16 @@ export default function Calendar() {
                 >
                   {exporting ? <Upload className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
                   Export to Google
+                </Button>
+                <Button
+                  onClick={handleDisconnectGoogle}
+                  variant="outline"
+                  size="sm"
+                  className="gap-2"
+                  style={{ backgroundColor: cardBg, border: "1px solid #ef4444", color: "#ef4444" }}
+                >
+                  <Unlink className="w-4 h-4" />
+                  Disconnect
                 </Button>
               </>
             ) : (
