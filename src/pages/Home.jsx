@@ -25,7 +25,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex flex-col p-4">
       {/* Main centered content */}
-      <div className="flex-1 flex items-center justify-center">
+      <div className="flex-1 flex items-center justify-center" style={{ paddingTop: 'max(2rem, env(safe-area-inset-top))' }}>
         <div className="max-w-md w-full text-center space-y-8">
           <div>
             <img 
