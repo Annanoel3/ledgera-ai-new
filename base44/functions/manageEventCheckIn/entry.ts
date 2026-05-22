@@ -32,20 +32,71 @@ Deno.serve(async (req) => {
         sent: false
       });
 
-      // Link check-in to event
+      // Schedule push notification 60 minutes before event
+      let notificationId = null;
+      try {
+        const sendAtISO = new Date(new Date(startDate).getTime() - 60 * 60000).toISOString();
+        const schedulePushUrl = new URL(req.url);
+        schedulePushUrl.pathname = schedulePushUrl.pathname.replace('/manageEventCheckIn', '/schedulePush');
+        const pushRes = await fetch(schedulePushUrl.toString(), {
+          method: 'POST',
+          headers: req.headers,
+          body: JSON.stringify({
+            toUserExternalId: user.email,
+            title: `Upcoming event: ${name}`,
+            body: `You have ${name} starting in 1 hour`,
+            sendAtISO,
+            data: { eventId: event.id }
+          })
+        });
+        if (pushRes.ok) {
+          const pushData = await pushRes.json();
+          notificationId = pushData.notification_id;
+        }
+      } catch (pushErr) {
+        console.error('Failed to schedule push notification:', pushErr);
+      }
+
+      // Link check-in and notification to event
       await base44.entities.Event.update(event.id, {
-        checkInScheduledId: checkIn.id
+        checkInScheduledId: checkIn.id,
+        ...(notificationId && { onesignalNotificationId: notificationId })
       });
 
       return Response.json({
         success: true,
         event,
-        checkIn
+        checkIn,
+        notificationId
       });
     }
 
     if (action === 'update') {
-      // Update event and reschedule check-in if startDate changed
+      // Fetch existing event to check if startDate changed
+      const existingEvent = await base44.entities.Event.get(eventId);
+      const startDateChanged = startDate && startDate !== existingEvent.startDate;
+
+      // Cancel old OneSignal notification if startDate changed
+      if (startDateChanged && existingEvent.onesignalNotificationId) {
+        try {
+          const onesignalAppId = Deno.env.get('ONESIGNAL_APP_ID');
+          const onesignalRestKey = Deno.env.get('ONESIGNAL_REST_API_KEY');
+          await fetch(
+            `https://onesignal.com/api/v1/notifications/${existingEvent.onesignalNotificationId}?app_id=${onesignalAppId}`,
+            {
+              method: 'DELETE',
+              headers: {
+                'Authorization': `Basic ${onesignalRestKey}`,
+                'Content-Type': 'application/json'
+              }
+            }
+          );
+        } catch (err) {
+          console.error('Failed to cancel old OneSignal notification:', err);
+        }
+      }
+
+      // Update event
       const event = await base44.entities.Event.update(eventId, {
         name: name || undefined,
         startDate: startDate || undefined,
@@ -53,13 +104,47 @@ Deno.serve(async (req) => {
         notes: notes || undefined
       });
 
-      // If startDate changed, update the check-in time
-      if (startDate && event.checkInScheduledId) {
-        const checkInTime = new Date(new Date(startDate).getTime() + 2 * 60 * 60000);
-        await base44.entities.ScheduledCheckIn.update(event.checkInScheduledId, {
-          scheduledFor: checkInTime.toISOString(),
-          eventName: name || event.name
-        });
+      // If startDate changed, schedule new notification
+      if (startDateChanged) {
+        let newNotificationId = null;
+        try {
+          const sendAtISO = new Date(new Date(startDate).getTime() - 60 * 60000).toISOString();
+          const schedulePushUrl = new URL(req.url);
+          schedulePushUrl.pathname = schedulePushUrl.pathname.replace('/manageEventCheckIn', '/schedulePush');
+          const pushRes = await fetch(schedulePushUrl.toString(), {
+            method: 'POST',
+            headers: req.headers,
+            body: JSON.stringify({
+              toUserExternalId: user.email,
+              title: `Upcoming event: ${name || event.name}`,
+              body: `You have ${name || event.name} starting in 1 hour`,
+              sendAtISO,
+              data: { eventId: event.id }
+            })
+          });
+          if (pushRes.ok) {
+            const pushData = await pushRes.json();
+            newNotificationId = pushData.notification_id;
+          }
+        } catch (pushErr) {
+          console.error('Failed to schedule new push notification:', pushErr);
+        }
+
+        // Update event with new notification ID
+        if (newNotificationId) {
+          await base44.entities.Event.update(eventId, {
+            onesignalNotificationId: newNotificationId
+          });
+        }
+
+        // Update check-in time if it exists
+        if (event.checkInScheduledId) {
+          const checkInTime = new Date(new Date(startDate).getTime() + 2 * 60 * 60000);
+          await base44.entities.ScheduledCheckIn.update(event.checkInScheduledId, {
+            scheduledFor: checkInTime.toISOString(),
+            eventName: name || event.name
+          });
+        }
       }
 
       return Response.json({
@@ -69,16 +154,40 @@ Deno.serve(async (req) => {
     }
 
     if (action === 'delete') {
-      // Delete event and cancel associated check-in
-      const event = await base44.entities.Event.filter({ id: eventId });
-      if (event.length > 0 && event[0].checkInScheduledId) {
-        await base44.entities.ScheduledCheckIn.delete(event[0].checkInScheduledId);
+      // Fetch event to get associated IDs
+      const event = await base44.entities.Event.get(eventId);
+
+      // Cancel OneSignal notification
+      if (event.onesignalNotificationId) {
+        try {
+          const onesignalAppId = Deno.env.get('ONESIGNAL_APP_ID');
+          const onesignalRestKey = Deno.env.get('ONESIGNAL_REST_API_KEY');
+          await fetch(
+            `https://onesignal.com/api/v1/notifications/${event.onesignalNotificationId}?app_id=${onesignalAppId}`,
+            {
+              method: 'DELETE',
+              headers: {
+                'Authorization': `Basic ${onesignalRestKey}`,
+                'Content-Type': 'application/json'
+              }
+            }
+          );
+        } catch (err) {
+          console.error('Failed to cancel OneSignal notification:', err);
+        }
       }
+
+      // Delete check-in
+      if (event.checkInScheduledId) {
+        await base44.entities.ScheduledCheckIn.delete(event.checkInScheduledId);
+      }
+
+      // Delete event
       await base44.entities.Event.delete(eventId);
 
       return Response.json({
         success: true,
-        message: 'Event and associated check-in deleted'
+        message: 'Event and associated notifications deleted'
       });
     }
 

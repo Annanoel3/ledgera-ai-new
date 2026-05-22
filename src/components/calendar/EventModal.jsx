@@ -7,6 +7,7 @@ import { Trash2 } from "lucide-react";
 import { format } from "date-fns";
 import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
+import { manageEventCheckIn } from "@/functions/manageEventCheckIn";
 
 export default function EventModal({ event, defaultDate, profile, onSave, onDelete, onClose }) {
   const dark = profile?.darkMode;
@@ -60,14 +61,31 @@ export default function EventModal({ event, defaultDate, profile, onSave, onDele
       return localDate.toISOString();
     };
     
-    await onSave({ 
-      name: name.trim(), 
-      startDate: formatDate(startDate), 
-      endDate: endDate ? formatDate(endDate) : null, 
-      notes, 
-      projectId: projectId || null 
-    });
-    setSaving(false);
+    try {
+      if (event) {
+        // Update existing event through manageEventCheckIn
+        await manageEventCheckIn({
+          action: 'update',
+          eventId: event.id,
+          name: name.trim(),
+          startDate: formatDate(startDate),
+          endDate: endDate ? formatDate(endDate) : null,
+          notes,
+          projectId: projectId || null
+        });
+      } else {
+        // Create new event through onSave
+        await onSave({ 
+          name: name.trim(), 
+          startDate: formatDate(startDate), 
+          endDate: endDate ? formatDate(endDate) : null, 
+          notes, 
+          projectId: projectId || null 
+        });
+      }
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (

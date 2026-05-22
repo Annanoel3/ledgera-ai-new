@@ -31,6 +31,10 @@
     "googleEventId": {
       "type": "string",
       "description": "Google Calendar event ID for sync tracking"
+    },
+    "onesignalNotificationId": {
+      "type": "string",
+      "description": "OneSignal notification ID for the scheduled reminder push notification"
     }
   },
   "required": [
