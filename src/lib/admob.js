@@ -8,7 +8,7 @@ const STORAGE_KEY = 'app_open_count'; // must match App.jsx
 let AdMob = null;
 
 export async function initAdMob() {
-  if (s!Capacitor.isNativePlatform()) return;
+  if (!Capacitor.isNativePlatform()) return;
   try {
     AdMob = registerPlugin('AdMob');
     await AdMob.initialize({ initializeForTesting: false });
