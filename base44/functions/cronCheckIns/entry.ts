@@ -1,4 +1,4 @@
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
+import { createClient, createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
 const CRON_SECRET = Deno.env.get('CRON_SECRET');
 const ONESIGNAL_APP_ID = Deno.env.get('ONESIGNAL_APP_ID');
