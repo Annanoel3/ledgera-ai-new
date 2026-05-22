@@ -32,10 +32,10 @@ Deno.serve(async (req) => {
         sent: false
       });
 
-      // Schedule push notification 60 minutes before event
+      // Schedule push notification 2 hours after event (same as check-in)
       let notificationId = null;
       try {
-        const sendAtISO = new Date(new Date(startDate).getTime() - 60 * 60000).toISOString();
+        const sendAtISO = new Date(new Date(startDate).getTime() + 2 * 60 * 60000).toISOString();
         const schedulePushUrl = new URL(req.url);
         schedulePushUrl.pathname = schedulePushUrl.pathname.replace('/manageEventCheckIn', '/schedulePush');
         const pushRes = await fetch(schedulePushUrl.toString(), {
@@ -43,8 +43,8 @@ Deno.serve(async (req) => {
           headers: req.headers,
           body: JSON.stringify({
             toUserExternalId: user.email,
-            title: `Upcoming event: ${name}`,
-            body: `You have ${name} starting in 1 hour`,
+            title: `Follow up: ${name}`,
+            body: `Did anything change during ${name}? Log any updates or new invoices.`,
             sendAtISO,
             data: { eventId: event.id }
           })
@@ -108,7 +108,7 @@ Deno.serve(async (req) => {
       if (startDateChanged) {
         let newNotificationId = null;
         try {
-          const sendAtISO = new Date(new Date(startDate).getTime() - 60 * 60000).toISOString();
+          const sendAtISO = new Date(new Date(startDate).getTime() + 2 * 60 * 60000).toISOString();
           const schedulePushUrl = new URL(req.url);
           schedulePushUrl.pathname = schedulePushUrl.pathname.replace('/manageEventCheckIn', '/schedulePush');
           const pushRes = await fetch(schedulePushUrl.toString(), {
@@ -116,8 +116,8 @@ Deno.serve(async (req) => {
             headers: req.headers,
             body: JSON.stringify({
               toUserExternalId: user.email,
-              title: `Upcoming event: ${name || event.name}`,
-              body: `You have ${name || event.name} starting in 1 hour`,
+              title: `Follow up: ${name || event.name}`,
+              body: `Did anything change during ${name || event.name}? Log any updates or new invoices.`,
               sendAtISO,
               data: { eventId: event.id }
             })
