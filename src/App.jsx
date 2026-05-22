@@ -21,6 +21,15 @@ import DeleteData from './pages/DeleteData';
 import Calendar from './pages/Calendar';
 import Home from './pages/Home';
 
+// Sentry loaded via CDN in index.html
+const Sentry = window.Sentry;
+if (Sentry) {
+  Sentry.init({
+    dsn: "https://692ccdd0d8707bc788e89b568351858d@o4511434142580736.ingest.us.sentry.io/4511434161520640",
+    environment: "production",
+  });
+}
+
 const { Pages, Layout, mainPage } = pagesConfig;
 const mainPageKey = mainPage ?? Object.keys(Pages)[0];
 const MainPage = mainPageKey ? Pages[mainPageKey] : <></>;
