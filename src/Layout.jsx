@@ -309,7 +309,7 @@ export default function Layout({ children }) {
 
         {/* Mobile Top Bar */}
         {!isChat && 
-        <div className="mobile-top-bar md:hidden sticky top-0 z-10 flex flex-shrink-0 items-center" style={{
+        <div className="mobile-top-bar sticky top-0 z-10 flex flex-shrink-0 items-center" style={{
           backgroundColor: darkMode ? '#1a1a1a' : '#ffffff',
           minHeight: '3.5rem'
         }}>
