@@ -559,8 +559,8 @@ export default function Chat() {
           }
 
           if (incomeCount === 0 && expenseCount === 0 && duplicateFiles.length === 0) {
-            toastMessage = "Files saved, but no transactions were extracted.";
-            processingSummaryMessage = "I saved the files but could not extract any transactions from them.";
+            toastMessage = "Files saved. No transactions auto-extracted.";
+            processingSummaryMessage = "The file was saved but no transactions could be auto-extracted from it. Please ask the user to list any expenses or income they want to add manually.";
           }
 
           if (toastMessage) {
