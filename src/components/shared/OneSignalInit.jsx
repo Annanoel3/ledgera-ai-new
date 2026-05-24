@@ -67,18 +67,6 @@ export default function OneSignalInit({ user }) {
         if (externalId) {
           console.log('[OneSignal] ✅ Calling NotifyBridge.login() with:', externalId);
 
-          // Listen for player ID pushed from native side via event
-          try {
-            await NotifyBridge.addListener('playerIdAvailable', async (data) => {
-              const id = data?.playerId || data?.id || data?.value;
-              console.log('[OneSignal] playerIdAvailable event received:', id);
-              if (id) await persistPlayerId(id);
-            });
-            console.log('[OneSignal] ✅ playerIdAvailable listener registered');
-          } catch (listenErr) {
-            console.warn('[OneSignal] Could not add playerIdAvailable listener:', listenErr);
-          }
-
           // requestPermission can throw if already granted or dialog is dismissed — that's OK
           try {
             await NotifyBridge.requestPermission();
@@ -87,19 +75,9 @@ export default function OneSignalInit({ user }) {
             console.warn('[OneSignal] requestPermission threw (may already be granted):', permErr);
           }
 
-          // Always call login regardless of permission result
+          // Login with external ID — notifications are sent via external_user_id, no player ID needed
           await NotifyBridge.login({ externalId: externalId });
           console.log('[OneSignal] ✅ login() sent for:', externalId);
-
-          // Also try to get it directly after login (in case already available)
-          try {
-            const result = await NotifyBridge.getSubscriptionId?.();
-            const id = result?.subscriptionId || result?.id || result?.value;
-            console.log('[OneSignal] Direct getSubscriptionId result:', id);
-            if (id) await persistPlayerId(id);
-          } catch (err) {
-            console.log('[OneSignal] getSubscriptionId not available, waiting for event...');
-          }
         } else {
           console.log('[OneSignal] Calling NotifyBridge.logout()');
           await NotifyBridge.logout();
