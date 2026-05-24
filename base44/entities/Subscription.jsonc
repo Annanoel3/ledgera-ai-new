@@ -1,0 +1,46 @@
+{
+  "name": "Subscription",
+  "type": "object",
+  "properties": {
+    "stripeCustomerId": {
+      "type": "string",
+      "description": "Stripe customer ID"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "trialing",
+        "active",
+        "past_due",
+        "canceled"
+      ],
+      "default": "trialing",
+      "description": "Subscription status"
+    },
+    "trialStart": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Trial start date"
+    },
+    "trialEnd": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Trial end date"
+    }
+  },
+  "required": [],
+  "rls": {
+    "create": {
+      "created_by": "{{user.email}}"
+    },
+    "read": {
+      "created_by": "{{user.email}}"
+    },
+    "update": {
+      "created_by": "{{user.email}}"
+    },
+    "delete": {
+      "created_by": "{{user.email}}"
+    }
+  }
+}
