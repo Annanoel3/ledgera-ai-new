@@ -1,4 +1,3 @@
-
 import { createClientFromRequest } from 'npm:@base44/sdk@0.7.1';
 
 Deno.serve(async (req) => {
@@ -355,11 +354,12 @@ Return JSON with an array of transactions.`;
                     });
                 }
 
-                // Simple duplicate check (same amount, date, project)
+                // Duplicate check: same amount + date + project + notes (vendor) to avoid false positives
                 const isDuplicate = (itemType === 'income' ? existingIncome : existingExpenses).some(existing =>
                     Math.abs(existing.amount - transactionData.amount) < 0.01 &&
                     existing.date === transactionData.date &&
-                    existing.projectId === transactionData.projectId
+                    existing.projectId === transactionData.projectId &&
+                    (existing.notes || '').toLowerCase() === (transactionData.notes || '').toLowerCase()
                 );
 
                 if (isDuplicate) {
@@ -385,19 +385,21 @@ Return JSON with an array of transactions.`;
 
             console.log(`📝 Creating ${incomeToCreate.length} income items and ${expensesToCreate.length} expense items`);
 
-            // Bulk create transactions
+            // Create transactions individually to avoid bulk truncation
             let createdIncome = [];
             let createdExpenses = [];
 
-            if (incomeToCreate.length > 0) {
-                createdIncome = await base44.entities.IncomeItem.bulkCreate(incomeToCreate);
-                console.log(`✅ Created ${createdIncome.length} income items`);
+            for (const item of incomeToCreate) {
+                const created = await base44.entities.IncomeItem.create(item);
+                createdIncome.push(created);
             }
+            if (createdIncome.length > 0) console.log(`✅ Created ${createdIncome.length} income items`);
 
-            if (expensesToCreate.length > 0) {
-                createdExpenses = await base44.entities.ExpenseItem.bulkCreate(expensesToCreate);
-                console.log(`✅ Created ${createdExpenses.length} expense items`);
+            for (const item of expensesToCreate) {
+                const created = await base44.entities.ExpenseItem.create(item);
+                createdExpenses.push(created);
             }
+            if (createdExpenses.length > 0) console.log(`✅ Created ${createdExpenses.length} expense items`);
 
             // Create document records
             const documentsCreated = [];
