@@ -1,0 +1,61 @@
+{
+  "name": "Project",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "Project name"
+    },
+    "startDate": {
+      "type": "string",
+      "format": "date",
+      "description": "Project start date"
+    },
+    "endDate": {
+      "type": "string",
+      "format": "date",
+      "description": "Project end date"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "planned",
+        "active",
+        "complete"
+      ],
+      "default": "active",
+      "description": "Project status"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Project notes"
+    },
+    "totalIncome": {
+      "type": "number",
+      "default": 0,
+      "description": "Denormalized total income"
+    },
+    "totalExpense": {
+      "type": "number",
+      "default": 0,
+      "description": "Denormalized total expenses"
+    }
+  },
+  "required": [
+    "title"
+  ],
+  "rls": {
+    "create": {
+      "created_by": "{{user.email}}"
+    },
+    "read": {
+      "created_by": "{{user.email}}"
+    },
+    "update": {
+      "created_by": "{{user.email}}"
+    },
+    "delete": {
+      "created_by": "{{user.email}}"
+    }
+  }
+}
