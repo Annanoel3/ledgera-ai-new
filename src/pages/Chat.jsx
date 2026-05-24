@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, memo, useCallback } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -162,7 +162,7 @@ const ChatHeader = ({ profile, showChatList, setShowChatList, handleNewChat, set
   </div>;
 
 
-const ChatInputArea = ({ profile, selectedFiles, removeFile, fileInputRef, handleFileSelect, handleKeyPress, input, setInput, isRecording, stopRecording, startRecording, handleSend, sendingMessage, uploadingFile }) =>
+const ChatInputArea = memo(({ profile, selectedFiles, removeFile, fileInputRef, handleFileSelect, input, setInput, isRecording, stopRecording, startRecording, handleSend, sendingMessage, uploadingFile }) =>
 <>
     {selectedFiles.length > 0 &&
   <div className="fixed left-0 right-0 z-20" style={{
@@ -238,7 +238,12 @@ const ChatInputArea = ({ profile, selectedFiles, removeFile, fileInputRef, handl
             <Textarea
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            onKeyPress={handleKeyPress}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleSend();
+              }
+            }}
             placeholder={profile?.funMode ? "Spill the financial tea..." : "Type your message or speak..."}
             className="px-3 py-1 text-base rounded-md flex w-full border shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm min-h-[48px] max-h-32 resize-none"
             style={{
@@ -315,7 +320,8 @@ const ChatInputArea = ({ profile, selectedFiles, removeFile, fileInputRef, handl
       }
       </div>
     </div>
-  </>;
+  </>
+);
 
 
 export default function Chat() {
@@ -899,7 +905,7 @@ export default function Chat() {
         </DialogContent>
       </Dialog>
 
-      <div className="px-4 flex-1 overflow-y-auto" style={{ paddingBottom: '9rem' }}>
+      <div className="px-4 flex-1 overflow-y-auto" style={{ paddingTop: '5rem', paddingBottom: '10rem' }}>
         <div className="max-w-4xl mx-auto space-y-4 py-4">
           {showWelcome ?
           <div className="flex flex-col items-center justify-center h-full">
@@ -1132,7 +1138,6 @@ export default function Chat() {
         removeFile={removeFile}
         fileInputRef={fileInputRef}
         handleFileSelect={handleFileSelect}
-        handleKeyPress={handleKeyPress}
         input={input}
         setInput={setInput}
         isRecording={isRecording}
