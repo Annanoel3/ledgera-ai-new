@@ -1,0 +1,51 @@
+{
+  "name": "IncomeItem",
+  "type": "object",
+  "properties": {
+    "projectId": {
+      "type": "string",
+      "description": "Associated project ID"
+    },
+    "amount": {
+      "type": "number",
+      "description": "Income amount"
+    },
+    "date": {
+      "type": "string",
+      "format": "date",
+      "description": "Income date"
+    },
+    "category": {
+      "type": "string",
+      "default": "other",
+      "description": "Income category"
+    },
+    "method": {
+      "type": "string",
+      "description": "Payment method"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Additional notes"
+    }
+  },
+  "required": [
+    "projectId",
+    "amount",
+    "date"
+  ],
+  "rls": {
+    "create": {
+      "created_by": "{{user.email}}"
+    },
+    "read": {
+      "created_by": "{{user.email}}"
+    },
+    "update": {
+      "created_by": "{{user.email}}"
+    },
+    "delete": {
+      "created_by": "{{user.email}}"
+    }
+  }
+}
