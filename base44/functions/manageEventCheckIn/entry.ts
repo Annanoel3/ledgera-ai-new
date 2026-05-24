@@ -1,5 +1,30 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
+async function schedulePushNotification(base44, userEmail, eventName, sendAtISO, eventId) {
+  const ONESIGNAL_APP_ID = Deno.env.get('ONESIGNAL_APP_ID');
+  const ONESIGNAL_REST_API_KEY = Deno.env.get('ONESIGNAL_REST_API_KEY');
+  if (!ONESIGNAL_APP_ID || !ONESIGNAL_REST_API_KEY) return null;
+
+  const res = await fetch('https://onesignal.com/api/v1/notifications', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Basic ${ONESIGNAL_REST_API_KEY}`
+    },
+    body: JSON.stringify({
+      app_id: ONESIGNAL_APP_ID,
+      include_external_user_ids: [userEmail],
+      headings: { en: `Follow up: ${eventName}` },
+      contents: { en: `Did anything change during ${eventName}? Log any updates or new invoices.` },
+      send_after: sendAtISO,
+      data: { eventId },
+      channel_for_external_user_ids: 'push'
+    })
+  });
+  const data = await res.json();
+  return res.ok ? data.id : null;
+}
+
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
@@ -32,27 +57,11 @@ Deno.serve(async (req) => {
         sent: false
       });
 
-      // Schedule push notification 2 hours after event (same as check-in)
+      // Schedule push notification 2 hours after event
       let notificationId = null;
       try {
         const sendAtISO = new Date(new Date(startDate).getTime() + 2 * 60 * 60000).toISOString();
-        const schedulePushUrl = new URL(req.url);
-        schedulePushUrl.pathname = schedulePushUrl.pathname.replace('/manageEventCheckIn', '/schedulePush');
-        const pushRes = await fetch(schedulePushUrl.toString(), {
-          method: 'POST',
-          headers: req.headers,
-          body: JSON.stringify({
-            toUserExternalId: user.email,
-            title: `Follow up: ${name}`,
-            body: `Did anything change during ${name}? Log any updates or new invoices.`,
-            sendAtISO,
-            data: { eventId: event.id }
-          })
-        });
-        if (pushRes.ok) {
-          const pushData = await pushRes.json();
-          notificationId = pushData.notification_id;
-        }
+        notificationId = await schedulePushNotification(base44, user.email, name, sendAtISO, event.id);
       } catch (pushErr) {
         console.error('Failed to schedule push notification:', pushErr);
       }
@@ -109,23 +118,8 @@ Deno.serve(async (req) => {
         let newNotificationId = null;
         try {
           const sendAtISO = new Date(new Date(startDate).getTime() + 2 * 60 * 60000).toISOString();
-          const schedulePushUrl = new URL(req.url);
-          schedulePushUrl.pathname = schedulePushUrl.pathname.replace('/manageEventCheckIn', '/schedulePush');
-          const pushRes = await fetch(schedulePushUrl.toString(), {
-            method: 'POST',
-            headers: req.headers,
-            body: JSON.stringify({
-              toUserExternalId: user.email,
-              title: `Follow up: ${name || event.name}`,
-              body: `Did anything change during ${name || event.name}? Log any updates or new invoices.`,
-              sendAtISO,
-              data: { eventId: event.id }
-            })
-          });
-          if (pushRes.ok) {
-            const pushData = await pushRes.json();
-            newNotificationId = pushData.notification_id;
-          }
+          const eventName = name || event.name;
+          newNotificationId = await schedulePushNotification(base44, user.email, eventName, sendAtISO, eventId);
         } catch (pushErr) {
           console.error('Failed to schedule new push notification:', pushErr);
         }
