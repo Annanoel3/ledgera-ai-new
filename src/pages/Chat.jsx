@@ -335,6 +335,7 @@ export default function Chat() {
   const [backgroundProcessing, setBackgroundProcessing] = useState(false);
   const [showCapabilities, setShowCapabilities] = useState(false);
   const [sendingMessage, setSendingMessage] = useState(false);
+  const [pendingDuplicates, setPendingDuplicates] = useState([]);
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
   const queryClient = useQueryClient();
@@ -506,6 +507,7 @@ export default function Chat() {
           const duplicatesSkipped = processData.duplicatesSkipped || 0;
           const duplicateFiles = processData.duplicateFiles || [];
           const uncertainAssignments = processData.uncertainAssignments || [];
+          const newPendingDuplicates = processData.pendingDuplicates || [];
 
           let toastMessage = "";
 
@@ -534,6 +536,15 @@ export default function Chat() {
               processingSummaryMessage += `- $${item.amount.toFixed(2)} (${item.description}) → ${item.assignedProject}\n`;
             });
             processingSummaryMessage += `\nPlease confirm if these project assignments are correct, or let me know if any need to be moved to a different project.`;
+          }
+
+          if (newPendingDuplicates.length > 0) {
+            setPendingDuplicates(newPendingDuplicates);
+            processingSummaryMessage += `\n\nDUPLICATE WARNING: ${newPendingDuplicates.length} transaction(s) look like they may already exist. Ask the user if each one was intentional or a mistake, one by one. List each: `;
+            newPendingDuplicates.forEach((dup) => {
+              processingSummaryMessage += `\n- $${dup.amount.toFixed ? dup.amount.toFixed(2) : dup.amount} on ${dup.date} (${dup.notes || dup.vendor}) → ${dup.projectName}`;
+            });
+            processingSummaryMessage += `\nIf user says YES keep it, reply with EXACTLY: "SAVE_DUPLICATES". If user says NO skip them, reply with EXACTLY: "SKIP_DUPLICATES".`;
           }
 
           if (incomeCount === 0 && expenseCount === 0 && duplicateFiles.length === 0) {
@@ -586,6 +597,17 @@ export default function Chat() {
           setConversationId(response.data.conversationId);
         }
 
+        // Check if AI signaled to save or skip duplicates
+        const aiReply = response.data.response || '';
+        if (aiReply.includes('SAVE_DUPLICATES') && pendingDuplicates.length > 0) {
+          try {
+            await processFinancialData({ action: 'processFiles', data: { files: [], userMessage: '', forceSave: true, preSavedItems: pendingDuplicates } });
+            setPendingDuplicates([]);
+          } catch (e) { console.error('Error force-saving duplicates:', e); }
+        } else if (aiReply.includes('SKIP_DUPLICATES')) {
+          setPendingDuplicates([]);
+        }
+
         await refetchConversations();
       } catch (error) {
         console.error('Chat error:', error);
@@ -615,6 +637,17 @@ export default function Chat() {
 
         if (response.data.conversationId) {
           setConversationId(response.data.conversationId);
+        }
+
+        // Check if AI signaled to save or skip duplicates
+        const aiReplyText = response.data.response || '';
+        if (aiReplyText.includes('SAVE_DUPLICATES') && pendingDuplicates.length > 0) {
+          try {
+            await processFinancialData({ action: 'processFiles', data: { files: [], userMessage: '', forceSave: true, preSavedItems: pendingDuplicates } });
+            setPendingDuplicates([]);
+          } catch (e) { console.error('Error force-saving duplicates:', e); }
+        } else if (aiReplyText.includes('SKIP_DUPLICATES')) {
+          setPendingDuplicates([]);
         }
 
         await refetchConversations();

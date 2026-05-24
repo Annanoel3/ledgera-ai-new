@@ -22,6 +22,20 @@ Deno.serve(async (req) => {
             });
         }
 
+        // Force-save pre-identified duplicate items
+        if (action === 'processFiles' && data.preSavedItems && data.preSavedItems.length > 0 && data.forceSave) {
+            let savedCount = 0;
+            for (const item of data.preSavedItems) {
+                if (item.type === 'income') {
+                    await base44.entities.IncomeItem.create(item.fullData);
+                } else {
+                    await base44.entities.ExpenseItem.create(item.fullData);
+                }
+                savedCount++;
+            }
+            return Response.json({ success: true, forceSavedCount: savedCount });
+        }
+
         // Bulk process expense items
         if (action === 'bulkExpenses') {
             const items = await base44.entities.ExpenseItem.bulkCreate(data.items);
@@ -235,6 +249,7 @@ Return JSON with an array of transactions.`;
             const expensesToCreate = [];
             let duplicatesSkipped = 0;
             let uncertainAssignments = [];
+            const pendingDuplicates = [];
 
             for (const item of allExtractedItems) {
                 // Validate amount
@@ -355,7 +370,7 @@ Return JSON with an array of transactions.`;
                 }
 
                 // Duplicate check: same amount + date + project + notes (vendor) to avoid false positives
-                const isDuplicate = (itemType === 'income' ? existingIncome : existingExpenses).some(existing =>
+                const isDuplicate = !data.forceSave && (itemType === 'income' ? existingIncome : existingExpenses).some(existing =>
                     Math.abs(existing.amount - transactionData.amount) < 0.01 &&
                     existing.date === transactionData.date &&
                     existing.projectId === transactionData.projectId &&
@@ -364,7 +379,19 @@ Return JSON with an array of transactions.`;
 
                 if (isDuplicate) {
                     duplicatesSkipped++;
-                    console.log(`⏭️ Skipping duplicate: $${parsedAmount} on ${transactionData.date}`);
+                    pendingDuplicates.push({
+                        amount: parsedAmount,
+                        date: transactionData.date,
+                        notes: transactionData.notes,
+                        vendor: item.vendor || '',
+                        type: itemType,
+                        projectId: transactionData.projectId,
+                        projectName: assignedProject.title,
+                        fullData: itemType === 'income'
+                            ? { ...transactionData, category: 'service', method: 'other' }
+                            : { ...transactionData, vendor: item.vendor || 'Unknown', category: 'other' }
+                    });
+                    console.log(`⏭️ Flagging duplicate for user confirmation: $${parsedAmount} on ${transactionData.date}`);
                     continue;
                 }
 
@@ -434,7 +461,8 @@ Return JSON with an array of transactions.`;
                 totalExpenses,
                 duplicatesSkipped,
                 uncertainAssignments: uncertainAssignments.length > 0 ? uncertainAssignments : undefined,
-                duplicateFiles: duplicateFiles.length > 0 ? duplicateFiles : undefined
+                duplicateFiles: duplicateFiles.length > 0 ? duplicateFiles : undefined,
+                pendingDuplicates: pendingDuplicates.length > 0 ? pendingDuplicates : undefined
             });
         }
 
