@@ -486,6 +486,17 @@ export default function Chat() {
         fileType: 'receipt'
       }));
 
+      // Optimistically show user message with file attachments
+      const optimisticUserMsg = {
+        role: 'user',
+        content: userMessageText || '',
+        _fileNames: fileNames,
+        _fileUrls: fileUrls
+      };
+      setMessages((prev) => [...prev, optimisticUserMsg]);
+      setInput("");
+      setSelectedFiles([]);
+
       setBackgroundProcessing(true);
 
       let processingSummaryMessage = "";
@@ -578,9 +589,6 @@ export default function Chat() {
       } else {
         finalMessage = processingSummaryMessage ? `[System: ${processingSummaryMessage.trim()}]` : "I uploaded some files.";
       }
-
-      setInput("");
-      setSelectedFiles([]);
 
       setSendingMessage(true);
       try {

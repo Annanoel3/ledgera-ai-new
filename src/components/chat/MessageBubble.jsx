@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import { Button } from "@/components/ui/button";
-import { Copy } from 'lucide-react';
+import { Copy, FileText } from 'lucide-react';
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
@@ -23,6 +23,35 @@ export default function MessageBubble({ message, profile, hideAvatar = false }) 
                 </div>
             )}
             <div className={cn("max-w-[80%]", isUser && "flex flex-col items-end")}>
+                {/* File attachments */}
+                {isUser && message._fileUrls?.length > 0 && (
+                    <div className="flex flex-col gap-1.5 mb-1.5 items-end">
+                        {message._fileUrls.map((url, idx) => {
+                            const name = message._fileNames?.[idx] || 'File';
+                            const isImage = /\.(png|jpe?g|gif|webp|bmp|svg)$/i.test(name) || /^https?:.*\.(png|jpe?g|gif|webp|bmp|svg)/i.test(url);
+                            return isImage ? (
+                                <img
+                                    key={idx}
+                                    src={url}
+                                    alt={name}
+                                    className="rounded-xl max-w-[200px] max-h-[200px] object-cover shadow-sm border"
+                                    style={{ borderColor: darkMode ? '#374151' : '#e5e7eb' }}
+                                />
+                            ) : (
+                                <div key={idx} className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm"
+                                    style={{
+                                        background: funMode
+                                            ? 'linear-gradient(to right, #f9a8d4, #d8b4fe)'
+                                            : darkMode ? '#374151' : '#e5e7eb',
+                                        color: darkMode ? '#e5e7eb' : '#374151'
+                                    }}>
+                                    <FileText className="w-4 h-4 flex-shrink-0" />
+                                    <span style={{ maxWidth: 160, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{name}</span>
+                                </div>
+                            );
+                        })}
+                    </div>
+                )}
                 {message.content && (
                     <div className={cn(
                         "rounded-2xl px-4 py-2.5 shadow-sm transition-transform hover:scale-[1.02]",
