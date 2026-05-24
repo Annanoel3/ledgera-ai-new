@@ -97,6 +97,21 @@ export default function PrivacyPolicy() {
             </div>
 
             <div>
+              <h3 className="text-base font-semibold mb-2 text-gray-900">9. Google API Limited Use Disclosure</h3>
+              <p className="mb-2">
+                Ledgera AI's use and transfer of information received from Google APIs adheres to the{" "}
+                <a href="https://developers.google.com/terms/api-services-user-data-policy" target="_blank" rel="noopener noreferrer" className="text-[#22A699] underline">
+                  Google API Services User Data Policy
+                </a>
+                , including the Limited Use requirements.
+              </p>
+              <p className="mb-2"><strong>What we access:</strong> Google Calendar events (read and write) — solely to enable the optional calendar sync feature.</p>
+              <p className="mb-2"><strong>How we use it:</strong> Only to display your Google Calendar events within the app and to sync Ledgera events to your Google Calendar when you explicitly initiate it.</p>
+              <p className="mb-2"><strong>What we do not do:</strong> Google user data is never sold, used for advertising, shared with third parties beyond what is needed for the calendar feature, or used to train AI/ML models.</p>
+              <p><strong>Your control:</strong> The Google Calendar integration is entirely optional. You can connect or disconnect at any time from within the Calendar section of the app.</p>
+            </div>
+
+            <div>
               <p>
                 If you have questions about this policy, contact us at{' '}
                 <a href="mailto:mediocreatbestdev@outlook.com" className="text-[#22A699] underline">
