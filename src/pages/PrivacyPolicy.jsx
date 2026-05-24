@@ -1,6 +1,6 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Shield, FileText, ArrowLeft } from "lucide-react";
+import { Shield, FileText, ArrowLeft, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 
@@ -97,21 +97,6 @@ export default function PrivacyPolicy() {
             </div>
 
             <div>
-              <h3 className="text-base font-semibold mb-2 text-gray-900">9. Google API Limited Use Disclosure</h3>
-              <p className="mb-2">
-                Ledgera AI's use and transfer of information received from Google APIs adheres to the{" "}
-                <a href="https://developers.google.com/terms/api-services-user-data-policy" target="_blank" rel="noopener noreferrer" className="text-[#22A699] underline">
-                  Google API Services User Data Policy
-                </a>
-                , including the Limited Use requirements.
-              </p>
-              <p className="mb-2"><strong>What we access:</strong> Google Calendar events (read and write) — solely to enable the optional calendar sync feature.</p>
-              <p className="mb-2"><strong>How we use it:</strong> Only to display your Google Calendar events within the app and to sync Ledgera events to your Google Calendar when you explicitly initiate it.</p>
-              <p className="mb-2"><strong>What we do not do:</strong> Google user data is never sold, used for advertising, shared with third parties beyond what is needed for the calendar feature, or used to train AI/ML models.</p>
-              <p><strong>Your control:</strong> The Google Calendar integration is entirely optional. You can connect or disconnect at any time from within the Calendar section of the app.</p>
-            </div>
-
-            <div>
               <p>
                 If you have questions about this policy, contact us at{' '}
                 <a href="mailto:mediocreatbestdev@outlook.com" className="text-[#22A699] underline">
@@ -119,6 +104,52 @@ export default function PrivacyPolicy() {
                 </a>.
               </p>
             </div>
+          </CardContent>
+        </Card>
+
+        {/* Google API Disclosure - standalone card */}
+        <Card className="mb-6 border border-gray-200">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-gray-900">
+              <Globe className="w-5 h-5 text-[#22A699]" />
+              Google API Limited Use Disclosure
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4 text-gray-700">
+            <p>
+              Ledgera AI's use and transfer of information received from Google APIs adheres to the{" "}
+              <a href="https://developers.google.com/terms/api-services-user-data-policy" target="_blank" rel="noopener noreferrer" className="text-[#22A699] underline">
+                Google API Services User Data Policy
+              </a>
+              , including the Limited Use requirements.
+            </p>
+            <div>
+              <p className="font-semibold text-gray-900 mb-1">What we access</p>
+              <p>Google Calendar events (read and write) — solely to enable the optional calendar sync feature.</p>
+            </div>
+            <div>
+              <p className="font-semibold text-gray-900 mb-1">How we use it</p>
+              <p>Only to display your Google Calendar events within the app and to sync Ledgera events to your Google Calendar when you explicitly initiate it.</p>
+            </div>
+            <div>
+              <p className="font-semibold text-gray-900 mb-1">What we do NOT do with Google data</p>
+              <ul className="list-disc list-inside space-y-1">
+                <li>Sell or share it with third parties</li>
+                <li>Use it for advertising or marketing</li>
+                <li>Use it to train AI or machine learning models</li>
+                <li>Use it for any purpose unrelated to the calendar feature</li>
+              </ul>
+            </div>
+            <div>
+              <p className="font-semibold text-gray-900 mb-1">Your control</p>
+              <p>The Google Calendar integration is entirely optional. You can connect or disconnect at any time from within the Calendar section of the app.</p>
+            </div>
+            <p className="text-sm text-gray-500 border-t border-gray-100 pt-3">
+              Questions? Contact us at{" "}
+              <a href="mailto:mediocreatbestdev@outlook.com" className="text-[#22A699] underline">
+                mediocreatbestdev@outlook.com
+              </a>.
+            </p>
           </CardContent>
         </Card>
 

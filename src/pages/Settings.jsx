@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge";
 
 import { Textarea } from "@/components/ui/textarea";
 import { Download, Trash2, Loader2, FileText, Plus, X, Sparkles, CheckCircle2, AlertTriangle, Bell } from "lucide-react";
+import ExpenseCategoriesManager from "@/components/settings/ExpenseCategoriesManager";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { format } from "date-fns";
 import { Link } from "react-router-dom";
@@ -575,6 +576,12 @@ export default function Settings() {
               </Link>
             </CardContent>
           </Card>
+
+          {/* Expense Categories Section */}
+          <ExpenseCategoriesManager
+            profile={profile}
+            onSave={(cats) => updateProfileMutation.mutateAsync({ customExpenseCategories: cats })}
+          />
 
           {/* Appearance Section */}
           <Card style={{ backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff', border: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}` }}>
