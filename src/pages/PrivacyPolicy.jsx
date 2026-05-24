@@ -116,12 +116,12 @@ export default function PrivacyPolicy() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4 text-gray-700">
-            <p>
-              Ledgera AI's use and transfer of information received from Google APIs adheres to the{" "}
+            <p className="font-semibold text-gray-900 bg-green-50 border border-green-200 rounded-md px-4 py-3">
+              ✅ Ledgera AI's use and transfer of information received from Google APIs adheres to the{" "}
               <a href="https://developers.google.com/terms/api-services-user-data-policy" target="_blank" rel="noopener noreferrer" className="text-[#22A699] underline">
                 Google API Services User Data Policy
               </a>
-              , including the Limited Use requirements.
+              , including the Limited Use requirements. Ledgera AI does not use Google user data for any purpose that violates these restrictions.
             </p>
             <div>
               <p className="font-semibold text-gray-900 mb-1">What we access</p>
