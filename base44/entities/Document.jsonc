@@ -1,0 +1,56 @@
+{
+  "name": "Document",
+  "type": "object",
+  "properties": {
+    "projectId": {
+      "type": "string",
+      "description": "Associated project ID"
+    },
+    "fileName": {
+      "type": "string",
+      "description": "Original file name"
+    },
+    "fileUrl": {
+      "type": "string",
+      "description": "URL to the uploaded file"
+    },
+    "fileType": {
+      "type": "string",
+      "enum": [
+        "invoice",
+        "contract",
+        "receipt",
+        "other"
+      ],
+      "description": "Type of document"
+    },
+    "uploadDate": {
+      "type": "string",
+      "format": "date",
+      "description": "Date uploaded"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Additional notes about the document"
+    }
+  },
+  "required": [
+    "fileName",
+    "fileUrl",
+    "uploadDate"
+  ],
+  "rls": {
+    "create": {
+      "created_by": "{{user.email}}"
+    },
+    "read": {
+      "created_by": "{{user.email}}"
+    },
+    "update": {
+      "created_by": "{{user.email}}"
+    },
+    "delete": {
+      "created_by": "{{user.email}}"
+    }
+  }
+}
