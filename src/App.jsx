@@ -15,6 +15,7 @@ import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import Terms from './pages/Terms';
+import GoogleDataPolicy from './pages/GoogleDataPolicy';
 import ProjectFinancials from './pages/ProjectFinancials';
 import DeleteAccount from './pages/DeleteAccount';
 import DeleteData from './pages/DeleteData';
@@ -124,6 +125,7 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/PrivacyPolicy" element={<PrivacyPolicy />} />
             <Route path="/Terms" element={<Terms />} />
+            <Route path="/GoogleDataPolicy" element={<GoogleDataPolicy />} />
             <Route
               path="*"
               element={
