@@ -88,8 +88,8 @@ export default function GoogleDataPolicy() {
             <h3 className="text-lg font-semibold text-gray-900 mb-2">Contact</h3>
             <p>
               If you have questions about how we handle your Google data, please contact us at{" "}
-              <a href="mailto:support@ledgera.ai" className="text-blue-600 hover:underline">
-                support@ledgera.ai
+              <a href="mailto:mediocreatbestdev@outlook.com" className="text-blue-600 hover:underline">
+                mediocreatbestdev@outlook.com
               </a>
               .
             </p>
