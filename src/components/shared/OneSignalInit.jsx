@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { saveOneSignalPlayerId } from '@/functions/saveOneSignalPlayerId';
 
 // Helper function to detect if running in Capacitor mobile app
 function isRunningInCapacitor() {
@@ -60,6 +61,21 @@ export default function OneSignalInit({ user }) {
           // Always call login regardless of permission result
           await NotifyBridge.login({ externalId: externalId });
           console.log('[OneSignal] ✅ login() sent for:', externalId);
+
+          // Save push subscription ID for mobile
+          try {
+            const playerIdResult = await NotifyBridge.getPlayerId?.();
+            const playerId = playerIdResult?.value || playerIdResult?.id;
+            console.log('[OneSignal] Mobile player ID:', playerId);
+            if (playerId) {
+              const res = await saveOneSignalPlayerId({ playerId });
+              console.log('[OneSignal] ✅ Mobile player ID saved to DB:', res?.data);
+            } else {
+              console.warn('[OneSignal] No mobile player ID returned from NotifyBridge');
+            }
+          } catch (err) {
+            console.warn('[OneSignal] Could not get mobile player ID:', err);
+          }
         } else {
           console.log('[OneSignal] Calling NotifyBridge.logout()');
           await NotifyBridge.logout();
@@ -90,6 +106,38 @@ export default function OneSignalInit({ user }) {
                 await OneSignal.login(externalId);
                 console.log('[OneSignal] ✅ User logged in with:', externalId);
               }
+
+              // Save push subscription ID to DB
+              const savePlayerId = async () => {
+                try {
+                  const playerId = OneSignal.User.pushSubscription.id;
+                  console.log('[OneSignal] pushSubscription.id after init:', playerId);
+                  if (playerId) {
+                    const res = await saveOneSignalPlayerId({ playerId });
+                    console.log('[OneSignal] ✅ Player ID saved to DB:', res?.data);
+                  } else {
+                    console.warn('[OneSignal] No pushSubscription.id available yet');
+                  }
+                } catch (err) {
+                  console.error('[OneSignal] Failed to save player ID:', err);
+                }
+              };
+
+              await savePlayerId();
+
+              // Also listen for subscription changes
+              OneSignal.User.pushSubscription.addEventListener('change', async (event) => {
+                const newId = event.current?.id;
+                console.log('[OneSignal] Subscription change event, new ID:', newId);
+                if (newId) {
+                  try {
+                    const res = await saveOneSignalPlayerId({ playerId: newId });
+                    console.log('[OneSignal] ✅ Updated player ID saved to DB:', res?.data);
+                  } catch (err) {
+                    console.error('[OneSignal] Failed to save updated player ID:', err);
+                  }
+                }
+              });
             } catch (error) {
               console.error('[OneSignal] Initialization error:', error);
             }
