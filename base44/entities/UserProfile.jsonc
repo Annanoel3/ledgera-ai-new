@@ -1,0 +1,62 @@
+{
+  "name": "UserProfile",
+  "type": "object",
+  "properties": {
+    "professions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "User's professions/business types"
+    },
+    "currency": {
+      "type": "string",
+      "default": "USD",
+      "description": "ISO 4217 currency code"
+    },
+    "locale": {
+      "type": "string",
+      "default": "en-US",
+      "description": "Locale for formatting"
+    },
+    "goalMonthlyIncome": {
+      "type": "number",
+      "description": "Target monthly income goal"
+    },
+    "trialStart": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When trial started"
+    },
+    "subscribed": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether user has active subscription"
+    },
+    "darkMode": {
+      "type": "boolean",
+      "default": false,
+      "description": "Dark mode preference"
+    },
+    "funMode": {
+      "type": "boolean",
+      "default": false,
+      "description": "Fun mode - makes accounting playful!"
+    }
+  },
+  "required": [],
+  "rls": {
+    "create": {
+      "created_by": "{{user.email}}"
+    },
+    "read": {
+      "created_by": "{{user.email}}"
+    },
+    "update": {
+      "created_by": "{{user.email}}"
+    },
+    "delete": {
+      "created_by": "{{user.email}}"
+    }
+  }
+}
