@@ -85,6 +85,10 @@ export default function Home() {
               <a href="/Terms" className="text-[#22A699] hover:underline font-medium">
                 Terms of Service
               </a>
+              <span className="text-slate-300">•</span>
+              <a href="/GoogleDataPolicy" className="text-[#22A699] hover:underline font-medium">
+                Google Data Policy
+              </a>
             </div>
           </div>
         </div>
@@ -96,6 +100,7 @@ export default function Home() {
         <div className="flex gap-4">
           <a href="/PrivacyPolicy" className="hover:underline">Privacy</a>
           <a href="/Terms" className="hover:underline">Terms</a>
+          <a href="/GoogleDataPolicy" className="hover:underline">Google Data Policy</a>
         </div>
       </div>
     </div>
