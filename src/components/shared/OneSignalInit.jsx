@@ -66,6 +66,20 @@ export default function OneSignalInit({ user }) {
 
         if (externalId) {
           console.log('[OneSignal] ✅ Calling NotifyBridge.login() with:', externalId);
+
+          // 1. Set up change listener BEFORE login so we don't miss the event
+          try {
+            window.OneSignal.User.pushSubscription.addEventListener('change', async (event) => {
+              const id = event.current?.id;
+              console.log('[OneSignal] Got player ID:', id);
+              if (id) {
+                await persistPlayerId(id);
+              }
+            });
+          } catch (listenerErr) {
+            console.warn('[OneSignal] Could not attach change listener:', listenerErr);
+          }
+
           // requestPermission can throw if already granted or dialog is dismissed — that's OK, we still need to login
           try {
             await NotifyBridge.requestPermission();
@@ -76,20 +90,22 @@ export default function OneSignalInit({ user }) {
           // Always call login regardless of permission result
           await NotifyBridge.login({ externalId: externalId });
           console.log('[OneSignal] ✅ login() sent for:', externalId);
+          console.log('[OneSignal] login complete, checking pushSubscription.id immediately:', window.OneSignal?.User?.pushSubscription?.id);
 
-          // Save push subscription ID for mobile — try immediately, then retry after delay
-          const tryGetMobilePlayerId = async (attemptsLeft = 5) => {
+          // 2. Retry loop: 20 attempts × 3 seconds = 60 seconds total
+          const tryGetMobilePlayerId = async (attemptsLeft = 20) => {
             try {
               const playerIdResult = await NotifyBridge.getPlayerId?.();
-              const playerId = playerIdResult?.value || playerIdResult?.id;
-              console.log('[OneSignal] Mobile player ID attempt:', playerId, '(attempts left:', attemptsLeft, ')');
-              if (playerId) {
-                await persistPlayerId(playerId);
+              const id = playerIdResult?.value || playerIdResult?.id;
+              console.log('[OneSignal] Mobile player ID attempt:', id, '(attempts left:', attemptsLeft, ')');
+              if (id) {
+                console.log('[OneSignal] Got player ID:', id);
+                await persistPlayerId(id);
               } else if (attemptsLeft > 0) {
-                console.log('[OneSignal] Mobile player ID not ready, retrying in 2s...');
-                setTimeout(() => tryGetMobilePlayerId(attemptsLeft - 1), 2000);
+                console.log('[OneSignal] Mobile player ID not ready, retrying in 3s...');
+                setTimeout(() => tryGetMobilePlayerId(attemptsLeft - 1), 3000);
               } else {
-                console.warn('[OneSignal] Mobile player ID never became available');
+                console.warn('[OneSignal] Mobile player ID never became available after 60s');
               }
             } catch (err) {
               console.warn('[OneSignal] Could not get mobile player ID:', err);
