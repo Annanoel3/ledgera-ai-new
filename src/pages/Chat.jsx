@@ -166,7 +166,7 @@ const ChatInputArea = memo(({ profile, selectedFiles, removeFile, fileInputRef, 
 <>
     {selectedFiles.length > 0 &&
   <div className="fixed left-0 right-0 z-20" style={{
-    bottom: 'calc(5rem + env(safe-area-inset-bottom) + 4rem)',
+    bottom: 'calc(5rem + env(safe-area-inset-bottom) + 5rem)',
     borderTop: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}`,
     background: profile?.darkMode ? '#1a1a1a' : '#f9fafb',
     padding: '0.5rem 1rem'
@@ -938,7 +938,7 @@ export default function Chat() {
         </DialogContent>
       </Dialog>
 
-      <div className="px-4 flex-1 overflow-y-auto" style={{ paddingTop: '5rem', paddingBottom: 'calc(8rem + env(safe-area-inset-bottom))' }}>
+      <div className="px-4 flex-1 overflow-y-auto" style={{ paddingTop: '5rem', paddingBottom: 'calc(12rem + env(safe-area-inset-bottom))' }}>
         <div className="max-w-4xl mx-auto space-y-4 py-4">
           {showWelcome ?
           <div className="flex flex-col items-center justify-center h-full">
