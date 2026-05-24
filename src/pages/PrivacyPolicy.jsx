@@ -47,6 +47,20 @@ export default function PrivacyPolicy() {
             </div>
 
             <div>
+              <h3 className="text-base font-semibold mb-2 text-gray-900">1a. Data Protection Mechanisms</h3>
+              <p className="mb-2">We employ the following specific technical and organizational safeguards to protect your sensitive financial data:</p>
+              <ul className="list-disc list-inside space-y-1">
+                <li><strong>TLS/HTTPS encryption in transit</strong> — All data transmitted between your device and our servers is encrypted using TLS 1.2 or higher, preventing interception</li>
+                <li><strong>AES-256 encryption at rest</strong> — Stored data, including financial records and uploaded documents, is encrypted using AES-256, the same standard used by banks</li>
+                <li><strong>Row-level security (RLS)</strong> — Database access controls ensure your records are only queryable by your own authenticated session — no cross-user data leakage is possible</li>
+                <li><strong>Secure authentication</strong> — User sessions are managed via short-lived, cryptographically signed tokens; passwords are never stored in plaintext</li>
+                <li><strong>Minimal data access principle</strong> — Internal systems and third-party integrations (e.g., OpenAI, Google Calendar) are granted only the minimum permissions necessary to perform their function</li>
+                <li><strong>Secure file storage</strong> — Uploaded documents (invoices, receipts, contracts) are stored in isolated, access-controlled cloud storage buckets not publicly accessible</li>
+                <li><strong>No plaintext logging of sensitive data</strong> — Financial figures, account details, and personal identifiers are never written to application logs</li>
+              </ul>
+            </div>
+
+            <div>
               <h3 className="text-base font-semibold mb-2 text-gray-900">2. How We Use Your Information</h3>
               <p className="mb-2">We use your information only to:</p>
               <ul className="list-disc list-inside space-y-1">
