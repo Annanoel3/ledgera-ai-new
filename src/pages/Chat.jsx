@@ -166,7 +166,7 @@ const ChatInputArea = memo(({ profile, selectedFiles, removeFile, fileInputRef, 
 <>
     {selectedFiles.length > 0 &&
   <div className="fixed left-0 right-0 z-20" style={{
-    bottom: 'calc(4rem + env(safe-area-inset-bottom) + 4rem)',
+    bottom: 'calc(5rem + env(safe-area-inset-bottom) + 4rem)',
     borderTop: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}`,
     background: profile?.darkMode ? '#1a1a1a' : '#f9fafb',
     padding: '0.5rem 1rem'
@@ -202,7 +202,7 @@ const ChatInputArea = memo(({ profile, selectedFiles, removeFile, fileInputRef, 
   }
 
     <div className="fixed left-0 right-0 z-20 px-4 py-1 my-1" style={{
-    bottom: 'calc(4rem + env(safe-area-inset-bottom))',
+    bottom: 'calc(5rem + env(safe-area-inset-bottom))',
     borderTop: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}`,
     boxShadow: profile?.funMode ? '0 -10px 15px -3px rgba(0, 0, 0, 0.1)' : '0 -4px 6px -1px rgba(0, 0, 0, 0.1)',
     background: profile?.funMode ?
