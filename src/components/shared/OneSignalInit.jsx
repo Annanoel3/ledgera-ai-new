@@ -67,48 +67,44 @@ export default function OneSignalInit({ user }) {
         if (externalId) {
           console.log('[OneSignal] ✅ Calling NotifyBridge.login() with:', externalId);
 
-          // 1. Set up change listener BEFORE login so we don't miss the event
-          try {
-            window.OneSignal.User.pushSubscription.addEventListener('change', async (event) => {
-              const id = event.current?.id;
-              console.log('[OneSignal] Got player ID:', id);
-              if (id) {
-                await persistPlayerId(id);
-              }
-            });
-          } catch (listenerErr) {
-            console.warn('[OneSignal] Could not attach change listener:', listenerErr);
-          }
-
-          // requestPermission can throw if already granted or dialog is dismissed — that's OK, we still need to login
+          // requestPermission can throw if already granted or dialog is dismissed — that's OK
           try {
             await NotifyBridge.requestPermission();
             console.log('[OneSignal] ✅ Permission granted/already set');
           } catch (permErr) {
             console.warn('[OneSignal] requestPermission threw (may already be granted):', permErr);
           }
+
           // Always call login regardless of permission result
           await NotifyBridge.login({ externalId: externalId });
           console.log('[OneSignal] ✅ login() sent for:', externalId);
-          console.log('[OneSignal] login complete, checking pushSubscription.id immediately:', window.OneSignal?.User?.pushSubscription?.id);
 
-          // 2. Retry loop: 20 attempts × 3 seconds = 60 seconds total
+          // Poll for the push subscription ID — try multiple native methods
           const tryGetMobilePlayerId = async (attemptsLeft = 20) => {
+            // Try every known method to retrieve the subscription ID
+            let id = null;
             try {
-              const playerIdResult = await NotifyBridge.getPlayerId?.();
-              const id = playerIdResult?.value || playerIdResult?.id;
-              console.log('[OneSignal] Mobile player ID attempt:', id, '(attempts left:', attemptsLeft, ')');
-              if (id) {
-                console.log('[OneSignal] Got player ID:', id);
-                await persistPlayerId(id);
-              } else if (attemptsLeft > 0) {
-                console.log('[OneSignal] Mobile player ID not ready, retrying in 3s...');
-                setTimeout(() => tryGetMobilePlayerId(attemptsLeft - 1), 3000);
-              } else {
-                console.warn('[OneSignal] Mobile player ID never became available after 60s');
-              }
-            } catch (err) {
-              console.warn('[OneSignal] Could not get mobile player ID:', err);
+              const r1 = await NotifyBridge.getPushSubscriptionId?.();
+              id = r1?.value || r1?.id || r1?.subscriptionId || null;
+            } catch (_) {}
+            if (!id) {
+              try {
+                const r2 = await NotifyBridge.getPlayerId?.();
+                id = r2?.value || r2?.id || null;
+              } catch (_) {}
+            }
+            if (!id) {
+              id = window.OneSignal?.User?.pushSubscription?.id || null;
+            }
+
+            console.log('[OneSignal] Mobile player ID attempt:', id, '(attempts left:', attemptsLeft, ')');
+            if (id) {
+              await persistPlayerId(id);
+            } else if (attemptsLeft > 0) {
+              console.log('[OneSignal] Mobile player ID not ready, retrying in 3s...');
+              setTimeout(() => tryGetMobilePlayerId(attemptsLeft - 1), 3000);
+            } else {
+              console.warn('[OneSignal] Mobile player ID never became available after 60s');
             }
           };
           await tryGetMobilePlayerId();
