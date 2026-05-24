@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { ArrowLeft, Trash2, Loader2 } from "lucide-react";
+import { ArrowLeft, Trash2, Loader2, Copy } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { format, startOfYear, endOfYear, startOfMonth, endOfMonth } from "date-fns";
@@ -95,6 +95,40 @@ export default function ProjectFinancials() {
     queryFn: () => base44.entities.ExpenseItem.filter({ projectId, created_by: user.email }, '-date'),
     initialData: [],
     enabled: !!projectId && !!user,
+  });
+
+  const duplicateIncomeMutation = useMutation({
+    mutationFn: (item) => base44.entities.IncomeItem.create({
+      projectId: item.projectId,
+      amount: item.amount,
+      date: item.date,
+      category: item.category,
+      method: item.method,
+      notes: item.notes,
+    }),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['incomeItems', projectId]);
+      queryClient.invalidateQueries(['projects']);
+      toast.success("Income item duplicated");
+    },
+    onError: () => toast.error("Failed to duplicate income item"),
+  });
+
+  const duplicateExpenseMutation = useMutation({
+    mutationFn: (item) => base44.entities.ExpenseItem.create({
+      projectId: item.projectId,
+      amount: item.amount,
+      date: item.date,
+      category: item.category,
+      vendor: item.vendor,
+      notes: item.notes,
+    }),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['expenseItems', projectId]);
+      queryClient.invalidateQueries(['projects']);
+      toast.success("Expense item duplicated");
+    },
+    onError: () => toast.error("Failed to duplicate expense item"),
   });
 
   const deleteIncomeMutation = useMutation({
@@ -414,15 +448,27 @@ export default function ProjectFinancials() {
                               </Select>
                             </TableCell>
                             <TableCell>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={(e) => handleDeleteIncome(e, item.id)}
-                                className="hover:text-red-500"
-                                disabled={deleteIncomeMutation.isPending}
-                              >
-                                {deleteIncomeMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
-                              </Button>
+                              <div className="flex gap-1">
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={(e) => { e.stopPropagation(); duplicateIncomeMutation.mutate(item); }}
+                                  className="hover:text-[#22A699]"
+                                  disabled={duplicateIncomeMutation.isPending}
+                                  title="Duplicate"
+                                >
+                                  {duplicateIncomeMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Copy className="w-4 h-4" />}
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={(e) => handleDeleteIncome(e, item.id)}
+                                  className="hover:text-red-500"
+                                  disabled={deleteIncomeMutation.isPending}
+                                >
+                                  {deleteIncomeMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                                </Button>
+                              </div>
                             </TableCell>
                           </TableRow>
                         ))}
@@ -449,11 +495,13 @@ export default function ProjectFinancials() {
                           key={item.id}
                           item={item}
                           onDelete={handleDeleteExpense}
+                          onDuplicate={(item) => duplicateExpenseMutation.mutate(item)}
                           onProjectChange={handleExpenseProjectChange}
                           onMakeRecurring={handleStartRecurring}
                           darkMode={profile?.darkMode}
                           allProjects={allProjects}
                           isDeleteLoading={deleteExpenseMutation.isPending}
+                          isDuplicateLoading={duplicateExpenseMutation.isPending}
                           isRecurringLoading={convertToRecurringMutation.isPending}
                           isMobile={true}
                           isSelected={selectedExpenseIds.has(item.id)}
@@ -483,11 +531,13 @@ export default function ProjectFinancials() {
                               key={item.id}
                               item={item}
                               onDelete={handleDeleteExpense}
+                              onDuplicate={(item) => duplicateExpenseMutation.mutate(item)}
                               onProjectChange={handleExpenseProjectChange}
                               onMakeRecurring={handleStartRecurring}
                               darkMode={profile?.darkMode}
                               allProjects={allProjects}
                               isDeleteLoading={deleteExpenseMutation.isPending}
+                              isDuplicateLoading={duplicateExpenseMutation.isPending}
                               isRecurringLoading={convertToRecurringMutation.isPending}
                               isMobile={false}
                               isSelected={selectedExpenseIds.has(item.id)}

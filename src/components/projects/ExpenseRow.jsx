@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Trash2, Loader2, ChevronDown, ChevronUp } from "lucide-react";
+import { Trash2, Loader2, ChevronDown, ChevronUp, Copy } from "lucide-react";
 import { format } from "date-fns";
 import {
   Select,
@@ -13,11 +13,13 @@ import {
 export default function ExpenseRow({
   item,
   onDelete,
+  onDuplicate,
   onProjectChange,
   onMakeRecurring,
   darkMode,
   allProjects,
   isDeleteLoading,
+  isDuplicateLoading,
   isRecurringLoading,
   isMobile,
   isSelected,
@@ -174,6 +176,20 @@ export default function ExpenseRow({
               <Button
                 variant="ghost"
                 size="sm"
+                onClick={() => onDuplicate(item)}
+                disabled={isDuplicateLoading}
+                className="hover:text-[#22A699] h-8"
+                title="Duplicate"
+              >
+                {isDuplicateLoading ? (
+                  <Loader2 className="w-3 h-3 animate-spin" />
+                ) : (
+                  <Copy className="w-4 h-4" />
+                )}
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
                 onClick={(e) => onDelete(e, item.id)}
                 disabled={isDeleteLoading}
                 className="hover:text-red-500 h-8"
@@ -266,6 +282,20 @@ export default function ExpenseRow({
               <Loader2 className="w-3 h-3 animate-spin" />
             ) : (
               "Make Recurring"
+            )}
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => onDuplicate(item)}
+            disabled={isDuplicateLoading}
+            className="hover:text-[#22A699]"
+            title="Duplicate"
+          >
+            {isDuplicateLoading ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <Copy className="w-4 h-4" />
             )}
           </Button>
           <Button
