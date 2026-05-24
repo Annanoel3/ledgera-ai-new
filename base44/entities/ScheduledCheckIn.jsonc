@@ -1,0 +1,105 @@
+{
+  "name": "ScheduledCheckIn",
+  "type": "object",
+  "properties": {
+    "userEmail": {
+      "type": "string",
+      "description": "Email of user to notify"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "after_event",
+        "weekly"
+      ],
+      "description": "Type of check-in"
+    },
+    "scheduledFor": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When to send the notification"
+    },
+    "eventName": {
+      "type": "string",
+      "description": "Name of the event (for after_event type)"
+    },
+    "projectId": {
+      "type": "string",
+      "description": "Associated project ID"
+    },
+    "sent": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether notification was sent"
+    },
+    "sentAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When notification was actually sent"
+    }
+  },
+  "required": [
+    "userEmail",
+    "type",
+    "scheduledFor"
+  ],
+  "security": {
+    "read": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "created_by": "{{user.id}}"
+        },
+        {
+          "service_role": true
+        }
+      ]
+    },
+    "write": {
+      "created_by": "{{user.email}}"
+    }
+  },
+  "rls": {
+    "create": {
+      "created_by": "{{user.email}}",
+      "data.userEmail": "{{user.email}}"
+    },
+    "read": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "data.userEmail": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "data.userEmail": "{{user.email}}"
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "data.userEmail": "{{user.email}}"
+        }
+      ]
+    }
+  }
+}
