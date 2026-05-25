@@ -576,7 +576,8 @@ export default function Chat() {
       try {
         const response = await processChat({
           message: finalMessage,
-          conversationId: conversationId || null
+          conversationId: conversationId || null,
+          fileUrls: fileUrls
         });
 
         if (response.data.error) {
@@ -598,12 +599,11 @@ export default function Chat() {
           setPendingDuplicates([]);
         }
 
-        const updated = await refetchConversations();
-        const updatedConvId = response.data.conversationId || conversationId;
-        if (updated?.data && updatedConvId) {
-          const conv = updated.data.find((c) => c.id === updatedConvId);
-          if (conv?.messages) setMessages(conv.messages);
+        // Append AI reply without overwriting optimistic user message
+        if (aiReply) {
+          setMessages((prev) => [...prev, { role: 'assistant', content: aiReply }]);
         }
+        await refetchConversations();
       } catch (error) {
         console.error('Chat error:', error);
         toast.error("Failed to send message: " + (error.response?.data?.error || error.message));
@@ -634,7 +634,7 @@ export default function Chat() {
           setConversationId(response.data.conversationId);
         }
 
-        // Check if AI signaled to save or skip duplicates
+        // Append AI reply without overwriting optimistic user message
         const aiReplyText = response.data.response || '';
         if (aiReplyText.includes('SAVE_DUPLICATES') && pendingDuplicates.length > 0) {
           try {
@@ -644,13 +644,10 @@ export default function Chat() {
         } else if (aiReplyText.includes('SKIP_DUPLICATES')) {
           setPendingDuplicates([]);
         }
-
-        const updatedText = await refetchConversations();
-        const updatedConvIdText = response.data.conversationId || conversationId;
-        if (updatedText?.data && updatedConvIdText) {
-          const conv = updatedText.data.find((c) => c.id === updatedConvIdText);
-          if (conv?.messages) setMessages(conv.messages);
+        if (aiReplyText) {
+          setMessages((prev) => [...prev, { role: 'assistant', content: aiReplyText }]);
         }
+        await refetchConversations();
       } catch (error) {
         console.error('Chat error:', error);
         console.error('Error response:', error.response?.data);

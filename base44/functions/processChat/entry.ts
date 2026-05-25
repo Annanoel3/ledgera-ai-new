@@ -703,11 +703,11 @@ Deno.serve(async (req) => {
         console.log('Processing chat for user:', user.email);
 
         const body = await req.json();
-        const { message, conversationId } = body;
+        const { message, conversationId, fileUrls } = body;
 
-        console.log('Request body:', { message, conversationId });
+        console.log('Request body:', { message, conversationId, fileUrls });
 
-        if (!message) {
+        if (!message && (!fileUrls || fileUrls.length === 0)) {
             return Response.json({ error: 'Message is required' }, { status: 400 });
         }
 
@@ -740,11 +740,19 @@ Deno.serve(async (req) => {
             console.log('Created conversation:', conversation.id);
         }
 
-        // Add user message
-        messages.push({
-            role: 'user',
-            content: message
-        });
+        // Add user message — support vision if fileUrls provided
+        if (fileUrls && fileUrls.length > 0) {
+            const contentParts = [];
+            if (message) {
+                contentParts.push({ type: 'text', text: message });
+            }
+            for (const url of fileUrls) {
+                contentParts.push({ type: 'image_url', image_url: { url, detail: 'high' } });
+            }
+            messages.push({ role: 'user', content: contentParts });
+        } else {
+            messages.push({ role: 'user', content: message });
+        }
 
         // Get user profile for context
         const profiles = await base44.entities.UserProfile.filter({ created_by: user.email });
