@@ -232,7 +232,7 @@ const ChatInputArea = memo(({ profile, selectedFiles, removeFile, fileInputRef, 
               }
             }}
             placeholder={profile?.funMode ? "Spill the financial tea..." : "Type your message or speak..."}
-            className="px-3 py-1 text-base rounded-md flex w-full border shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm min-h-[48px] max-h-32 resize-none"
+            className="px-3 py-1 text-base rounded-md flex w-full border shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm min-h-[48px] max-h-40 resize-none"
             style={{
               backgroundColor: profile?.funMode ?
               profile?.darkMode ? 'rgba(31, 41, 55, 0.8)' : 'rgba(255, 255, 255, 0.9)' :
@@ -322,7 +322,9 @@ export default function Chat() {
   const [showCapabilities, setShowCapabilities] = useState(false);
   const [sendingMessage, setSendingMessage] = useState(false);
   const [pendingDuplicates, setPendingDuplicates] = useState([]);
+  const [lastUploadedFileUrls, setLastUploadedFileUrls] = useState([]);
   const fileInputRef = useRef(null);
+  const messagesEndRef = useRef(null);
   const queryClient = useQueryClient();
 
   const { data: user, isLoading: userLoading } = useQuery({
@@ -392,6 +394,11 @@ export default function Chat() {
     initialData: []
   });
 
+  // Auto-scroll to bottom whenever messages change
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages, sendingMessage, backgroundProcessing]);
+
   // On initial load only: auto-select the latest conversation
   const initialLoadDone = useRef(false);
   useEffect(() => {
@@ -451,6 +458,7 @@ export default function Chat() {
           fileNames.push(file.name);
         }
         toast.success(`Uploaded ${selectedFiles.length} file(s)`);
+        setLastUploadedFileUrls(fileUrls); // remember for vision context
       } catch (error) {
         toast.error("Failed to upload files");
         setUploadingFile(false);
@@ -573,7 +581,7 @@ export default function Chat() {
         const response = await processChat({
           message: finalMessage,
           conversationId: conversationId || null,
-          fileUrls: fileUrls
+          fileUrls: fileUrls // always pass the just-uploaded URLs for vision
         });
 
         if (response.data.error) {
@@ -616,10 +624,14 @@ export default function Chat() {
       setMessages((prev) => [...prev, newUserMessage]);
 
       setSendingMessage(true);
+      // If there are recently uploaded files still in context, re-attach them for vision
+      const pendingFileUrls = lastUploadedFileUrls.length > 0 ? lastUploadedFileUrls : undefined;
+      if (pendingFileUrls) setLastUploadedFileUrls([]); // consume them
       try {
         const response = await processChat({
           message: message,
-          conversationId: conversationId || null
+          conversationId: conversationId || null,
+          fileUrls: pendingFileUrls
         });
 
         if (response.data.error) {
@@ -933,7 +945,7 @@ export default function Chat() {
         </DialogContent>
       </Dialog>
 
-      <div className="px-4 flex-1 overflow-y-auto" style={{ paddingTop: '5rem', paddingBottom: 'calc(13rem + env(safe-area-inset-bottom))' }}>
+      <div className="px-4 flex-1 overflow-y-auto" style={{ paddingTop: '5rem', paddingBottom: 'calc(14rem + env(safe-area-inset-bottom))' }}>
         <div className="max-w-4xl mx-auto space-y-4 py-4">
           {showWelcome ?
           <div className="flex flex-col items-center justify-center h-full">
@@ -1112,7 +1124,7 @@ export default function Chat() {
             })()}
 
               {backgroundProcessing &&
-            <div className="flex gap-3 justify-start">
+            <div className="flex gap-3 justify-start" key="bg-processing">
                   <div style={{
                 height: '2rem',
                 width: '2rem',
@@ -1157,13 +1169,14 @@ export default function Chat() {
 
             </>
           }
+          <div ref={messagesEndRef} />
         </div>
       </div>
 
-      {/* Fixed input bar — sits above the bottom nav on mobile, natural flow on desktop */}
+      {/* Fixed input bar — sits just above the bottom nav on mobile */}
       <div
         className="fixed left-0 right-0 z-40 md:static md:bottom-auto"
-        style={{ bottom: 'calc(5.5rem + env(safe-area-inset-bottom))' }}
+        style={{ bottom: 'calc(4rem + env(safe-area-inset-bottom))' }}
       >
         <ChatInputArea
           profile={profile}
