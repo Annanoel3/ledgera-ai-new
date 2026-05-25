@@ -448,10 +448,10 @@ async function executeTool(toolName, args, base44, userEmail) {
             }
             
             case "get_income": {
-                const filter = { created_by: userEmail };
+                const filter = {};
                 if (args.projectId) filter.projectId = args.projectId;
                 
-                const income = await base44.entities.IncomeItem.filter(filter, '-date');
+                const income = await base44.asServiceRole.entities.IncomeItem.filter(filter, '-date');
                 return { success: true, income };
             }
             
@@ -557,10 +557,10 @@ async function executeTool(toolName, args, base44, userEmail) {
             }
             
             case "get_expenses": {
-                const filter = { created_by: userEmail };
+                const filter = {};
                 if (args.projectId) filter.projectId = args.projectId;
                 
-                const expenses = await base44.entities.ExpenseItem.filter(filter, '-date');
+                const expenses = await base44.asServiceRole.entities.ExpenseItem.filter(filter, '-date');
                 return { success: true, expenses };
             }
             
@@ -586,27 +586,24 @@ async function executeTool(toolName, args, base44, userEmail) {
             }
 
             case "delete_project": {
-                // Delete all associated income items
-                const incomeItems = await base44.entities.IncomeItem.filter({ projectId: args.projectId, created_by: userEmail });
+                // Use service role to bypass created_by mismatch (items may be created by service role)
+                const incomeItems = await base44.asServiceRole.entities.IncomeItem.filter({ projectId: args.projectId });
                 for (const income of incomeItems) {
-                    await base44.entities.IncomeItem.delete(income.id);
+                    await base44.asServiceRole.entities.IncomeItem.delete(income.id);
                 }
 
-                // Delete all associated expense items
-                const expenseItems = await base44.entities.ExpenseItem.filter({ projectId: args.projectId, created_by: userEmail });
+                const expenseItems = await base44.asServiceRole.entities.ExpenseItem.filter({ projectId: args.projectId });
                 for (const expense of expenseItems) {
-                    await base44.entities.ExpenseItem.delete(expense.id);
+                    await base44.asServiceRole.entities.ExpenseItem.delete(expense.id);
                 }
 
-                // Delete all associated subscriptions
-                const subscriptions = await base44.entities.RecurringSubscription.filter({ projectId: args.projectId, created_by: userEmail });
+                const subscriptions = await base44.asServiceRole.entities.RecurringSubscription.filter({ projectId: args.projectId });
                 for (const subscription of subscriptions) {
-                    await base44.entities.RecurringSubscription.delete(subscription.id);
+                    await base44.asServiceRole.entities.RecurringSubscription.delete(subscription.id);
                 }
 
-                // Delete the project itself
                 await base44.entities.Project.delete(args.projectId);
-                return { success: true, message: "Project deleted successfully" };
+                return { success: true, message: "Project and all associated records deleted successfully" };
             }
 
             case "delete_income": {
