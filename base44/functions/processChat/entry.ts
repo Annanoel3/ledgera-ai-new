@@ -327,7 +327,10 @@ const tools = [
 
 // Helper to clean messages before sending to OpenAI
 function cleanMessagesForOpenAI(messages) {
-    return messages.map(msg => {
+    // Keep only the last 40 messages to avoid context bloat
+    const trimmed = messages.slice(-40);
+
+    return trimmed.map(msg => {
         const cleaned = { ...msg };
         
         // Remove empty tool_calls arrays
@@ -338,6 +341,25 @@ function cleanMessagesForOpenAI(messages) {
         // Remove empty content strings for tool messages, or set a default
         if (cleaned.role === 'tool' && !cleaned.content) {
             cleaned.content = 'Function executed successfully';
+        }
+
+        // Truncate large tool result payloads (e.g. get_income/get_expenses) to avoid token overflow
+        if (cleaned.role === 'tool' && cleaned.content && cleaned.content.length > 3000) {
+            try {
+                const parsed = JSON.parse(cleaned.content);
+                // Summarize large arrays
+                if (parsed.income && Array.isArray(parsed.income)) {
+                    parsed.income = parsed.income.slice(0, 20);
+                    parsed._truncated = true;
+                }
+                if (parsed.expenses && Array.isArray(parsed.expenses)) {
+                    parsed.expenses = parsed.expenses.slice(0, 20);
+                    parsed._truncated = true;
+                }
+                cleaned.content = JSON.stringify(parsed);
+            } catch (_) {
+                cleaned.content = cleaned.content.substring(0, 3000) + '...[truncated]';
+            }
         }
         
         return cleaned;
