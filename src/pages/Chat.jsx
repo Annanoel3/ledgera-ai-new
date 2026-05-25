@@ -954,7 +954,7 @@ export default function Chat() {
         </DialogContent>
       </Dialog>
 
-      <div className="px-4 flex-1 overflow-y-auto" style={{ paddingTop: '5rem', paddingBottom: 'calc(8rem + env(safe-area-inset-bottom))' }}>
+      <div className="px-4 flex-1 overflow-y-auto" style={{ paddingTop: '5rem', paddingBottom: 'calc(12rem + env(safe-area-inset-bottom))' }}>
         <div className="max-w-4xl mx-auto space-y-4 py-4">
           {showWelcome ?
           <div className="flex flex-col items-center justify-center h-full">
@@ -1182,11 +1182,25 @@ export default function Chat() {
         </div>
       </div>
 
-      {/* Fixed input bar — sits just above the bottom nav on mobile */}
-      <div
-        className="fixed left-0 right-0 z-40 md:static md:bottom-auto"
-        style={{ bottom: 'env(safe-area-inset-bottom, 0px)' }}
-      >
+      {/* Fixed input bar — sits above the bottom nav on mobile (nav is ~56px) */}
+      <div className="fixed left-0 right-0 z-40 md:hidden" style={{ bottom: '56px' }}>
+        <ChatInputArea
+          profile={profile}
+          selectedFiles={selectedFiles}
+          removeFile={removeFile}
+          fileInputRef={fileInputRef}
+          handleFileSelect={handleFileSelect}
+          input={input}
+          setInput={setInput}
+          isRecording={isRecording}
+          stopRecording={stopRecording}
+          startRecording={startRecording}
+          handleSend={handleSend}
+          sendingMessage={sendingMessage}
+          uploadingFile={uploadingFile} />
+      </div>
+      {/* Desktop: input bar at very bottom */}
+      <div className="hidden md:block fixed left-0 right-0 z-40" style={{ bottom: 0 }}>
         <ChatInputArea
           profile={profile}
           selectedFiles={selectedFiles}
