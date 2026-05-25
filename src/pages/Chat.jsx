@@ -163,8 +163,7 @@ const ChatHeader = ({ profile, showChatList, setShowChatList, handleNewChat, set
 
 
 const ChatInputArea = memo(({ profile, selectedFiles, removeFile, fileInputRef, handleFileSelect, input, setInput, isRecording, stopRecording, startRecording, handleSend, sendingMessage, uploadingFile }) =>
-    <div className="fixed left-0 right-0 z-[60]" style={{
-    bottom: 'calc(5rem + env(safe-area-inset-bottom))',
+    <div className="flex-shrink-0 w-full" style={{
     borderTop: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}`,
     boxShadow: profile?.funMode ? '0 -10px 15px -3px rgba(0, 0, 0, 0.1)' : '0 -4px 6px -1px rgba(0, 0, 0, 0.1)',
     background: profile?.funMode ?
@@ -173,7 +172,7 @@ const ChatInputArea = memo(({ profile, selectedFiles, removeFile, fileInputRef, 
     'linear-gradient(to right, #fce7f3, #faf5ff, #eff6ff)' :
     profile?.darkMode ? '#1a1a1a' : '#f9fafb'
   }}>
-      <div className="max-w-4xl mx-auto w-full px-3 pt-2" style={{ paddingBottom: 'calc(0.5rem + env(safe-area-inset-bottom))' }}>
+      <div className="max-w-4xl mx-auto w-full px-3 pt-2 pb-2">
         {/* File preview strip — lives inside the same bar */}
         {selectedFiles.length > 0 && (
           <div className="flex gap-2 overflow-x-auto pb-2 pt-1">
@@ -741,7 +740,8 @@ export default function Chat() {
 
   return (
     <div
-      className="h-screen flex flex-col overflow-hidden"
+      className="flex flex-col overflow-hidden"
+      style={{ height: 'calc(100vh - 4rem - env(safe-area-inset-bottom))' }}
       style={{
         background: profile?.funMode ?
         profile?.darkMode ?
@@ -932,7 +932,7 @@ export default function Chat() {
         </DialogContent>
       </Dialog>
 
-      <div className="px-4 flex-1 overflow-y-auto" style={{ paddingTop: '5rem', paddingBottom: 'calc(13rem + env(safe-area-inset-bottom))' }}>
+      <div className="px-4 flex-1 overflow-y-auto" style={{ paddingTop: '5rem', paddingBottom: '1rem' }}>
         <div className="max-w-4xl mx-auto space-y-4 py-4">
           {showWelcome ?
           <div className="flex flex-col items-center justify-center h-full">
