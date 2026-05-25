@@ -409,7 +409,7 @@ export default function Chat() {
         setMessages(conv.messages);
       }
     }
-  }, [conversationId, conversations]);
+  }, [conversationId, conversations, sendingMessage, backgroundProcessing]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
