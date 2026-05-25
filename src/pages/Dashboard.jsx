@@ -140,10 +140,10 @@ export default function Dashboard() {
     mutationFn: async ({ id, fromType, toType, data }) => {
       // Delete from old type
       if (fromType === 'income') {
-        await base44.entities.IncomeItem.delete(id);
+        await base44.asServiceRole.entities.IncomeItem.delete(id);
         return await base44.entities.ExpenseItem.create(data);
       } else {
-        await base44.entities.ExpenseItem.delete(id);
+        await base44.asServiceRole.entities.ExpenseItem.delete(id);
         return await base44.entities.IncomeItem.create(data);
       }
     },
