@@ -403,7 +403,7 @@ export default function Chat() {
   }, [conversations, conversationId]);
 
   useEffect(() => {
-    if (conversationId && conversations) {
+    if (conversationId && conversations && !sendingMessage && !backgroundProcessing) {
       const conv = conversations.find((c) => c.id === conversationId);
       if (conv && conv.messages) {
         setMessages(conv.messages);
