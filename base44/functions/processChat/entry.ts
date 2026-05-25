@@ -607,17 +607,23 @@ async function executeTool(toolName, args, base44, userEmail) {
             }
 
             case "delete_income": {
-                await base44.entities.IncomeItem.delete(args.incomeId);
+                const incomeToDelete = await base44.asServiceRole.entities.IncomeItem.filter({ id: args.incomeId });
+                const incomeProjectId = incomeToDelete[0]?.projectId;
+                await base44.asServiceRole.entities.IncomeItem.delete(args.incomeId);
+                if (incomeProjectId) await updateProjectTotals(base44, incomeProjectId, userEmail);
                 return { success: true, message: "Income item deleted successfully" };
             }
 
             case "delete_expense": {
-                await base44.entities.ExpenseItem.delete(args.expenseId);
+                const expenseToDelete = await base44.asServiceRole.entities.ExpenseItem.filter({ id: args.expenseId });
+                const expenseProjectId = expenseToDelete[0]?.projectId;
+                await base44.asServiceRole.entities.ExpenseItem.delete(args.expenseId);
+                if (expenseProjectId) await updateProjectTotals(base44, expenseProjectId, userEmail);
                 return { success: true, message: "Expense item deleted successfully" };
             }
 
             case "delete_subscription": {
-                await base44.entities.RecurringSubscription.delete(args.subscriptionId);
+                await base44.asServiceRole.entities.RecurringSubscription.delete(args.subscriptionId);
                 return { success: true, message: "Subscription deleted successfully" };
             }
 
@@ -792,11 +798,9 @@ When user mentions money going OUT or money they SPENT or PAID:
 
 Pay close attention to the context. If user says 'I got $500' that's INCOME. If they say 'I spent $500 on supplies' that's EXPENSE.
 
-For INCOME: Ask when, amount, what for. Auto-assign to project. Create and confirm. You can UPDATE income items but NEVER delete them.
+For INCOME: Ask when, amount, what for. Auto-assign to project. Create and confirm. You can also UPDATE or DELETE income items when the user requests.
 
-For EXPENSES: Ask when, amount, category, vendor. Auto-assign to project. Create and confirm. You can UPDATE expense items but NEVER delete them.
-
-CRITICAL: You do NOT have permission to delete any financial records. Users must delete through the UI if needed.
+For EXPENSES: Ask when, amount, category, vendor. Auto-assign to project. Create and confirm. You can also UPDATE or DELETE expense items when the user requests.
 
 SMART EXPENSE CATEGORIZATION: When creating expenses, intelligently assign them to the most appropriate tax category based on the description and vendor.
 
