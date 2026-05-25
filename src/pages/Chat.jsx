@@ -164,7 +164,7 @@ const ChatHeader = ({ profile, showChatList, setShowChatList, handleNewChat, set
 
 const ChatInputArea = memo(({ profile, selectedFiles, removeFile, fileInputRef, handleFileSelect, input, setInput, isRecording, stopRecording, startRecording, handleSend, sendingMessage, uploadingFile }) =>
     <div className="fixed left-0 right-0 z-[60]" style={{
-    bottom: 'calc(4rem + env(safe-area-inset-bottom))',
+    bottom: 'calc(3.5rem + env(safe-area-inset-bottom))',
     borderTop: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}`,
     boxShadow: profile?.funMode ? '0 -10px 15px -3px rgba(0, 0, 0, 0.1)' : '0 -4px 6px -1px rgba(0, 0, 0, 0.1)',
     background: profile?.funMode ?
@@ -323,7 +323,6 @@ export default function Chat() {
   const [showCapabilities, setShowCapabilities] = useState(false);
   const [sendingMessage, setSendingMessage] = useState(false);
   const [pendingDuplicates, setPendingDuplicates] = useState([]);
-  const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
   const queryClient = useQueryClient();
 
@@ -405,9 +404,7 @@ export default function Chat() {
     }
   }, [conversations]);
 
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, backgroundProcessing]);
+
 
   const handleNewChat = () => {
     initialLoadDone.current = true; // prevent auto-reselect
@@ -1156,7 +1153,7 @@ export default function Chat() {
                 </div>
             }
 
-              <div ref={messagesEndRef} />
+
             </>
           }
         </div>
