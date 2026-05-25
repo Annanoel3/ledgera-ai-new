@@ -163,45 +163,7 @@ const ChatHeader = ({ profile, showChatList, setShowChatList, handleNewChat, set
 
 
 const ChatInputArea = memo(({ profile, selectedFiles, removeFile, fileInputRef, handleFileSelect, input, setInput, isRecording, stopRecording, startRecording, handleSend, sendingMessage, uploadingFile }) =>
-<>
-    {selectedFiles.length > 0 &&
-  <div className="fixed left-0 right-0 z-20" style={{
-    bottom: 'calc(5rem + env(safe-area-inset-bottom) + 5rem)',
-    borderTop: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}`,
-    background: profile?.darkMode ? '#1a1a1a' : '#f9fafb',
-    padding: '0.5rem 1rem'
-  }}>
-        <div className="max-w-4xl mx-auto flex gap-2 overflow-x-auto">
-          {selectedFiles.map((file, idx) =>
-      <div key={idx} style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: '0.5rem',
-        borderRadius: '0.5rem',
-        padding: '0.5rem 0.75rem',
-        fontSize: '0.875rem',
-        background: profile?.funMode ?
-        profile?.darkMode ?
-        'rgba(236, 72, 153, 0.3)' :
-        'linear-gradient(to right, #fce7f3, #fae8ff)' :
-        profile?.darkMode ? '#374151' : '#f3f4f6',
-        color: profile?.darkMode ? '#e5e7eb' : '#374151'
-      }}>
-              <FileText className="w-4 h-4" />
-              <span style={{ maxWidth: '150px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{file.name}</span>
-              <button
-          onClick={() => removeFile(idx)}
-          style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>
-
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-      )}
-        </div>
-      </div>
-  }
-
-    <div className="fixed left-0 right-0 z-20 px-4 py-1 my-1" style={{
+    <div className="fixed left-0 right-0 z-20" style={{
     bottom: 'calc(5rem + env(safe-area-inset-bottom))',
     borderTop: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}`,
     boxShadow: profile?.funMode ? '0 -10px 15px -3px rgba(0, 0, 0, 0.1)' : '0 -4px 6px -1px rgba(0, 0, 0, 0.1)',
@@ -212,6 +174,32 @@ const ChatInputArea = memo(({ profile, selectedFiles, removeFile, fileInputRef, 
     profile?.darkMode ? '#1a1a1a' : '#f9fafb'
   }}>
       <div className="max-w-4xl mx-auto w-full">
+        {/* File preview strip — lives inside the same bar */}
+        {selectedFiles.length > 0 && (
+          <div className="flex gap-2 overflow-x-auto pb-2 pt-1">
+            {selectedFiles.map((file, idx) => (
+              <div key={idx} style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                borderRadius: '0.5rem',
+                padding: '0.4rem 0.6rem',
+                fontSize: '0.8rem',
+                flexShrink: 0,
+                background: profile?.funMode ?
+                  profile?.darkMode ? 'rgba(236, 72, 153, 0.3)' : 'linear-gradient(to right, #fce7f3, #fae8ff)' :
+                  profile?.darkMode ? '#374151' : '#e5e7eb',
+                color: profile?.darkMode ? '#e5e7eb' : '#374151'
+              }}>
+                <FileText className="w-3.5 h-3.5 flex-shrink-0" />
+                <span style={{ maxWidth: '130px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{file.name}</span>
+                <button onClick={() => removeFile(idx)} style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
         <div className="flex gap-2 items-center">
           <input
           ref={fileInputRef}
@@ -320,7 +308,7 @@ const ChatInputArea = memo(({ profile, selectedFiles, removeFile, fileInputRef, 
       }
       </div>
     </div>
-  </>
+  </div>
 );
 
 
@@ -946,7 +934,7 @@ export default function Chat() {
         </DialogContent>
       </Dialog>
 
-      <div className="px-4 flex-1 overflow-y-auto" style={{ paddingTop: '5rem', paddingBottom: 'calc(12rem + env(safe-area-inset-bottom))' }}>
+      <div className="px-4 flex-1 overflow-y-auto" style={{ paddingTop: '5rem', paddingBottom: 'calc(9rem + env(safe-area-inset-bottom))' }}>
         <div className="max-w-4xl mx-auto space-y-4 py-4">
           {showWelcome ?
           <div className="flex flex-col items-center justify-center h-full">
