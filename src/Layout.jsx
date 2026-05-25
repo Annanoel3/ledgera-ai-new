@@ -450,12 +450,12 @@ export default function Layout({ children }) {
         }
 
         {/* Main Content */}
-        <div className={isChat ? "" : "md:pl-64 flex flex-col flex-1"} style={{
+        <div className={isChat ? "flex flex-col flex-1" : "md:pl-64 flex flex-col flex-1"} style={{
           backgroundColor: darkMode ? '#0f0f0f' : '#ffffff',
-          paddingBottom: isChat ? '0' : '5rem',
+          paddingBottom: isChat ? 'calc(3.75rem + env(safe-area-inset-bottom))' : '5rem',
           paddingTop: isCalendar ? '0' : 'auto'
         }}>
-          <main className={isChat ? "" : "flex-1"}>
+          <main className="flex-1">
             {children}
           </main>
         </div>

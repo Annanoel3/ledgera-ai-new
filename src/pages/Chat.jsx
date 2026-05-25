@@ -761,10 +761,8 @@ export default function Chat() {
 
   return (
     <div
-      className="flex flex-col"
+      className="flex flex-col h-full"
       style={{
-        height: '100dvh',
-        overflow: 'hidden',
         background: profile?.funMode ?
         profile?.darkMode ?
         'linear-gradient(to bottom right, rgba(236, 72, 153, 0.1), rgba(168, 85, 247, 0.1), rgba(59, 130, 246, 0.1))' :
@@ -954,8 +952,8 @@ export default function Chat() {
         </DialogContent>
       </Dialog>
 
-      <div className="px-4 overflow-y-auto" style={{ paddingTop: '5rem', height: 'calc(100dvh - 5rem - env(safe-area-inset-bottom))' }}>
-        <div className="max-w-4xl mx-auto space-y-4 py-4" style={{ paddingBottom: '160px' }}>
+      <div className="flex-1 overflow-y-auto px-4">
+        <div className="max-w-4xl mx-auto space-y-4 py-4" style={{ paddingTop: '5rem' }}>
           {showWelcome ?
           <div className="flex flex-col items-center justify-center h-full">
               <div className="w-full max-w-2xl">
@@ -1182,46 +1180,20 @@ export default function Chat() {
         </div>
       </div>
 
-      {/* Fixed input bar — on mobile sits above the bottom nav (~65px); on desktop at very bottom */}
-      <div
-        className="fixed left-0 right-0 z-50 hidden md:block"
-        style={{ bottom: 0 }}
-      >
-        <ChatInputArea
-          profile={profile}
-          selectedFiles={selectedFiles}
-          removeFile={removeFile}
-          fileInputRef={fileInputRef}
-          handleFileSelect={handleFileSelect}
-          input={input}
-          setInput={setInput}
-          isRecording={isRecording}
-          stopRecording={stopRecording}
-          startRecording={startRecording}
-          handleSend={handleSend}
-          sendingMessage={sendingMessage}
-          uploadingFile={uploadingFile} />
-      </div>
-
-      <div
-        className="fixed left-0 right-0 z-50 md:hidden"
-        style={{ bottom: 'calc(var(--mobile-nav-height, 100px) + env(safe-area-inset-bottom))' }}
-      >
-        <ChatInputArea
-          profile={profile}
-          selectedFiles={selectedFiles}
-          removeFile={removeFile}
-          fileInputRef={fileInputRef}
-          handleFileSelect={handleFileSelect}
-          input={input}
-          setInput={setInput}
-          isRecording={isRecording}
-          stopRecording={stopRecording}
-          startRecording={startRecording}
-          handleSend={handleSend}
-          sendingMessage={sendingMessage}
-          uploadingFile={uploadingFile} />
-      </div>
+      <ChatInputArea
+        profile={profile}
+        selectedFiles={selectedFiles}
+        removeFile={removeFile}
+        fileInputRef={fileInputRef}
+        handleFileSelect={handleFileSelect}
+        input={input}
+        setInput={setInput}
+        isRecording={isRecording}
+        stopRecording={stopRecording}
+        startRecording={startRecording}
+        handleSend={handleSend}
+        sendingMessage={sendingMessage}
+        uploadingFile={uploadingFile} />
 
     </div>);
 
