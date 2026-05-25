@@ -322,8 +322,7 @@ export default function Chat() {
   const [showCapabilities, setShowCapabilities] = useState(false);
   const [sendingMessage, setSendingMessage] = useState(false);
   const [pendingDuplicates, setPendingDuplicates] = useState([]);
-  const [lastUploadedFileUrls, setLastUploadedFileUrls] = useState([]);
-  const fileUrlFollowUpCount = useRef(0);
+  const [lastFileUrls, setLastFileUrls] = useState([]);
   const fileInputRef = useRef(null);
   const messagesEndRef = useRef(null);
   const queryClient = useQueryClient();
@@ -459,8 +458,7 @@ export default function Chat() {
           fileNames.push(file.name);
         }
         toast.success(`Uploaded ${selectedFiles.length} file(s)`);
-        setLastUploadedFileUrls(fileUrls); // remember for vision context
-        fileUrlFollowUpCount.current = 0;
+        setLastFileUrls(fileUrls); // remember for next send
       } catch (error) {
         toast.error("Failed to upload files");
         setUploadingFile(false);
@@ -583,8 +581,11 @@ export default function Chat() {
         const response = await processChat({
           message: finalMessage,
           conversationId: conversationId || null,
-          fileUrls: fileUrls // always pass the just-uploaded URLs for vision
+          fileUrls: fileUrls // pass the just-uploaded URLs for vision
         });
+        
+        // Clear file URLs after use
+        setLastFileUrls([]);
 
         if (response.data.error) {
           throw new Error(response.data.error);
@@ -626,22 +627,17 @@ export default function Chat() {
       setMessages((prev) => [...prev, newUserMessage]);
 
       setSendingMessage(true);
-      // Re-attach file URLs for up to 3 follow-up messages so AI can still see the image
-      let pendingFileUrls;
-      if (lastUploadedFileUrls.length > 0) {
-        pendingFileUrls = lastUploadedFileUrls;
-        fileUrlFollowUpCount.current += 1;
-        if (fileUrlFollowUpCount.current >= 3) {
-          setLastUploadedFileUrls([]);
-          fileUrlFollowUpCount.current = 0;
-        }
-      }
       try {
         const response = await processChat({
           message: message,
           conversationId: conversationId || null,
-          fileUrls: pendingFileUrls
+          fileUrls: lastFileUrls.length > 0 ? lastFileUrls : undefined
         });
+        
+        // Clear file URLs after use
+        if (lastFileUrls.length > 0) {
+          setLastFileUrls([]);
+        }
 
         if (response.data.error) {
           throw new Error(response.data.error);
