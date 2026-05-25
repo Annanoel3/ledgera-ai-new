@@ -953,8 +953,8 @@ export default function Chat() {
         </DialogContent>
       </Dialog>
 
-      <div className="px-4 overflow-y-auto" style={{ paddingTop: '5rem', height: 'calc(100dvh - 5rem - 150px - env(safe-area-inset-bottom))' }}>
-        <div className="max-w-4xl mx-auto space-y-4 py-4">
+      <div className="px-4 flex-1 overflow-y-auto" style={{ paddingTop: '5rem' }}>
+        <div className="max-w-4xl mx-auto space-y-4 py-4" style={{ paddingBottom: '200px' }}>
           {showWelcome ?
           <div className="flex flex-col items-center justify-center h-full">
               <div className="w-full max-w-2xl">
