@@ -323,6 +323,7 @@ export default function Chat() {
   const [sendingMessage, setSendingMessage] = useState(false);
   const [pendingDuplicates, setPendingDuplicates] = useState([]);
   const [lastUploadedFileUrls, setLastUploadedFileUrls] = useState([]);
+  const fileUrlFollowUpCount = useRef(0);
   const fileInputRef = useRef(null);
   const messagesEndRef = useRef(null);
   const queryClient = useQueryClient();
@@ -459,6 +460,7 @@ export default function Chat() {
         }
         toast.success(`Uploaded ${selectedFiles.length} file(s)`);
         setLastUploadedFileUrls(fileUrls); // remember for vision context
+        fileUrlFollowUpCount.current = 0;
       } catch (error) {
         toast.error("Failed to upload files");
         setUploadingFile(false);
@@ -624,9 +626,16 @@ export default function Chat() {
       setMessages((prev) => [...prev, newUserMessage]);
 
       setSendingMessage(true);
-      // If there are recently uploaded files still in context, re-attach them for vision
-      const pendingFileUrls = lastUploadedFileUrls.length > 0 ? lastUploadedFileUrls : undefined;
-      if (pendingFileUrls) setLastUploadedFileUrls([]); // consume them
+      // Re-attach file URLs for up to 3 follow-up messages so AI can still see the image
+      let pendingFileUrls;
+      if (lastUploadedFileUrls.length > 0) {
+        pendingFileUrls = lastUploadedFileUrls;
+        fileUrlFollowUpCount.current += 1;
+        if (fileUrlFollowUpCount.current >= 3) {
+          setLastUploadedFileUrls([]);
+          fileUrlFollowUpCount.current = 0;
+        }
+      }
       try {
         const response = await processChat({
           message: message,
@@ -1176,7 +1185,7 @@ export default function Chat() {
       {/* Fixed input bar — sits just above the bottom nav on mobile */}
       <div
         className="fixed left-0 right-0 z-40 md:static md:bottom-auto"
-        style={{ bottom: 'calc(4rem + env(safe-area-inset-bottom))' }}
+        style={{ bottom: 0 }}
       >
         <ChatInputArea
           profile={profile}
