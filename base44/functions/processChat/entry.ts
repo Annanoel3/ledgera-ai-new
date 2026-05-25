@@ -951,8 +951,12 @@ TAX PREPARATION: Proactively help users categorize expenses correctly for tax pu
             .map(msg => {
                 // Strip tool_calls from assistant messages to keep storage lean
                 const { tool_calls, ...rest } = msg;
-                // Convert multimodal content arrays to plain text
-                if (rest.content && typeof rest.content !== 'string') {
+                // Keep multimodal content arrays (images) intact for user messages, convert assistant to text
+                if (rest.role === 'user' && Array.isArray(rest.content)) {
+                    // Keep the full multimodal array for user messages with images
+                    return rest;
+                } else if (rest.content && typeof rest.content !== 'string') {
+                    // Convert other multimodal content to plain text
                     const textParts = Array.isArray(rest.content)
                         ? rest.content.filter(p => p.type === 'text').map(p => p.text).join('\n')
                         : String(rest.content);
