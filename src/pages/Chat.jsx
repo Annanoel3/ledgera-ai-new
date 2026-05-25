@@ -172,7 +172,7 @@ const ChatInputArea = memo(({ profile, selectedFiles, removeFile, fileInputRef, 
     'linear-gradient(to right, #fce7f3, #faf5ff, #eff6ff)' :
     profile?.darkMode ? '#1a1a1a' : '#f9fafb'
   }}>
-      <div className="max-w-4xl mx-auto w-full px-3 pt-2 pb-2">
+      <div className="max-w-4xl mx-auto w-full px-3 pt-2" style={{ paddingBottom: 'calc(0.5rem + env(safe-area-inset-bottom))' }}>
         {/* File preview strip — lives inside the same bar */}
         {selectedFiles.length > 0 && (
           <div className="flex gap-2 overflow-x-auto pb-2 pt-1">
@@ -742,7 +742,8 @@ export default function Chat() {
     <div
       className="flex flex-col overflow-hidden"
       style={{
-        height: 'calc(100vh - 4rem - env(safe-area-inset-bottom))',
+        height: '100dvh',
+        paddingBottom: 'calc(4rem + env(safe-area-inset-bottom))',
         background: profile?.funMode ?
         profile?.darkMode ?
         'linear-gradient(to bottom right, rgba(236, 72, 153, 0.1), rgba(168, 85, 247, 0.1), rgba(59, 130, 246, 0.1))' :
