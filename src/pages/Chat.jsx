@@ -394,28 +394,23 @@ export default function Chat() {
     initialData: []
   });
 
+  // On initial load only: auto-select the latest conversation
+  const initialLoadDone = useRef(false);
   useEffect(() => {
-    if (conversations && conversations.length > 0 && !conversationId) {
+    if (!initialLoadDone.current && conversations && conversations.length > 0 && !conversationId) {
+      initialLoadDone.current = true;
       const latestConv = conversations[0];
       setConversationId(latestConv.id);
       setMessages(latestConv.messages || []);
     }
-  }, [conversations, conversationId]);
-
-  useEffect(() => {
-    if (conversationId && conversations && !sendingMessage && !backgroundProcessing) {
-      const conv = conversations.find((c) => c.id === conversationId);
-      if (conv && conv.messages) {
-        setMessages(conv.messages);
-      }
-    }
-  }, [conversationId, conversations, sendingMessage, backgroundProcessing]);
+  }, [conversations]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, backgroundProcessing]);
 
   const handleNewChat = () => {
+    initialLoadDone.current = true; // prevent auto-reselect
     setConversationId(null);
     setMessages([]);
     setShowChatList(false);
@@ -603,7 +598,12 @@ export default function Chat() {
           setPendingDuplicates([]);
         }
 
-        await refetchConversations();
+        const updated = await refetchConversations();
+        const updatedConvId = response.data.conversationId || conversationId;
+        if (updated?.data && updatedConvId) {
+          const conv = updated.data.find((c) => c.id === updatedConvId);
+          if (conv?.messages) setMessages(conv.messages);
+        }
       } catch (error) {
         console.error('Chat error:', error);
         toast.error("Failed to send message: " + (error.response?.data?.error || error.message));
@@ -645,7 +645,12 @@ export default function Chat() {
           setPendingDuplicates([]);
         }
 
-        await refetchConversations();
+        const updatedText = await refetchConversations();
+        const updatedConvIdText = response.data.conversationId || conversationId;
+        if (updatedText?.data && updatedConvIdText) {
+          const conv = updatedText.data.find((c) => c.id === updatedConvIdText);
+          if (conv?.messages) setMessages(conv.messages);
+        }
       } catch (error) {
         console.error('Chat error:', error);
         console.error('Error response:', error.response?.data);
@@ -820,7 +825,7 @@ export default function Chat() {
                         <Button
                       variant="ghost"
                       size="icon"
-                      className="opacity-0 group-hover:opacity-100 transition-opacity h-8 w-8"
+                      className="opacity-100 h-8 w-8 flex-shrink-0"
                       onClick={(e) => handleDeleteConversation(conv.id, e)}
                       style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>
 
