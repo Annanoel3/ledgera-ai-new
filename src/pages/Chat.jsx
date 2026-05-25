@@ -743,7 +743,7 @@ export default function Chat() {
       className="flex flex-col overflow-hidden"
       style={{
         height: '100dvh',
-        paddingBottom: 'calc(4rem + env(safe-area-inset-bottom))',
+        paddingBottom: '0',
         background: profile?.funMode ?
         profile?.darkMode ?
         'linear-gradient(to bottom right, rgba(236, 72, 153, 0.1), rgba(168, 85, 247, 0.1), rgba(59, 130, 246, 0.1))' :
@@ -933,7 +933,7 @@ export default function Chat() {
         </DialogContent>
       </Dialog>
 
-      <div className="px-4 flex-1 overflow-y-auto" style={{ paddingTop: '5rem', paddingBottom: '1rem' }}>
+      <div className="px-4 flex-1 overflow-y-auto" style={{ paddingTop: '5rem', paddingBottom: 'calc(10rem + env(safe-area-inset-bottom))' }}>
         <div className="max-w-4xl mx-auto space-y-4 py-4">
           {showWelcome ?
           <div className="flex flex-col items-center justify-center h-full">
@@ -1160,20 +1160,26 @@ export default function Chat() {
         </div>
       </div>
 
-      <ChatInputArea
-        profile={profile}
-        selectedFiles={selectedFiles}
-        removeFile={removeFile}
-        fileInputRef={fileInputRef}
-        handleFileSelect={handleFileSelect}
-        input={input}
-        setInput={setInput}
-        isRecording={isRecording}
-        stopRecording={stopRecording}
-        startRecording={startRecording}
-        handleSend={handleSend}
-        sendingMessage={sendingMessage}
-        uploadingFile={uploadingFile} />
+      {/* Fixed input bar — sits above the bottom nav on mobile, natural flow on desktop */}
+      <div
+        className="fixed left-0 right-0 z-40 md:static md:bottom-auto"
+        style={{ bottom: 'calc(4rem + env(safe-area-inset-bottom))' }}
+      >
+        <ChatInputArea
+          profile={profile}
+          selectedFiles={selectedFiles}
+          removeFile={removeFile}
+          fileInputRef={fileInputRef}
+          handleFileSelect={handleFileSelect}
+          input={input}
+          setInput={setInput}
+          isRecording={isRecording}
+          stopRecording={stopRecording}
+          startRecording={startRecording}
+          handleSend={handleSend}
+          sendingMessage={sendingMessage}
+          uploadingFile={uploadingFile} />
+      </div>
 
     </div>);
 
