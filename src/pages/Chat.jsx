@@ -1182,25 +1182,11 @@ export default function Chat() {
         </div>
       </div>
 
-      {/* Fixed input bar — sits above the bottom nav on mobile (nav is ~56px) */}
-      <div className="fixed left-0 right-0 z-40 md:hidden" style={{ bottom: '56px' }}>
-        <ChatInputArea
-          profile={profile}
-          selectedFiles={selectedFiles}
-          removeFile={removeFile}
-          fileInputRef={fileInputRef}
-          handleFileSelect={handleFileSelect}
-          input={input}
-          setInput={setInput}
-          isRecording={isRecording}
-          stopRecording={stopRecording}
-          startRecording={startRecording}
-          handleSend={handleSend}
-          sendingMessage={sendingMessage}
-          uploadingFile={uploadingFile} />
-      </div>
-      {/* Desktop: input bar at very bottom */}
-      <div className="hidden md:block fixed left-0 right-0 z-40" style={{ bottom: 0 }}>
+      {/* Fixed input bar — on mobile sits above the bottom nav; on desktop at the very bottom */}
+      <div
+        className="fixed left-0 right-0 z-40 md:bottom-0"
+        style={{ bottom: 'calc(65px + env(safe-area-inset-bottom, 0px))' }}
+      >
         <ChatInputArea
           profile={profile}
           selectedFiles={selectedFiles}
