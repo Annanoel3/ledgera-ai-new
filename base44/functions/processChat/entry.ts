@@ -945,17 +945,21 @@ TAX PREPARATION: Proactively help users categorize expenses correctly for tax pu
             messages.push(responseMessage);
         }
 
-        // Sanitize messages before saving — multimodal content (arrays) must be stringified
-        const messagesForDB = messages.map(msg => {
-            if (msg.content && typeof msg.content !== 'string') {
-                // Convert array content to plain text for storage
-                const textParts = Array.isArray(msg.content)
-                    ? msg.content.filter(p => p.type === 'text').map(p => p.text).join('\n')
-                    : String(msg.content);
-                return { ...msg, content: textParts || '[image]' };
-            }
-            return msg;
-        });
+        // Sanitize messages before saving — only keep user/assistant messages, drop tool call noise
+        const messagesForDB = messages
+            .filter(msg => msg.role === 'user' || msg.role === 'assistant')
+            .map(msg => {
+                // Strip tool_calls from assistant messages to keep storage lean
+                const { tool_calls, ...rest } = msg;
+                // Convert multimodal content arrays to plain text
+                if (rest.content && typeof rest.content !== 'string') {
+                    const textParts = Array.isArray(rest.content)
+                        ? rest.content.filter(p => p.type === 'text').map(p => p.text).join('\n')
+                        : String(rest.content);
+                    return { ...rest, content: textParts || '[image]' };
+                }
+                return rest;
+            });
 
         // Update conversation
         await base44.entities.Conversation.update(conversation.id, {
