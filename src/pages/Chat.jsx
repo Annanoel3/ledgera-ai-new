@@ -741,8 +741,8 @@ export default function Chat() {
   return (
     <div
       className="flex flex-col overflow-hidden"
-      style={{ height: 'calc(100vh - 4rem - env(safe-area-inset-bottom))' }}
       style={{
+        height: 'calc(100vh - 4rem - env(safe-area-inset-bottom))',
         background: profile?.funMode ?
         profile?.darkMode ?
         'linear-gradient(to bottom right, rgba(236, 72, 153, 0.1), rgba(168, 85, 247, 0.1), rgba(59, 130, 246, 0.1))' :

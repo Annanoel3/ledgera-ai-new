@@ -915,9 +915,21 @@ TAX PREPARATION: Proactively help users categorize expenses correctly for tax pu
             messages.push(responseMessage);
         }
 
+        // Sanitize messages before saving — multimodal content (arrays) must be stringified
+        const messagesForDB = messages.map(msg => {
+            if (msg.content && typeof msg.content !== 'string') {
+                // Convert array content to plain text for storage
+                const textParts = Array.isArray(msg.content)
+                    ? msg.content.filter(p => p.type === 'text').map(p => p.text).join('\n')
+                    : String(msg.content);
+                return { ...msg, content: textParts || '[image]' };
+            }
+            return msg;
+        });
+
         // Update conversation
         await base44.entities.Conversation.update(conversation.id, {
-            messages: messages,
+            messages: messagesForDB,
             name: conversation.name || message.substring(0, 50)
         });
 
