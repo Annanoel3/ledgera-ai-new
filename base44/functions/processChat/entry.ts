@@ -895,7 +895,8 @@ TAX PREPARATION: Proactively help users categorize expenses correctly for tax pu
                 ...cleanedMessages
             ],
             tools: tools,
-            tool_choice: "auto"
+            tool_choice: "auto",
+            max_tokens: 4096
         });
 
         console.log('OpenAI response received');
@@ -936,7 +937,8 @@ TAX PREPARATION: Proactively help users categorize expenses correctly for tax pu
                     ...cleanedMessagesForNextCall
                 ],
                 tools: tools,
-                tool_choice: "auto"
+                tool_choice: "auto",
+                max_tokens: 4096
             });
 
             responseMessage = completion.choices[0].message;
