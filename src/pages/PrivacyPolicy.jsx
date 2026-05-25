@@ -137,26 +137,45 @@ export default function PrivacyPolicy() {
               </a>
               , including the Limited Use requirements. Ledgera AI does not use Google user data for any purpose that violates these restrictions.
             </p>
+
+            <div className="bg-blue-50 border border-blue-200 rounded-md px-4 py-3">
+              <p className="font-semibold text-blue-900 mb-1">Sole Purpose Statement</p>
+              <p className="text-blue-800">
+                Google user data accessed by Ledgera AI is used <strong>solely to provide and improve the in-app calendar sync feature</strong> — a core part of the app's functionality. We do not use Google data for any secondary purpose, advertising, profiling, or any purpose unrelated to directly serving you within the app.
+              </p>
+            </div>
+
             <div>
               <p className="font-semibold text-gray-900 mb-1">What we access</p>
-              <p>Google Calendar events (read and write) — solely to enable the optional calendar sync feature.</p>
+              <p>Google Calendar events (read and write) — solely to enable the optional calendar sync feature within Ledgera AI.</p>
             </div>
             <div>
-              <p className="font-semibold text-gray-900 mb-1">How we use it</p>
-              <p>Only to display your Google Calendar events within the app and to sync Ledgera events to your Google Calendar when you explicitly initiate it.</p>
+              <p className="font-semibold text-gray-900 mb-1">How we use it — and only how</p>
+              <p>Google Calendar data is used exclusively to: (1) display your Google Calendar events inside the Ledgera AI app, and (2) sync Ledgera AI events to your Google Calendar when you explicitly request it. This data is never used for any other purpose.</p>
             </div>
             <div>
               <p className="font-semibold text-gray-900 mb-1">What we do NOT do with Google data</p>
               <ul className="list-disc list-inside space-y-1">
-                <li>Sell or share it with third parties</li>
-                <li>Use it for advertising or marketing</li>
+                <li>Sell, rent, or share it with any third parties</li>
+                <li>Use it for advertising, retargeting, or marketing of any kind</li>
                 <li>Use it to train AI or machine learning models</li>
-                <li>Use it for any purpose unrelated to the calendar feature</li>
+                <li>Transfer it to any other app or service</li>
+                <li>Use it for any purpose unrelated to providing the in-app calendar feature</li>
+              </ul>
+            </div>
+            <div>
+              <p className="font-semibold text-gray-900 mb-1">Data Protection for Google Data</p>
+              <p className="mb-2">Google user data is protected by the same mechanisms described in section 1a of this Privacy Policy, including:</p>
+              <ul className="list-disc list-inside space-y-1">
+                <li><strong>TLS/HTTPS encryption in transit</strong> — all Google API calls are made over encrypted connections</li>
+                <li><strong>No persistent storage</strong> — Google Calendar data is fetched in real time and is not stored in our database</li>
+                <li><strong>Minimal scope</strong> — we request only the Google Calendar scopes strictly necessary for the sync feature</li>
+                <li><strong>Session-bound tokens</strong> — OAuth access tokens are stored securely and never exposed to other users</li>
               </ul>
             </div>
             <div>
               <p className="font-semibold text-gray-900 mb-1">Your control</p>
-              <p>The Google Calendar integration is entirely optional. You can connect or disconnect at any time from within the Calendar section of the app.</p>
+              <p>The Google Calendar integration is entirely optional. You can connect or disconnect at any time from within the Calendar section of the app. Disconnecting immediately revokes our access to your Google data.</p>
             </div>
             <p className="text-sm text-gray-500 border-t border-gray-100 pt-3">
               Questions? Contact us at{" "}
