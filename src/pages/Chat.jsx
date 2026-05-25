@@ -1184,7 +1184,7 @@ export default function Chat() {
 
       {/* Fixed input bar — on mobile sits above the bottom nav (~65px); on desktop at very bottom */}
       <div
-        className="fixed left-0 right-0 z-40 hidden md:block"
+        className="fixed left-0 right-0 z-50 hidden md:block"
         style={{ bottom: 0 }}
       >
         <ChatInputArea
@@ -1204,7 +1204,7 @@ export default function Chat() {
       </div>
 
       <div
-        className="fixed left-0 right-0 z-40 md:hidden"
+        className="fixed left-0 right-0 z-50 md:hidden"
         style={{ bottom: '65px' }}
       >
         <ChatInputArea
