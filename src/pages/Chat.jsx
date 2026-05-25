@@ -473,7 +473,7 @@ export default function Chat() {
       };
       setMessages((prev) => [...prev, optimisticUserMsg]);
       setInput("");
-      setSelectedFiles([]);
+      setSelectedFiles([]); // Clear after optimistic message is shown
 
       setBackgroundProcessing(true);
 

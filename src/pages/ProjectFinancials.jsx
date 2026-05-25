@@ -27,6 +27,8 @@ import { toast } from "sonner";
 import RecurringSubscriptionModal from "@/components/projects/RecurringSubscriptionModal";
 import ExpenseRow from "@/components/projects/ExpenseRow";
 import { useWindowSize } from "@/hooks/useWindowSize";
+import { usePullToRefresh } from "@/hooks/usePullToRefresh";
+import { Loader2 as RefreshLoader } from "lucide-react";
 
 export default function ProjectFinancials() {
    const navigate = useNavigate();
@@ -255,6 +257,17 @@ export default function ProjectFinancials() {
     setShowRecurringModal(true);
   };
 
+  const handleRefresh = async () => {
+    await Promise.all([
+      queryClient.invalidateQueries(['project', projectId]),
+      queryClient.invalidateQueries(['incomeItems', projectId]),
+      queryClient.invalidateQueries(['expenseItems', projectId]),
+      queryClient.invalidateQueries(['projects']),
+    ]);
+  };
+
+  const { refreshing, pullDistance } = usePullToRefresh(handleRefresh);
+
   const handleConfirmRecurring = (settings) => {
     convertToRecurringMutation.mutate({
       expenseId: selectedExpense.id,
@@ -332,6 +345,14 @@ export default function ProjectFinancials() {
 
   return (
     <div className="p-6 md:p-8 pb-24 md:pb-8 min-h-screen" style={{ backgroundColor: profile?.darkMode ? '#0f0f0f' : '#f9fafb' }}>
+      {/* Pull to refresh indicator */}
+      {(pullDistance > 0 || refreshing) && (
+        <div className="fixed top-0 left-0 right-0 flex justify-center z-50 pointer-events-none" style={{ paddingTop: Math.min(pullDistance / 2, 40) + 'px' }}>
+          <div className="rounded-full p-2 shadow-md" style={{ backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff' }}>
+            <RefreshLoader className={`w-5 h-5 ${refreshing ? 'animate-spin' : ''}`} style={{ color: '#22A699', transform: refreshing ? '' : `rotate(${pullDistance * 2}deg)` }} />
+          </div>
+        </div>
+      )}
       <div className="max-w-6xl mx-auto">
         <div className="mb-8">
           <Button
