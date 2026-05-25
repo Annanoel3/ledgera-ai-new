@@ -24,6 +24,29 @@ export default function MessageBubble({ message, profile, hideAvatar = false }) 
             )}
             <div className={cn("max-w-[80%]", isUser && "flex flex-col items-end")}>
                 {/* File attachments */}
+                {/* Multimodal content (loaded from conversation with images) */}
+                {isUser && Array.isArray(message.content) && (
+                    <div className="flex flex-col gap-1.5 mb-1.5 items-end">
+                        {message.content.map((part, idx) => {
+                            if (part.type === 'image_url' && part.image_url?.url) {
+                                return (
+                                    <img
+                                        key={idx}
+                                        src={part.image_url.url}
+                                        alt="attachment"
+                                        className="rounded-xl max-w-[200px] max-h-[200px] object-cover shadow-sm border"
+                                        style={{ borderColor: darkMode ? '#374151' : '#e5e7eb' }}
+                                    />
+                                );
+                            } else if (part.type === 'text' && part.text) {
+                                // Render text part of multimodal message
+                                return null; // Text will be rendered in the message bubble below
+                            }
+                            return null;
+                        })}
+                    </div>
+                )}
+                {/* File attachments from optimistic/draft messages */}
                 {isUser && message._fileUrls?.length > 0 && (
                     <div className="flex flex-col gap-1.5 mb-1.5 items-end">
                         {message._fileUrls.map((url, idx) => {
@@ -68,7 +91,12 @@ export default function MessageBubble({ message, profile, hideAvatar = false }) 
                                         : "bg-white border border-gray-200 text-gray-900"
                     )}>
                         {isUser ? (
-                            <p style={{ fontSize: '15px', lineHeight: '1.4' }} className="whitespace-pre-wrap">{message.content}</p>
+                            // Extract text from multimodal content
+                            <p style={{ fontSize: '15px', lineHeight: '1.4' }} className="whitespace-pre-wrap">
+                                {Array.isArray(message.content) 
+                                    ? message.content.filter(p => p.type === 'text').map(p => p.text).join('\n')
+                                    : message.content}
+                            </p>
                         ) : (
                             <ReactMarkdown 
                                 className="prose prose-sm max-w-none [&>*:first-child]:mt-0 [&>*:last-child]:mb-0"
@@ -116,7 +144,7 @@ export default function MessageBubble({ message, profile, hideAvatar = false }) 
                                     ),
                                 }}
                             >
-                                {message.content}
+                                {typeof message.content === 'string' ? message.content : ''}
                             </ReactMarkdown>
                         )}
                     </div>
