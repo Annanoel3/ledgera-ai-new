@@ -1205,7 +1205,7 @@ export default function Chat() {
 
       <div
         className="fixed left-0 right-0 z-50 md:hidden"
-        style={{ bottom: 'calc(100px + env(safe-area-inset-bottom))' }}
+        style={{ bottom: 'calc(var(--mobile-nav-height, 100px) + env(safe-area-inset-bottom))' }}
       >
         <ChatInputArea
           profile={profile}

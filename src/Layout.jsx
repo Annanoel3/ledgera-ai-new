@@ -462,7 +462,11 @@ export default function Layout({ children }) {
 
         {/* Chat Page Bottom Navigation */}
         {isChat &&
-        <div className="mobile-bottom-nav fixed bottom-0 left-0 right-0 md:hidden z-50 flex items-center justify-around border-t" style={{
+        <div ref={(el) => {
+          if (el) {
+            document.documentElement.style.setProperty('--mobile-nav-height', `${el.offsetHeight}px`);
+          }
+        }} className="mobile-bottom-nav fixed bottom-0 left-0 right-0 md:hidden z-50 flex items-center justify-around border-t" style={{
           backgroundColor: darkMode ? '#1a1a1a' : '#ffffff',
           borderColor: darkMode ? '#374151' : '#e5e7eb'
         }}>
