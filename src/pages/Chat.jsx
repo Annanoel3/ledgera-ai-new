@@ -1182,10 +1182,14 @@ export default function Chat() {
         </div>
       </div>
 
+      <style>{`
+        #chat-input-bar { bottom: calc(65px + env(safe-area-inset-bottom, 0px)); }
+        @media (min-width: 768px) { #chat-input-bar { bottom: 0; } }
+      `}</style>
       {/* Fixed input bar — on mobile sits above the bottom nav; on desktop at the very bottom */}
       <div
-        className="fixed left-0 right-0 z-40 md:bottom-0"
-        style={{ bottom: 'calc(65px + env(safe-area-inset-bottom, 0px))' }}
+        id="chat-input-bar"
+        className="fixed left-0 right-0 z-40"
       >
         <ChatInputArea
           profile={profile}
