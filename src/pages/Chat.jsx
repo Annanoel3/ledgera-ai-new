@@ -308,7 +308,6 @@ const ChatInputArea = memo(({ profile, selectedFiles, removeFile, fileInputRef, 
       }
       </div>
     </div>
-  </div>
 );
 
 
