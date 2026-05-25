@@ -764,7 +764,6 @@ export default function Chat() {
       className="flex flex-col overflow-hidden"
       style={{
         height: '100dvh',
-        paddingBottom: 'calc(130px + env(safe-area-inset-bottom))',
         background: profile?.funMode ?
         profile?.darkMode ?
         'linear-gradient(to bottom right, rgba(236, 72, 153, 0.1), rgba(168, 85, 247, 0.1), rgba(59, 130, 246, 0.1))' :
@@ -954,7 +953,7 @@ export default function Chat() {
         </DialogContent>
       </Dialog>
 
-      <div className="px-4 flex-1 overflow-y-auto" style={{ paddingTop: '5rem', paddingBottom: 0 }}>
+      <div className="px-4 flex-1 overflow-y-auto" style={{ paddingTop: '5rem', paddingBottom: 'calc(150px + env(safe-area-inset-bottom))' }}>
         <div className="max-w-4xl mx-auto space-y-4 py-4">
           {showWelcome ?
           <div className="flex flex-col items-center justify-center h-full">
