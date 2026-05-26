@@ -13,7 +13,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
 import QuickEditItem from "../components/dashboard/QuickEditItem";
-import toast from "react-hot-toast"; // Assuming react-hot-toast for toast notifications
+import toast from "react-hot-toast";
+import { deleteExpenseItem } from "@/functions/deleteExpenseItem";
+import { deleteIncomeItem } from "@/functions/deleteIncomeItem";
 
 export default function Dashboard() {
   const queryClient = useQueryClient();
@@ -119,7 +121,7 @@ export default function Dashboard() {
   });
 
   const deleteIncomeMutation = useMutation({
-    mutationFn: (id) => base44.entities.IncomeItem.delete(id),
+    mutationFn: (id) => deleteIncomeItem({ itemId: id }),
     onSuccess: () => {
       queryClient.invalidateQueries(['incomeItems']);
       queryClient.invalidateQueries(['projects']);
@@ -128,7 +130,7 @@ export default function Dashboard() {
   });
 
   const deleteExpenseMutation = useMutation({
-    mutationFn: (id) => base44.entities.ExpenseItem.delete(id),
+    mutationFn: (id) => deleteExpenseItem({ itemId: id }),
     onSuccess: () => {
       queryClient.invalidateQueries(['expenseItems']);
       queryClient.invalidateQueries(['projects']);
@@ -140,10 +142,10 @@ export default function Dashboard() {
     mutationFn: async ({ id, fromType, toType, data }) => {
       // Delete from old type
       if (fromType === 'income') {
-        await base44.entities.IncomeItem.delete(id);
+        await deleteIncomeItem({ itemId: id });
         return await base44.entities.ExpenseItem.create(data);
       } else {
-        await base44.entities.ExpenseItem.delete(id);
+        await deleteExpenseItem({ itemId: id });
         return await base44.entities.IncomeItem.create(data);
       }
     },
