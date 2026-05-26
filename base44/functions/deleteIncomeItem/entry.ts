@@ -13,7 +13,16 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'itemId is required' }, { status: 400 });
     }
 
-    await base44.asServiceRole.entities.IncomeItem.delete(itemId);
+    try {
+      await base44.entities.IncomeItem.delete(itemId);
+    } catch (deleteError) {
+      // If item doesn't exist, treat as success (already deleted)
+      if (deleteError.message && deleteError.message.includes('not found')) {
+        return Response.json({ success: true });
+      }
+      throw deleteError;
+    }
+
     return Response.json({ success: true });
   } catch (error) {
     return Response.json({ error: error.message }, { status: 500 });
