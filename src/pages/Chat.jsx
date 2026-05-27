@@ -758,7 +758,7 @@ export default function Chat() {
 
   return (
     <div
-      className="flex flex-col h-full"
+      className="h-full flex flex-col overflow-hidden"
       style={{
         background: profile?.funMode ?
         profile?.darkMode ?
@@ -931,7 +931,7 @@ export default function Chat() {
             <div>
               <h3 className="font-semibold text-lg mb-2 flex items-center gap-2" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>
                 💬 Natural Conversation
-              </h3>
+      s        </h3>
               <ul className="list-disc space-y-1 ml-4 text-sm" style={{ color: profile?.darkMode ? '#d1d5db' : '#374151' }}>
                 <li>Ask questions in plain English</li>
                 <li>Get advice and insights</li>
@@ -949,7 +949,7 @@ export default function Chat() {
         </DialogContent>
       </Dialog>
 
-      <div className="flex-1 overflow-y-auto px-4">
+      <div className="flex-1 min-h-0 overflow-y-auto px-4">
         <div className="max-w-4xl mx-auto space-y-4 py-4" style={{ paddingTop: '5rem' }}>
           {showWelcome ?
           <div className="flex flex-col items-center justify-center h-full">
