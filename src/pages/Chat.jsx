@@ -715,18 +715,11 @@ export default function Chat() {
       setMicActive(false);
 
       const { recordDataBase64, mimeType } = result.value;
-      const dataUrl = `data:${mimeType};base64,${recordDataBase64}`;
 
       toast.info("Transcribing...");
 
-      // Convert dataUrl to a File for upload
-      const res = await fetch(dataUrl);
-      const blob = await res.blob();
-      const ext = mimeType.includes('aac') ? 'm4a' : 'webm';
-      const file = new File([blob], `recording.${ext}`, { type: mimeType });
-
-      const uploadResponse = await base44.integrations.Core.UploadFile({ file });
-      const response = await speechToText({ file_url: uploadResponse.file_url });
+      // Send base64 directly to backend — avoids MIME/container issues when uploading
+      const response = await speechToText({ audio_base64: recordDataBase64, mime_type: mimeType });
 
       if (response.data.text) {
         toast.success("Transcription complete!");
