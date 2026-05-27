@@ -766,17 +766,18 @@ Deno.serve(async (req) => {
         }
 
         // Add user message — support vision if fileUrls provided
-        if (fileUrls && fileUrls.length > 0) {
+        const fileUrlsArray = Array.isArray(fileUrls) ? fileUrls : (fileUrls ? [fileUrls] : []);
+        if (fileUrlsArray.length > 0) {
             const contentParts = [];
             if (message) {
                 contentParts.push({ type: 'text', text: message });
             }
-            for (const url of fileUrls) {
+            for (const url of fileUrlsArray) {
                 contentParts.push({ type: 'image_url', image_url: { url, detail: 'high' } });
             }
             messages.push({ role: 'user', content: contentParts });
         } else {
-            messages.push({ role: 'user', content: message });
+            messages.push({ role: 'user', content: message || '' });
         }
 
         // Get user profile for context
