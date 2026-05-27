@@ -719,7 +719,7 @@ export default function Chat() {
       toast.info("Transcribing...");
 
       // Send base64 directly to backend — avoids MIME/container issues when uploading
-      const response = await speechToText({ audio_base64: recordDataBase64, mime_type: mimeType });
+      const response = await speechToText({ audio_base64: recordDataBase64, filename: 'audio.m4a' });
 
       if (response.data.text) {
         toast.success("Transcription complete!");
