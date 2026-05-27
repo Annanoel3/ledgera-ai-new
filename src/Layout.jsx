@@ -452,7 +452,7 @@ export default function Layout({ children }) {
         {/* Main Content */}
         <div className={isChat ? "flex flex-col flex-1 min-h-0" : "md:pl-64 flex flex-col flex-1"} style={{
           backgroundColor: darkMode ? '#0f0f0f' : '#ffffff',
-          paddingBottom: isChat ? 'calc(6rem + env(safe-area-inset-bottom))' : '5rem',
+          paddingBottom: isChat ? 'calc(4rem + env(safe-area-inset-bottom))' : '5rem',
           paddingTop: isCalendar ? '0' : 'auto'
         }}>
           <main className={isChat ? "flex-1 min-h-0 overflow-hidden" : "flex-1"}>
