@@ -43,9 +43,25 @@ Deno.serve(async (req) => {
 
         const openai = new OpenAI({ apiKey });
 
+        // Detect file extension from URL and set correct MIME type
+        const urlPath = fileUrl.split('?')[0];
+        const ext = urlPath.split('.').pop()?.toLowerCase() || 'webm';
+        const mimeMap = {
+            'm4a': 'audio/mp4',
+            'mp4': 'audio/mp4',
+            'mp3': 'audio/mpeg',
+            'webm': 'audio/webm',
+            'ogg': 'audio/ogg',
+            'oga': 'audio/ogg',
+            'wav': 'audio/wav',
+            'flac': 'audio/flac',
+        };
+        const mimeType = mimeMap[ext] || 'audio/webm';
+        console.log('🎵 Detected audio format:', ext, 'MIME:', mimeType);
+
         // Convert blob to File for OpenAI
-        const file = new File([audioBlob], 'recording.webm', { 
-            type: 'audio/webm' 
+        const file = new File([audioBlob], `recording.${ext}`, { 
+            type: mimeType
         });
 
         console.log('🔄 Sending to OpenAI Whisper API...');
