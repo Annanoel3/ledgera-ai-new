@@ -766,15 +766,7 @@ export default function Chat() {
   }
 
   return (
-    <div
-      className="h-full flex flex-col overflow-hidden"
-      style={{
-        background: profile?.funMode ?
-        profile?.darkMode ?
-        'linear-gradient(to bottom right, rgba(236, 72, 153, 0.1), rgba(168, 85, 247, 0.1), rgba(59, 130, 246, 0.1))' :
-        'linear-gradient(to bottom right, #fdf2f8, #faf5ff, #eff6ff)' :
-        profile?.darkMode ? '#0f0f0f' : 'linear-gradient(to bottom, #f9fafb, #f3f4f6)'
-      }}>
+    <div style={{ position: 'fixed', inset: 0, display: 'flex', flexDirection: 'column', backgroundColor: profile?.darkMode ? '#0f0f0f' : '#f9fafb' }}>
 
       <ChatHeader profile={profile} showChatList={showChatList} setShowChatList={setShowChatList} handleNewChat={handleNewChat} setShowCapabilities={setShowCapabilities} />
 
