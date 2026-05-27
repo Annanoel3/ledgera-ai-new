@@ -83,7 +83,7 @@ export default function Layout({ children }) {
   }, [darkMode]);
 
   const currentPath = location.pathname;
-  const isChat = currentPath === createPageUrl("Chat");
+  const isChat = currentPath.toLowerCase() === createPageUrl("Chat");
   const isCalendar = currentPath === "/Calendar";
 
   const primaryColor = funMode ? '#FF6B9D' : '#22A699';
