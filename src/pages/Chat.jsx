@@ -688,19 +688,38 @@ export default function Chat() {
     }
   };
 
+  const mediaRecorderRef = useRef(null);
+  const audioChunksRef = useRef([]);
+
   const startRecording = async () => {
     try {
-      const { value: hasPermission } = await VoiceRecorder.hasAudioRecordingPermission();
-      if (!hasPermission) {
-        const { value: granted } = await VoiceRecorder.requestAudioRecordingPermission();
-        if (!granted) {
-          toast.error("Microphone permission denied.");
-          return;
+      // Use browser MediaRecorder (webm/opus) — universally supported on Android WebView
+      // and produces a proper container format that Whisper accepts
+      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
+          ? 'audio/webm;codecs=opus'
+          : MediaRecorder.isTypeSupported('audio/webm')
+          ? 'audio/webm'
+          : 'audio/ogg';
+        const recorder = new MediaRecorder(stream, { mimeType });
+        audioChunksRef.current = [];
+        recorder.ondataavailable = (e) => { if (e.data.size > 0) audioChunksRef.current.push(e.data); };
+        recorder.start();
+        mediaRecorderRef.current = recorder;
+        setIsRecording(true);
+        setMicActive(true);
+      } else {
+        // Fallback to Capacitor on native where getUserMedia may not be available
+        const { value: hasPermission } = await VoiceRecorder.hasAudioRecordingPermission();
+        if (!hasPermission) {
+          const { value: granted } = await VoiceRecorder.requestAudioRecordingPermission();
+          if (!granted) { toast.error("Microphone permission denied."); return; }
         }
+        await VoiceRecorder.startRecording();
+        setIsRecording(true);
+        setMicActive(true);
       }
-      await VoiceRecorder.startRecording();
-      setIsRecording(true);
-      setMicActive(true);
     } catch (error) {
       console.error('Recording error:', error);
       toast.error("Could not start recording. Please try again.");
@@ -709,26 +728,52 @@ export default function Chat() {
 
   const stopRecording = async () => {
     if (!isRecording) return;
+    setIsRecording(false);
+    setMicActive(false);
+
     try {
-      const result = await VoiceRecorder.stopRecording();
-      setIsRecording(false);
-      setMicActive(false);
+      if (mediaRecorderRef.current) {
+        // Browser MediaRecorder path
+        const recorder = mediaRecorderRef.current;
+        mediaRecorderRef.current = null;
 
-      const { recordDataBase64, mimeType } = result.value;
+        await new Promise((resolve) => {
+          recorder.onstop = resolve;
+          recorder.stop();
+          recorder.stream.getTracks().forEach(t => t.stop());
+        });
 
-      toast.info("Transcribing...");
+        const blob = new Blob(audioChunksRef.current, { type: recorder.mimeType });
+        audioChunksRef.current = [];
 
-      // Send base64 directly to backend — avoids MIME/container issues when uploading
-      const response = await speechToText({ audio_base64: recordDataBase64, filename: 'audio.m4a' });
+        toast.info("Transcribing...");
 
-      if (response.data.text) {
-        toast.success("Transcription complete!");
-        setInput(response.data.text);
+        // Convert blob to base64
+        const arrayBuffer = await blob.arrayBuffer();
+        const bytes = new Uint8Array(arrayBuffer);
+        let binary = '';
+        for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]);
+        const base64 = btoa(binary);
+        const ext = recorder.mimeType.includes('ogg') ? 'ogg' : 'webm';
+
+        const response = await speechToText({ audio_base64: base64, filename: `audio.${ext}` });
+        if (response.data.text) {
+          toast.success("Transcription complete!");
+          setInput(response.data.text);
+        }
+      } else {
+        // Capacitor fallback path
+        const result = await VoiceRecorder.stopRecording();
+        const { recordDataBase64 } = result.value;
+        toast.info("Transcribing...");
+        const response = await speechToText({ audio_base64: recordDataBase64, filename: 'audio.m4a' });
+        if (response.data.text) {
+          toast.success("Transcription complete!");
+          setInput(response.data.text);
+        }
       }
     } catch (error) {
       console.error('Stop recording error:', error);
-      setIsRecording(false);
-      setMicActive(false);
       toast.error("Could not process recording. Please try again.");
     }
   };
