@@ -13,7 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
 import QuickEditItem from "../components/dashboard/QuickEditItem";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 import { deleteExpenseItem } from "@/functions/deleteExpenseItem";
 import { deleteIncomeItem } from "@/functions/deleteIncomeItem";
 
