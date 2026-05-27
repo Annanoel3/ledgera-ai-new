@@ -354,7 +354,7 @@ Return JSON with an array of transactions.`;
                 const transactionData = {
                     projectId: assignedProject.id,
                     amount: parsedAmount,
-                    date: item.date || new Date().toISOString().split('T')[0],
+                    date: ((item.date || new Date().toISOString().split('T')[0]).split('T')[0]) + 'T12:00:00',
                     notes: item.description || item.vendor || `From ${item.fileName}`
                 };
 
