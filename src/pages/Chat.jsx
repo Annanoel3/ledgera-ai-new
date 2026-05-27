@@ -610,7 +610,12 @@ export default function Chat() {
         if (aiReply) {
           setMessages((prev) => [...prev, { role: 'assistant', content: aiReply }]);
         }
-        await refetchConversations();
+        const { data: updatedConvs } = await refetchConversations();
+        // Sync messages from DB so they persist across navigation
+        const savedConv = updatedConvs?.find(c => c.id === (response.data.conversationId || conversationId));
+        if (savedConv?.messages) {
+          setMessages(savedConv.messages.filter(m => m.role === 'user' || m.role === 'assistant'));
+        }
       } catch (error) {
         console.error('Chat error:', error);
         toast.error("Failed to send message: " + (error.response?.data?.error || error.message));
@@ -660,7 +665,12 @@ export default function Chat() {
         if (aiReplyText) {
           setMessages((prev) => [...prev, { role: 'assistant', content: aiReplyText }]);
         }
-        await refetchConversations();
+        const { data: updatedConvs } = await refetchConversations();
+        // Sync messages from DB so they persist across navigation
+        const savedConv = updatedConvs?.find(c => c.id === (response.data.conversationId || conversationId));
+        if (savedConv?.messages) {
+          setMessages(savedConv.messages.filter(m => m.role === 'user' || m.role === 'assistant'));
+        }
       } catch (error) {
         console.error('Chat error:', error);
         console.error('Error response:', error.response?.data);
