@@ -754,7 +754,7 @@ export default function Chat() {
 
   if (userLoading) {
     return (
-      <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: '64px', display: 'flex', flexDirection: 'column', backgroundColor: profile?.darkMode ? '#0f0f0f' : '#f9fafb' }}>
+      <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 'var(--mobile-nav-height, 64px)', display: 'flex', flexDirection: 'column', backgroundColor: profile?.darkMode ? '#0f0f0f' : '#f9fafb' }}>
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center">
             <Loader2 className="w-8 h-8 animate-spin text-[#22A699] mx-auto mb-3" />
@@ -766,7 +766,7 @@ export default function Chat() {
   }
 
   return (
-    <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: '64px', display: 'flex', flexDirection: 'column', backgroundColor: profile?.darkMode ? '#0f0f0f' : '#f9fafb' }}>
+    <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 'var(--mobile-nav-height, 64px)', display: 'flex', flexDirection: 'column', backgroundColor: profile?.darkMode ? '#0f0f0f' : '#f9fafb' }}>
 
       <ChatHeader profile={profile} showChatList={showChatList} setShowChatList={setShowChatList} handleNewChat={handleNewChat} setShowCapabilities={setShowCapabilities} />
 
