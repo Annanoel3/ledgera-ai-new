@@ -81,6 +81,15 @@ export default function Layout({ children }) {
       document.body.style.backgroundColor = '#ffffff';
     }
   }, [darkMode]);
+  // Set --app-height CSS variable to actual window.innerHeight for cross-browser reliability (iOS Safari fix)
+  useEffect(() => {
+    const setAppHeight = () => {
+      document.documentElement.style.setProperty('--app-height', `${window.innerHeight}px`);
+    };
+    setAppHeight();
+    window.addEventListener('resize', setAppHeight);
+    return () => window.removeEventListener('resize', setAppHeight);
+  }, []);
 
   const currentPath = location.pathname;
   const isChat = currentPath.toLowerCase() === createPageUrl("Chat");
@@ -146,7 +155,7 @@ export default function Layout({ children }) {
         }
       `}</style>
       
-      <div style={{ backgroundColor: darkMode ? '#0f0f0f' : '#ffffff', ...(isChat ? { height: '100dvh', display: 'flex', flexDirection: 'column', overflow: 'hidden' } : { minHeight: '100vh' }) }}>
+      <div style={{ backgroundColor: darkMode ? '#0f0f0f' : '#ffffff', ...(isChat ? { height: 'var(--app-height, 100dvh)', display: 'flex', flexDirection: 'column', overflow: 'hidden' } : { minHeight: '100vh' }) }}>
         {/* Desktop Sidebar - hide on Chat page */}
         {!isChat &&
         <aside className="hidden md:fixed md:inset-y-0 md:flex md:w-64 md:flex-col" style={{ backgroundColor: darkMode ? '#1a1a1a' : '#ffffff' }}>
