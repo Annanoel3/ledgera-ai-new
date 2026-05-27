@@ -146,7 +146,7 @@ export default function Layout({ children }) {
         }
       `}</style>
       
-      <div style={{ backgroundColor: darkMode ? '#0f0f0f' : '#ffffff', minHeight: '100vh' }}>
+      <div style={{ backgroundColor: darkMode ? '#0f0f0f' : '#ffffff', ...(isChat ? { height: '100dvh', display: 'flex', flexDirection: 'column', overflow: 'hidden' } : { minHeight: '100vh' }) }}>
         {/* Desktop Sidebar - hide on Chat page */}
         {!isChat &&
         <aside className="hidden md:fixed md:inset-y-0 md:flex md:w-64 md:flex-col" style={{ backgroundColor: darkMode ? '#1a1a1a' : '#ffffff' }}>
@@ -450,12 +450,12 @@ export default function Layout({ children }) {
         }
 
         {/* Main Content */}
-        <div className={isChat ? "flex flex-col flex-1" : "md:pl-64 flex flex-col flex-1"} style={{
+        <div className={isChat ? "flex flex-col flex-1 min-h-0" : "md:pl-64 flex flex-col flex-1"} style={{
           backgroundColor: darkMode ? '#0f0f0f' : '#ffffff',
           paddingBottom: isChat ? 'calc(6rem + env(safe-area-inset-bottom))' : '5rem',
           paddingTop: isCalendar ? '0' : 'auto'
         }}>
-          <main className="flex-1">
+          <main className={isChat ? "flex-1 min-h-0 overflow-hidden" : "flex-1"}>
             {children}
           </main>
         </div>
