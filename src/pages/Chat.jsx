@@ -930,7 +930,7 @@ export default function Chat() {
             <div>
               <h3 className="font-semibold text-lg mb-2 flex items-center gap-2" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>
                 💬 Natural Conversation
-      s        </h3>
+              </h3>
               <ul className="list-disc space-y-1 ml-4 text-sm" style={{ color: profile?.darkMode ? '#d1d5db' : '#374151' }}>
                 <li>Ask questions in plain English</li>
                 <li>Get advice and insights</li>
@@ -1125,6 +1125,40 @@ export default function Chat() {
                 return <MessageBubble key={idx} message={item} profile={profile} />;
               });
             })()}
+
+              {sendingMessage &&
+            <div className="flex gap-3 justify-start" key="ai-typing">
+                  <div style={{
+                height: '2rem',
+                width: '2rem',
+                borderRadius: '9999px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
+                background: profile?.funMode ?
+                'linear-gradient(135deg, #f472b6, #a855f7)' :
+                'linear-gradient(135deg, #22A699, #1d8d82)'
+              }}>
+                    <span style={{ color: '#ffffff', fontWeight: '600', fontSize: '0.875rem' }}>
+                      {profile?.funMode ? "💰" : "LA"}
+                    </span>
+                  </div>
+                  <div style={{
+                maxWidth: '85%',
+                borderRadius: '1rem',
+                padding: '0.75rem 1rem',
+                border: profile?.darkMode ? '1px solid #374151' : '1px solid #e5e7eb',
+                background: profile?.darkMode ? '#1f2937' : '#ffffff'
+              }}>
+                    <div className="flex items-center gap-2">
+                      <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#22A699', display: 'inline-block', animation: 'bounce 1s infinite 0s' }} />
+                      <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#22A699', display: 'inline-block', animation: 'bounce 1s infinite 0.2s' }} />
+                      <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#22A699', display: 'inline-block', animation: 'bounce 1s infinite 0.4s' }} />
+                    </div>
+                  </div>
+                </div>
+            }
 
               {backgroundProcessing &&
             <div className="flex gap-3 justify-start" key="bg-processing">
