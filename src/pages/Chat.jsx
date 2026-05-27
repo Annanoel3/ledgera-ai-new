@@ -570,10 +570,10 @@ export default function Chat() {
       if (userMessageText) {
         finalMessage = userMessageText;
         if (processingSummaryMessage) {
-          finalMessage += `\n\n[System: ${processingSummaryMessage.trim()}]`;
+          finalMessage += `\n\n[System: ${processingSummaryMessage.trim()} NOTE: This image was already processed for expense/income extraction. Do NOT call create_expense or create_income again for this upload.]`;
         }
       } else {
-        finalMessage = processingSummaryMessage ? `[System: ${processingSummaryMessage.trim()}]` : "I uploaded some files.";
+        finalMessage = processingSummaryMessage ? `[System: ${processingSummaryMessage.trim()} NOTE: This image was already processed for expense/income extraction. Do NOT call create_expense or create_income again for this upload.]` : (fileUrls.length > 0 ? "[System: Files were uploaded and processed. Do NOT create expense or income entries from these images.]" : "I uploaded some files.");
       }
 
       setSendingMessage(true);
@@ -581,8 +581,7 @@ export default function Chat() {
         const response = await processChat({
           message: finalMessage,
           conversationId: conversationId || null,
-          // fileUrls intentionally omitted: processFinancialData already extracted expenses from the image above.
-          // Passing fileUrls here would cause GPT-4o to re-process the image and create duplicate entries.
+          fileUrls: fileUrls.length > 0 ? fileUrls : undefined,
         });
         
         // Clear file URLs after use
