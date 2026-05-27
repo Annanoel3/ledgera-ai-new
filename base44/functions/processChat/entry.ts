@@ -925,7 +925,7 @@ Be conversational, ask clarifying questions, and wait for explicit user intent b
         // Update conversation
         await base44.entities.Conversation.update(conversation.id, {
             messages: messagesForDB,
-            name: conversation.name || message.substring(0, 50)
+            name: conversation.name || (message || '').substring(0, 50)
         });
 
         console.log('Conversation updated successfully');
