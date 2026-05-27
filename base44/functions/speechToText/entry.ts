@@ -26,12 +26,13 @@ Deno.serve(async (req) => {
             const rawMime = (body.mime_type || 'audio/mp4').toLowerCase();
 
             // Map MIME to Whisper-compatible extension
-            // iOS Capacitor records as audio/aac (raw AAC) — send as .mp4 container (Whisper handles it)
+            // Send raw AAC as .m4a — Whisper's REST API accepts it when labeled as m4a
             if (rawMime.includes('webm')) ext = 'webm';
             else if (rawMime.includes('mp3') || rawMime.includes('mpeg')) ext = 'mp3';
             else if (rawMime.includes('wav')) ext = 'wav';
             else if (rawMime.includes('ogg')) ext = 'ogg';
-            else ext = 'mp4'; // covers aac, m4a, mp4
+            else if (rawMime.includes('aac')) ext = 'm4a'; // raw AAC → label as m4a for Whisper
+            else ext = 'mp4';
 
             // Decode base64 to bytes
             const base64 = body.audio_base64.replace(/^data:[^;]+;base64,/, '');
@@ -68,6 +69,7 @@ Deno.serve(async (req) => {
                          ext === 'mp3'  ? 'audio/mpeg' :
                          ext === 'wav'  ? 'audio/wav'  :
                          ext === 'ogg'  ? 'audio/ogg'  :
+                         ext === 'm4a'  ? 'audio/mp4'  :
                          'audio/mp4';
 
         const formData = new FormData();
