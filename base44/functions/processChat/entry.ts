@@ -758,7 +758,7 @@ Deno.serve(async (req) => {
             conversation = await base44.entities.Conversation.create({
                 userEmail: user.email,
                 messages: [],
-                name: message.substring(0, 50),
+                name: (message || '').substring(0, 50),
                 createdAt: new Date().toISOString()
             });
             messages = [];
