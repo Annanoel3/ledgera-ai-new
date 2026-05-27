@@ -754,7 +754,7 @@ export default function Chat() {
 
   if (userLoading) {
     return (
-      <div className="h-full flex flex-col overflow-hidden" style={{ backgroundColor: profile?.darkMode ? '#0f0f0f' : '#f9fafb' }}>
+      <div style={{ position: 'fixed', inset: 0, display: 'flex', flexDirection: 'column', backgroundColor: profile?.darkMode ? '#0f0f0f' : '#f9fafb' }}>
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center">
             <Loader2 className="w-8 h-8 animate-spin text-[#22A699] mx-auto mb-3" />
