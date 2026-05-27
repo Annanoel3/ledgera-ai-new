@@ -1,4 +1,4 @@
-simport React, { useState, useEffect, useRef, memo, useCallback } from "react";
+import React, { useState, useEffect, useRef, memo, useCallback } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -580,7 +580,7 @@ export default function Chat() {
       try {
         const response = await processChat({
           message: finalMessage,
-          conversationId: conversationId || null
+          conversationId: conversationId || null,
           // fileUrls intentionally omitted: processFinancialData already extracted expenses from the image above.
           // Passing fileUrls here would cause GPT-4o to re-process the image and create duplicate entries.
         });
