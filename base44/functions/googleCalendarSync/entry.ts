@@ -22,13 +22,12 @@ Deno.serve(async (req) => {
     console.log(`[SYNC] Action: ${action}, User: ${user.email}`);
 
     if (action === 'check') {
-      // Just verify we can get the access token and make a simple API call
-      try {
-        await fetch('https://www.googleapis.com/calendar/v3/calendars/primary', { headers: authHeader });
-        return Response.json({ success: true, connected: true });
-      } catch {
+      // Verify the token is valid by making an actual API call and checking the status
+      const checkRes = await fetch('https://www.googleapis.com/calendar/v3/calendars/primary', { headers: authHeader });
+      if (!checkRes.ok) {
         return Response.json({ success: false, connected: false }, { status: 400 });
       }
+      return Response.json({ success: true, connected: true });
     }
 
     if (action === 'import') {

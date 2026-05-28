@@ -203,6 +203,8 @@ export default function Calendar() {
   const handleDisconnectGoogle = async () => {
     try {
       await base44.connectors.disconnectAppUser("6a04df00e62b57f635e00b0f");
+      // Remove cached result and force a fresh check
+      queryClient.removeQueries(["googleCalendarConnected"]);
       queryClient.invalidateQueries(["googleCalendarConnected"]);
       toast.success("Google Calendar disconnected");
     } catch (err) {
