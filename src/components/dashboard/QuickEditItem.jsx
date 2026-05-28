@@ -183,7 +183,7 @@ export default function QuickEditItem({ item, type, projects, onUpdate, onDelete
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <Label>Amount</Label>
+              <Label style={{ color: profile?.darkMode ? '#d1d5db' : '#111827' }}>Amount</Label>
               <Input
                 type="number"
                 value={editData.amount}
@@ -191,7 +191,7 @@ export default function QuickEditItem({ item, type, projects, onUpdate, onDelete
               />
             </div>
             <div>
-              <Label>Date</Label>
+              <Label style={{ color: profile?.darkMode ? '#d1d5db' : '#111827' }}>Date</Label>
               <Input
                 type="date"
                 value={editData.date}
@@ -199,7 +199,7 @@ export default function QuickEditItem({ item, type, projects, onUpdate, onDelete
               />
             </div>
             <div>
-              <Label>Description</Label>
+              <Label style={{ color: profile?.darkMode ? '#d1d5db' : '#111827' }}>Description</Label>
               <Input
                 value={editData.notes || ''}
                 onChange={(e) => setEditData({...editData, notes: e.target.value})}
@@ -207,7 +207,7 @@ export default function QuickEditItem({ item, type, projects, onUpdate, onDelete
             </div>
             {type === 'expense' && (
               <div>
-                <Label>Vendor</Label>
+                <Label style={{ color: profile?.darkMode ? '#d1d5db' : '#111827' }}>Vendor</Label>
                 <Input
                   value={editData.vendor || ''}
                   onChange={(e) => setEditData({...editData, vendor: e.target.value})}
