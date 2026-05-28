@@ -12,11 +12,12 @@ import { FileText, Search, ExternalLink, Loader2, FolderOpen, Trash2, ChevronLef
 import { format } from "date-fns";
 import { Link, useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
+import { useYear } from "@/lib/YearContext";
 
 export default function Documents() {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
-  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear().toString());
+  const { selectedYear, setSelectedYear } = useYear();
   const queryClient = useQueryClient();
 
   const handleRefresh = useCallback(async () => {

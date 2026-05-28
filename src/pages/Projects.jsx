@@ -9,6 +9,7 @@ import { Plus, Search, Folder, ArrowRight, Loader2, ChevronLeft } from "lucide-r
 import { Link, useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { startOfYear, endOfYear, startOfMonth, endOfMonth } from "date-fns";
+import { useYear } from "@/lib/YearContext";
 import {
   Dialog,
   DialogContent,
@@ -23,7 +24,7 @@ export default function Projects() {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("all");
-  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear().toString());
+  const { selectedYear, setSelectedYear } = useYear();
   const [selectedMonth, setSelectedMonth] = useState("all");
   const [showNewDialog, setShowNewDialog] = useState(false);
   const [newProjectTitle, setNewProjectTitle] = useState("");

@@ -16,10 +16,11 @@ import QuickEditItem from "../components/dashboard/QuickEditItem";
 import { toast } from "sonner";
 import { deleteExpenseItem } from "@/functions/deleteExpenseItem";
 import { deleteIncomeItem } from "@/functions/deleteIncomeItem";
+import { useYear } from "@/lib/YearContext";
 
 export default function Dashboard() {
   const queryClient = useQueryClient();
-  const [selectedYear, setSelectedYear] = React.useState(new Date().getFullYear().toString());
+  const { selectedYear, setSelectedYear } = useYear();
   const [selectedMonth, setSelectedMonth] = React.useState('all');
   const [recentActivityOpen, setRecentActivityOpen] = React.useState(false);
 

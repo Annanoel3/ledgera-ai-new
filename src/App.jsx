@@ -12,6 +12,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { setupIframeMessaging } from './lib/iframe-messaging';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
+import { YearProvider } from '@/lib/YearContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import Terms from './pages/Terms';
@@ -119,30 +120,32 @@ function App() {
 
   return (
     <AuthProvider>
-      <QueryClientProvider client={queryClientInstance}>
-        <Router>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/PrivacyPolicy" element={<PrivacyPolicy />} />
-            <Route path="/Terms" element={<Terms />} />
-            <Route path="/GoogleDataPolicy" element={<GoogleDataPolicy />} />
-            <Route
-              path="*"
-              element={
-                <>
-                  <NavigationTracker />
-                  <Routes>
-                    <Route path="/ProjectFinancials" element={<LayoutWrapper currentPageName="ProjectFinancials"><ProjectFinancials /></LayoutWrapper>} />
-                    <Route path="*" element={<AuthenticatedApp />} />
-                  </Routes>
-                  <Toaster />
-                  <VisualEditAgent />
-                </>
-              }
-            />
-          </Routes>
-        </Router>
-      </QueryClientProvider>
+      <YearProvider>
+        <QueryClientProvider client={queryClientInstance}>
+          <Router>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/PrivacyPolicy" element={<PrivacyPolicy />} />
+              <Route path="/Terms" element={<Terms />} />
+              <Route path="/GoogleDataPolicy" element={<GoogleDataPolicy />} />
+              <Route
+                path="*"
+                element={
+                  <>
+                    <NavigationTracker />
+                    <Routes>
+                      <Route path="/ProjectFinancials" element={<LayoutWrapper currentPageName="ProjectFinancials"><ProjectFinancials /></LayoutWrapper>} />
+                      <Route path="*" element={<AuthenticatedApp />} />
+                    </Routes>
+                    <Toaster />
+                    <VisualEditAgent />
+                  </>
+                }
+              />
+            </Routes>
+          </Router>
+        </QueryClientProvider>
+      </YearProvider>
     </AuthProvider>
   )
 }

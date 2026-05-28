@@ -9,6 +9,7 @@ import { Download, Loader2, ChevronRight, RotateCcw, Trash2, ChevronLeft } from 
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { startOfYear, endOfYear, startOfMonth, endOfMonth, format } from "date-fns";
+import { useYear } from "@/lib/YearContext";
 import {
   Table,
   TableBody,
@@ -29,9 +30,8 @@ import {
 
 export default function Reports() {
   const navigate = useNavigate();
-  const initialYear = new Date().getFullYear().toString();
+  const { selectedYear, setSelectedYear } = useYear();
   const initialMonth = "all";
-  const [selectedYear, setSelectedYear] = useState(initialYear);
   const [selectedMonth, setSelectedMonth] = useState(initialMonth);
   const [activeTab, setActiveTab] = useState("income");
   const [selectedProjectId, setSelectedProjectId] = useState("all");
@@ -376,7 +376,7 @@ export default function Reports() {
   };
 
   const handleResetFilters = () => {
-    setSelectedYear(initialYear);
+    setSelectedYear(new Date().getFullYear().toString());
     setSelectedMonth(initialMonth);
     setSelectedProjectId("all");
     setActiveTab("income");
