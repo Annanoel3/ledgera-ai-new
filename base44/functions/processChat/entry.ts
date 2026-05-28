@@ -330,7 +330,7 @@ function cleanMessagesForOpenAI(messages) {
     // Keep only the last 40 messages to avoid context bloat
     const trimmed = messages.slice(-40);
 
-    return trimmed.map(msg => {
+    return trimmed.map((msg, i) => {
         const cleaned = { ...msg };
         
         // Remove empty tool_calls arrays
@@ -343,14 +343,15 @@ function cleanMessagesForOpenAI(messages) {
             cleaned.content = 'Function executed successfully';
         }
 
-        // Normalize array content — only user messages with image_url parts are valid multimodal
-        // All other array content (e.g. stale stored arrays) must be flattened to a string
+        // Normalize array content — only the LATEST user message with images is valid multimodal.
+        // Strip image_url parts from all older messages to prevent context bleed across uploads.
         if (Array.isArray(cleaned.content)) {
+            const isLastMessage = i === trimmed.length - 1;
             const hasImagePart = cleaned.content.some(p => p.type === 'image_url');
-            if (cleaned.role === 'user' && hasImagePart) {
-                // Valid vision message — leave as-is
+            if (cleaned.role === 'user' && hasImagePart && isLastMessage) {
+                // Latest vision message — leave as-is
             } else {
-                // Flatten to plain text
+                // Flatten to plain text only (strip images from older messages)
                 cleaned.content = cleaned.content
                     .filter(p => p.type === 'text')
                     .map(p => p.text)
