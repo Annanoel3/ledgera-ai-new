@@ -155,7 +155,7 @@ CRITICAL CLASSIFICATION RULES:
 - Invoices where THEY paid you = INCOME
 
 For EACH transaction found, return:
-- date: The transaction date in YYYY-MM-DD format (if not clear, use today's date: ${new Date().toISOString().split('T')[0]})
+- date: The transaction date in YYYY-MM-DD format. READ THE DATE DIRECTLY FROM THE DOCUMENT - look for any date printed on the receipt, invoice, or statement. Only if there is absolutely no date visible, use: ${new Date().toLocaleDateString('en-CA')})
 - amount: The dollar amount as a number (e.g., 150.00, not "$150" or "150 dollars")
 - vendor: Who was paid or who paid (company/person name)
 - description: What was this for (service provided, item purchased, etc.)
@@ -167,7 +167,7 @@ IMPORTANT RULES:
 1. Extract EVERY amount you see - don't skip anything.
 2. If you see multiple line items, extract each one separately.
 3. PAY EXTREME ATTENTION TO THE CRITICAL CLASSIFICATION RULES FOR 'type'.
-4. If you can't find a date, use today's date: ${new Date().toISOString().split('T')[0]}
+4. If you can't find a date in the document, use: ${new Date().toLocaleDateString('en-CA')}
 5. Return at least one transaction even if partial information.
 
 User's additional context: "${userMessage}"

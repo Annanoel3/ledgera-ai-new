@@ -509,63 +509,6 @@ async function executeTool(toolName, args, base44, userEmail) {
                     created_by: userEmail
                 });
                 
-                // Intelligently detect recurring patterns
-                const recurringKeywords = ['subscription', 'monthly', 'yearly', 'recurring', 'claude', 'chatgpt', 'gpt', 'openai', 'adobe', 'figma', 'slack', 'github', 'netlify', 'aws', 'stripe', 'base44', 'netflix', 'spotify', 'hulu', 'canva', 'notion', 'linear', 'copilot'];
-                const description = (args.vendor || args.notes || "").toLowerCase();
-                const isLikelyRecurring = recurringKeywords.some(keyword => description.includes(keyword));
-                
-                if (isLikelyRecurring) {
-                    try {
-                        // Check if there are other expenses from this vendor in the past
-                        const allExpenses = await base44.entities.ExpenseItem.filter({ projectId: args.projectId, created_by: userEmail });
-                        const sameVendorExpenses = allExpenses.filter(e => e.vendor && e.vendor.toLowerCase() === (args.vendor || "").toLowerCase());
-                        
-                        // If multiple expenses from same vendor exist, it's definitely recurring
-                        if (sameVendorExpenses.length >= 2) {
-                            // Calculate average amount and frequency
-                            const amounts = sameVendorExpenses.map(e => e.amount);
-                            const avgAmount = amounts.reduce((a, b) => a + b, 0) / amounts.length;
-                            const dates = sameVendorExpenses.map(e => new Date(e.date).getTime()).sort((a, b) => b - a);
-                            
-                            // Estimate frequency from date gaps
-                            let frequency = "monthly";
-                            if (dates.length >= 2) {
-                                const daysBetween = (dates[0] - dates[1]) / (1000 * 60 * 60 * 24);
-                                if (daysBetween > 300) frequency = "yearly";
-                                else if (daysBetween > 20 && daysBetween < 35) frequency = "monthly";
-                                else if (daysBetween > 5 && daysBetween < 10) frequency = "weekly";
-                            }
-                            
-                            await base44.entities.RecurringSubscription.create({
-                                projectId: args.projectId,
-                                name: args.vendor || "Subscription",
-                                amount: Math.round(avgAmount * 100) / 100,
-                                frequency: frequency,
-                                startDate: sameVendorExpenses[sameVendorExpenses.length - 1].date,
-                                category: args.category || "subscriptions",
-                                notes: `Auto-detected recurring from ${sameVendorExpenses.length + 1} transactions`,
-                                active: true,
-                                created_by: userEmail
-                            });
-                        } else if (sameVendorExpenses.length === 1) {
-                            // Single prior expense + this one = likely recurring, assume monthly
-                            const avgAmount = (sameVendorExpenses[0].amount + args.amount) / 2;
-                            await base44.entities.RecurringSubscription.create({
-                                projectId: args.projectId,
-                                name: args.vendor || "Subscription",
-                                amount: Math.round(avgAmount * 100) / 100,
-                                frequency: "monthly",
-                                startDate: sameVendorExpenses[0].date,
-                                category: args.category || "subscriptions",
-                                notes: `Auto-detected recurring subscription`,
-                                active: true,
-                                created_by: userEmail
-                            });
-                        }
-                    } catch (error) {
-                        console.log('Could not create recurring subscription:', error.message);
-                    }
-                }
                 
                 // Update project totals
                 await updateProjectTotals(base44, args.projectId, userEmail);
