@@ -305,7 +305,7 @@ const tools = [
         type: "function",
         function: {
             name: "create_recurring_expense",
-            description: "Creates a recurring subscription/expense that repeats at a set interval. Use this when user requests a subscription or recurring expense.",
+            description: "Creates a recurring subscription/expense that repeats at a set interval. ONLY call this when the user has EXPLICITLY asked to create a recurring subscription or convert an existing expense to recurring. NEVER call this automatically based on vendor name or patterns.",
             parameters: {
                 type: "object",
                 properties: {
@@ -793,6 +793,12 @@ FILE PROCESSING (RECEIPTS & EXPENSE IMAGES):
 - For category: infer from the merchant type (e.g., gas station = travel, restaurant = other or marketing if client meal, office supply store = supplies)
 - Do NOT infer missing amounts or dates — ask the user if illegible
 - Treat [System: ...] notes as context only — the actual user request is the text before that
+
+RECURRING SUBSCRIPTIONS (STRICT):
+- NEVER create a recurring subscription automatically, even if the vendor name sounds like a subscription service
+- Only create a recurring subscription when the user EXPLICITLY says they want one (e.g. "set this up as recurring", "I pay this every month", "add a recurring subscription")
+- When a user asks to convert an existing expense to recurring, ask them: the frequency (monthly/yearly/weekly), the start date, and whether they'd like it scheduled through a specific end date
+- Do NOT suggest or nudge the user to create recurring subscriptions unprompted
 
 DELETION & UPDATES:
 - Always list specific items being affected (date, amount, vendor/description) before deleting
