@@ -121,7 +121,7 @@ Deno.serve(async (req) => {
                 'cost of', 'expense to', 'spent on', 'total paid', 'amount due'
             ];
             
-            // STRATEGY: Use GPT-4 Vision with very explicit instructions
+            // STRATEGY: Use GPT-4 Vision for images, ExtractDataFromUploadedFile for spreadsheets/docs
             for (const file of filesToProcess) {
                 if (!file.fileUrl) {
                     console.warn(`⚠️ Skipping file with no URL: ${file.fileName}`);
@@ -139,10 +139,49 @@ Deno.serve(async (req) => {
                         typeHint = 'The user indicated this is an EXPENSE (money paid/spent). Look for purchase amounts, receipt totals, or costs.';
                     }
 
-                    // Add project context to help AI
                     const projectContext = `Available projects: ${allProjects.map(p => p.title).join(', ')}`;
 
-                    const extractionPrompt = `You are a financial document analyzer. Extract ALL financial transactions from this image.
+                    const transactionSchema = {
+                        type: "object",
+                        properties: {
+                            transactions: {
+                                type: "array",
+                                items: {
+                                    type: "object",
+                                    properties: {
+                                        date: { type: "string" },
+                                        amount: { type: "number" },
+                                        vendor: { type: "string" },
+                                        description: { type: "string" },
+                                        type: { type: "string" },
+                                        projectHint: { type: "string" },
+                                        confidence: { type: "string" }
+                                    },
+                                    required: ["amount"]
+                                }
+                            }
+                        }
+                    };
+
+                    let visionResult = null;
+                    const ext = (file.fileName || '').split('.').pop().toLowerCase();
+                    const isSpreadsheet = ['xlsx', 'xls', 'csv'].includes(ext);
+
+                    if (isSpreadsheet) {
+                        // Use ExtractDataFromUploadedFile for spreadsheets
+                        console.log(`📊 Using ExtractDataFromUploadedFile for spreadsheet: ${file.fileName}`);
+                        const extractResult = await base44.integrations.Core.ExtractDataFromUploadedFile({
+                            file_url: file.fileUrl,
+                            json_schema: transactionSchema
+                        });
+                        if (extractResult?.status === 'success' && extractResult?.output) {
+                            visionResult = extractResult.output;
+                        } else {
+                            console.warn(`⚠️ ExtractDataFromUploadedFile failed for ${file.fileName}:`, extractResult?.details);
+                        }
+                    } else {
+                        // Use InvokeLLM vision for images/PDFs
+                        const extractionPrompt = `You are a financial document analyzer. Extract ALL financial transactions from this image.
 
 ${typeHint}
 ${projectContext}
@@ -174,31 +213,12 @@ User's additional context: "${userMessage}"
 
 Return JSON with an array of transactions.`;
 
-                    const visionResult = await base44.integrations.Core.InvokeLLM({
-                        prompt: extractionPrompt,
-                        file_urls: [file.fileUrl],
-                        response_json_schema: {
-                            type: "object",
-                            properties: {
-                                transactions: {
-                                    type: "array",
-                                    items: {
-                                        type: "object",
-                                        properties: {
-                                            date: { type: "string" },
-                                            amount: { type: "number" },
-                                            vendor: { type: "string" },
-                                            description: { type: "string" },
-                                            type: { type: "string" },
-                                            projectHint: { type: "string" },
-                                            confidence: { type: "string" }
-                                        },
-                                        required: ["amount"]
-                                    }
-                                }
-                            }
-                        }
-                    });
+                        visionResult = await base44.integrations.Core.InvokeLLM({
+                            prompt: extractionPrompt,
+                            file_urls: [file.fileUrl],
+                            response_json_schema: transactionSchema
+                        });
+                    }
 
                     console.log(`📊 Extraction result for ${file.fileName}:`, visionResult);
 
