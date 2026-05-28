@@ -79,7 +79,7 @@ export default function Documents() {
     }
   };
 
-  const allYears = [...new Set([...documents.map(doc => new Date(doc.uploadDate).getFullYear()), new Date().getFullYear()])].sort((a, b) => b - a);
+  const allYears = [...new Set([...documents.filter(doc => doc.uploadDate).map(doc => new Date(doc.uploadDate).getFullYear()).filter(y => !isNaN(y)), new Date().getFullYear()])].sort((a, b) => b - a);
   const availableYears = allYears.map(y => y.toString());
 
   const filteredDocuments = documents.filter(doc => {

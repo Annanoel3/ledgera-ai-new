@@ -110,8 +110,8 @@ export default function Projects() {
   });
 
   const allYears = [...new Set([
-    ...allIncome.map(item => new Date(item.date).getFullYear()),
-    ...allExpenses.map(item => new Date(item.date).getFullYear()),
+    ...allIncome.filter(item => item.date).map(item => new Date(item.date).getFullYear()).filter(y => !isNaN(y)),
+    ...allExpenses.filter(item => item.date).map(item => new Date(item.date).getFullYear()).filter(y => !isNaN(y)),
     new Date().getFullYear()
   ])].sort((a, b) => b - a);
   const availableYears = allYears.map(y => y.toString());

@@ -429,7 +429,7 @@ export default function Reports() {
   };
 
   // Generate available years from actual data
-  const allYears = [...new Set([...incomeItems, ...expenseItems].map(item => new Date(item.date).getFullYear()))].sort((a, b) => b - a);
+  const allYears = [...new Set([...incomeItems, ...expenseItems].filter(item => item.date).map(item => new Date(item.date).getFullYear()).filter(y => !isNaN(y)))].sort((a, b) => b - a);
   const availableYears = allYears.length > 0 ? allYears.map(y => y.toString()) : [new Date().getFullYear().toString()];
   
   const months = [

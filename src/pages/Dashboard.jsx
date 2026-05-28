@@ -224,9 +224,9 @@ export default function Dashboard() {
 
   // Get all years from data
   const allYears = [...new Set([
-    ...incomeItems.map(item => new Date(item.date).getFullYear()),
-    ...expenseItems.map(item => new Date(item.date).getFullYear()),
-    new Date().getFullYear() // Always include current year
+    ...incomeItems.filter(item => item.date).map(item => new Date(item.date).getFullYear()).filter(y => !isNaN(y)),
+    ...expenseItems.filter(item => item.date).map(item => new Date(item.date).getFullYear()).filter(y => !isNaN(y)),
+    new Date().getFullYear()
   ])].sort((a, b) => b - a);
   const availableYears = allYears.map(y => y.toString());
 
