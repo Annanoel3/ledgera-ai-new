@@ -3,18 +3,22 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.7.1';
 Deno.serve(async (req) => {
     try {
         const base44 = createClientFromRequest(req);
-        const user = await base44.auth.me();
-
-        if (!user) {
-            return Response.json({ error: 'Unauthorized' }, { status: 401 });
-        }
-
         const body = await req.json();
         const { action, data } = body;
 
+        // Support both direct user calls and service-role invocations from processChat
+        let user = await base44.auth.me();
+        const isServiceInvocation = !user && body.userEmail;
+        if (!user && !body.userEmail) {
+            return Response.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+        
+        // When invoked as service role, use asServiceRole for all entity operations
+        const db = isServiceInvocation ? base44.asServiceRole : base44;
+
         // Bulk process income items
         if (action === 'bulkIncome') {
-            const items = await base44.entities.IncomeItem.bulkCreate(data.items);
+            const items = await db.entities.IncomeItem.bulkCreate(data.items);
             return Response.json({
                 success: true,
                 count: items.length,
@@ -27,9 +31,9 @@ Deno.serve(async (req) => {
             let savedCount = 0;
             for (const item of data.preSavedItems) {
                 if (item.type === 'income') {
-                    await base44.entities.IncomeItem.create(item.fullData);
+                    await db.entities.IncomeItem.create(item.fullData);
                 } else {
-                    await base44.entities.ExpenseItem.create(item.fullData);
+                    await db.entities.ExpenseItem.create(item.fullData);
                 }
                 savedCount++;
             }
@@ -38,7 +42,7 @@ Deno.serve(async (req) => {
 
         // Bulk process expense items
         if (action === 'bulkExpenses') {
-            const items = await base44.entities.ExpenseItem.bulkCreate(data.items);
+            const items = await db.entities.ExpenseItem.bulkCreate(data.items);
             return Response.json({
                 success: true,
                 count: items.length,
@@ -50,17 +54,21 @@ Deno.serve(async (req) => {
         if (action === 'processFiles') {
             let duplicateFiles = [];
             
-            const allProjects = await base44.entities.Project.list();
+            const allProjects = await db.entities.Project.list();
             
             if (allProjects.length === 0) {
                 return Response.json({ 
                     error: 'No projects found. Please create a project first.',
-                    success: false 
-                }, { status: 400 });
+                    success: false,
+                    expenseCount: 0,
+                    incomeCount: 0,
+                    totalExpenses: 0,
+                    totalIncome: 0
+                });
             }
 
             // Check for duplicate files by URL (not name, since names can repeat)
-            const existingDocs = await base44.entities.Document.list();
+            const existingDocs = await db.entities.Document.list();
             const filesToProcess = [];
             
             for (const file of data.files) {
@@ -88,8 +96,8 @@ Deno.serve(async (req) => {
                 });
             }
 
-            const existingIncome = await base44.entities.IncomeItem.list();
-            const existingExpenses = await base44.entities.ExpenseItem.list();
+            const existingIncome = await db.entities.IncomeItem.list();
+            const existingExpenses = await db.entities.ExpenseItem.list();
 
             // Analyze user message for context
             const userMessage = data.userMessage || '';
@@ -170,7 +178,7 @@ Deno.serve(async (req) => {
                     if (isSpreadsheet) {
                         // Use ExtractDataFromUploadedFile for spreadsheets
                         console.log(`📊 Using ExtractDataFromUploadedFile for spreadsheet: ${file.fileName}`);
-                        const extractResult = await base44.integrations.Core.ExtractDataFromUploadedFile({
+                        const extractResult = await db.integrations.Core.ExtractDataFromUploadedFile({
                             file_url: file.fileUrl,
                             json_schema: transactionSchema
                         });
@@ -213,7 +221,7 @@ User's additional context: "${userMessage}"
 
 Return JSON with an array of transactions.`;
 
-                        visionResult = await base44.integrations.Core.InvokeLLM({
+                        visionResult = await db.integrations.Core.InvokeLLM({
                             prompt: extractionPrompt,
                             file_urls: [file.fileUrl],
                             response_json_schema: transactionSchema
@@ -437,13 +445,13 @@ Return JSON with an array of transactions.`;
             let createdExpenses = [];
 
             for (const item of incomeToCreate) {
-                const created = await base44.entities.IncomeItem.create(item);
+                const created = await db.entities.IncomeItem.create(item);
                 createdIncome.push(created);
             }
             if (createdIncome.length > 0) console.log(`✅ Created ${createdIncome.length} income items`);
 
             for (const item of expensesToCreate) {
-                const created = await base44.entities.ExpenseItem.create(item);
+                const created = await db.entities.ExpenseItem.create(item);
                 createdExpenses.push(created);
             }
             if (createdExpenses.length > 0) console.log(`✅ Created ${createdExpenses.length} expense items`);
@@ -455,7 +463,7 @@ Return JSON with an array of transactions.`;
                 if (!docProjectId) continue;
 
                 try {
-                    const createdDoc = await base44.entities.Document.create({
+                    const createdDoc = await db.entities.Document.create({
                         fileName: file.fileName,
                         fileUrl: file.fileUrl,
                         fileType: file.fileType || 'other',

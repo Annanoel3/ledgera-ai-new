@@ -1,8 +1,6 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.7.1';
 import OpenAI from 'npm:openai@4.73.1';
 
-const openai = new OpenAI({ apiKey: Deno.env.get("OPENAI_API_KEY") });
-
 // Define all available tools/functions for the AI
 const tools = [
     {
@@ -681,6 +679,7 @@ async function updateProjectTotals(base44, projectId, userEmail) {
 
 Deno.serve(async (req) => {
     try {
+        const openai = new OpenAI({ apiKey: Deno.env.get("OPENAI_API_KEY") });
         const base44 = createClientFromRequest(req);
         const user = await base44.auth.me();
 
@@ -739,9 +738,11 @@ Deno.serve(async (req) => {
         
         fileUrlsArray.forEach((url, i) => {
             const fileName = fileNamesArray[i] || '';
-            const ext = fileName.split('.').pop().toLowerCase();
+            // Check both the provided filename AND the URL itself for spreadsheet extensions
+            const nameToCheck = fileName || url.split('?')[0].split('/').pop();
+            const ext = nameToCheck.split('.').pop().toLowerCase();
             if (spreadsheetExtensions.includes(ext)) {
-                spreadsheetFiles.push({ fileUrl: url, fileName });
+                spreadsheetFiles.push({ fileUrl: url, fileName: fileName || nameToCheck });
             } else {
                 imageUrls.push(url);
             }
@@ -754,15 +755,18 @@ Deno.serve(async (req) => {
                 console.log('Pre-processing spreadsheet files:', spreadsheetFiles.map(f => f.fileName));
                 const procResult = await base44.asServiceRole.functions.invoke('processFinancialData', {
                     action: 'processFiles',
-                    files: spreadsheetFiles,
-                    userMessage: message || ''
+                    data: {
+                        files: spreadsheetFiles,
+                        userMessage: message || ''
+                    },
+                    userEmail: user.email
                 });
                 console.log('Spreadsheet processing result:', procResult);
                 const r = procResult?.data || procResult;
                 spreadsheetSummary = `[System: Spreadsheet(s) were processed automatically. Created ${r.expenseCount || 0} expense(s) and ${r.incomeCount || 0} income item(s) totaling $${((r.totalExpenses || 0) + (r.totalIncome || 0)).toFixed(2)}. ${r.uncertainAssignments?.length ? `Project assignment was uncertain for ${r.uncertainAssignments.length} item(s): ${JSON.stringify(r.uncertainAssignments)}` : ''} The records now exist in the database — use get_expenses/get_income to find them by amount, date, or vendor, then update their project assignment per the user's request.]`;
             } catch (err) {
                 console.error('Spreadsheet pre-processing error:', err);
-                spreadsheetSummary = `[System: Attempted to process spreadsheet but encountered an error: ${err.message}]`;
+                spreadsheetSummary = `[System: The spreadsheet file was uploaded. Automatic extraction encountered an issue (${err.message}). The user's message contains instructions about what to do with the data. Please ask the user to clarify what specific data they want added, or ask them to paste the relevant rows as text so you can add them manually using create_expense/create_income.]`;
             }
         }
 
