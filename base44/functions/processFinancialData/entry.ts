@@ -355,7 +355,9 @@ Return JSON with an array of transactions.`;
                     projectId: assignedProject.id,
                     amount: parsedAmount,
                     date: ((item.date || new Date().toISOString().split('T')[0]).split('T')[0]) + 'T12:00:00',
-                    notes: item.description || item.vendor || `From ${item.fileName}`
+                    notes: item.description || item.vendor || `From ${item.fileName}`,
+                    vendor: item.vendor || '',
+                    category: item.category || 'other'
                 };
 
                 // Track uncertain assignments so AI can ask about them
@@ -398,14 +400,12 @@ Return JSON with an array of transactions.`;
                 if (itemType === 'income') {
                     incomeToCreate.push({
                         ...transactionData,
-                        category: 'service',
+                        category: item.category || 'service',
                         method: 'other'
                     });
                 } else {
                     expensesToCreate.push({
-                        ...transactionData,
-                        vendor: item.vendor || 'Unknown',
-                        category: 'other'
+                        ...transactionData
                     });
                 }
             }

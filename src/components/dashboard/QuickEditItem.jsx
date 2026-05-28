@@ -65,6 +65,11 @@ export default function QuickEditItem({ item, type, projects, onUpdate, onDelete
             <p className="font-medium mb-1" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>
               {item.notes || item.vendor || 'No description'}
             </p>
+            {type === 'expense' && item.vendor && (
+              <p className="text-xs mb-2" style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>
+                {item.vendor}
+              </p>
+            )}
             
             <div className="flex items-center gap-2 flex-wrap">
               <Select
@@ -78,7 +83,10 @@ export default function QuickEditItem({ item, type, projects, onUpdate, onDelete
                 }}>
                   <SelectValue>{project?.title || 'Select project'}</SelectValue>
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent style={{
+                  backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff',
+                  border: `1px solid ${profile?.darkMode ? '#4b5563' : '#e5e7eb'}`
+                }}>
                   {projects.map(p => (
                     <SelectItem key={p.id} value={p.id}>{p.title}</SelectItem>
                   ))}
@@ -96,7 +104,10 @@ export default function QuickEditItem({ item, type, projects, onUpdate, onDelete
                 }}>
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent style={{
+                  backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff',
+                  border: `1px solid ${profile?.darkMode ? '#4b5563' : '#e5e7eb'}`
+                }}>
                   {type === 'expense' ? (
                     <>
                       <SelectItem value="supplies">Supplies & Materials</SelectItem>
