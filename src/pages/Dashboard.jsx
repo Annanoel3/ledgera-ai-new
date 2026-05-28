@@ -20,7 +20,7 @@ import { deleteIncomeItem } from "@/functions/deleteIncomeItem";
 export default function Dashboard() {
   const queryClient = useQueryClient();
   const [selectedYear, setSelectedYear] = React.useState(new Date().getFullYear().toString());
-  const [selectedMonth, setSelectedMonth] = React.useState(new Date().getMonth().toString());
+  const [selectedMonth, setSelectedMonth] = React.useState('all');
   const [recentActivityOpen, setRecentActivityOpen] = React.useState(false);
 
   const handleRefresh = useCallback(async () => {
@@ -230,86 +230,48 @@ export default function Dashboard() {
   ])].sort((a, b) => b - a);
   const availableYears = allYears.map(y => y.toString());
 
-  // Filter by year
+  // Filter by year + period
   const yearStart = startOfYear(new Date(parseInt(selectedYear), 0, 1));
   const yearEnd = endOfYear(new Date(parseInt(selectedYear), 0, 1));
+  const today = new Date();
+  const ytdEnd = today;
 
-  const yearIncomeItems = incomeItems.filter((item) => {
+  const displayMonthNum = (selectedMonth !== 'all' && selectedMonth !== 'ytd') ? parseInt(selectedMonth) : new Date().getMonth();
+  const monthStart = startOfMonth(new Date(parseInt(selectedYear), displayMonthNum, 1));
+  const monthEnd = endOfMonth(new Date(parseInt(selectedYear), displayMonthNum, 1));
+
+  const filterByPeriod = (items) => items.filter((item) => {
     const itemDate = new Date(item.date);
-    return itemDate >= yearStart && itemDate <= yearEnd;
+    if (selectedMonth === 'all') return itemDate >= yearStart && itemDate <= yearEnd;
+    if (selectedMonth === 'ytd') return itemDate >= yearStart && itemDate <= ytdEnd;
+    return itemDate >= monthStart && itemDate <= monthEnd;
   });
 
-  const yearExpenseItems = expenseItems.filter((item) => {
-    const itemDate = new Date(item.date);
-    return itemDate >= yearStart && itemDate <= yearEnd;
-  });
+  const yearIncomeItems = filterByPeriod(incomeItems);
+  const yearExpenseItems = filterByPeriod(expenseItems);
 
-  // Check if viewing current year
-  const isCurrentYear = parseInt(selectedYear) === new Date().getFullYear();
-  
-  const isMonthView = selectedMonth !== 'all';
-  const displayMonth = isMonthView ? parseInt(selectedMonth) : new Date().getMonth();
-  
-  // Calculate period stats
-  const yearIncome = yearIncomeItems.reduce((sum, item) => sum + (item.amount || 0), 0);
-  const yearExpenses = yearExpenseItems.reduce((sum, item) => sum + (item.amount || 0), 0);
-  const yearProfit = yearIncome - yearExpenses;
-  
-  // Calculate specific month stats
-  const monthStart = startOfMonth(new Date(parseInt(selectedYear), displayMonth, 1));
-  const monthEnd = endOfMonth(new Date(parseInt(selectedYear), displayMonth, 1));
+  const periodIncome = yearIncomeItems.reduce((sum, item) => sum + (item.amount || 0), 0);
+  const periodExpenses = yearExpenseItems.reduce((sum, item) => sum + (item.amount || 0), 0);
+  const periodProfit = periodIncome - periodExpenses;
 
-  const monthIncome = yearIncomeItems.
-  filter((item) => {
-    const itemDate = new Date(item.date);
-    return itemDate >= monthStart && itemDate <= monthEnd;
-  }).
-  reduce((sum, item) => sum + (item.amount || 0), 0);
+  // Calculate 6-month chart data (always uses all items for year context)
+  const allYearIncomeItems = incomeItems.filter(item => { const d = new Date(item.date); return d >= yearStart && d <= yearEnd; });
+  const allYearExpenseItems = expenseItems.filter(item => { const d = new Date(item.date); return d >= yearStart && d <= yearEnd; });
 
-  const monthExpenses = yearExpenseItems.
-  filter((item) => {
-    const itemDate = new Date(item.date);
-    return itemDate >= monthStart && itemDate <= monthEnd;
-  }).
-  reduce((sum, item) => sum + (item.amount || 0), 0);
-
-  const monthProfit = monthIncome - monthExpenses;
-  
-  // For current month MTD (only if current year)
-  const currentMonthStart = startOfMonth(new Date());
-  const currentMonthEnd = endOfMonth(new Date());
-  
-  const mtdIncome = incomeItems.
-  filter((item) => {
-    const itemDate = new Date(item.date);
-    return itemDate >= currentMonthStart && itemDate <= currentMonthEnd;
-  }).
-  reduce((sum, item) => sum + (item.amount || 0), 0);
-
-  const mtdExpenses = expenseItems.
-  filter((item) => {
-    const itemDate = new Date(item.date);
-    return itemDate >= currentMonthStart && itemDate <= currentMonthEnd;
-  }).
-  reduce((sum, item) => sum + (item.amount || 0), 0);
-
-  const mtdProfit = mtdIncome - mtdExpenses;
-
-  // Calculate 6-month chart data (within selected year)
   const chartData = [];
   for (let i = 5; i >= 0; i--) {
     const monthDate = subMonths(new Date(parseInt(selectedYear), new Date().getMonth()), i);
     const monthStartDate = startOfMonth(monthDate);
     const monthEndDate = endOfMonth(monthDate);
 
-    const income = yearIncomeItems.
+    const income = allYearIncomeItems.
     filter((item) => {
       const itemDate = new Date(item.date);
       return itemDate >= monthStartDate && itemDate <= monthEndDate;
     }).
     reduce((sum, item) => sum + (item.amount || 0), 0);
 
-    const expenses = yearExpenseItems.
+    const expenses = allYearExpenseItems.
     filter((item) => {
       const itemDate = new Date(item.date);
       return itemDate >= monthStartDate && itemDate <= monthEndDate;
@@ -325,20 +287,12 @@ export default function Dashboard() {
   }
 
   // Top projects filtered by the same period as KPI cards
-  const periodIncomeItems = selectedMonth.toString() === 'all'
-    ? yearIncomeItems
-    : yearIncomeItems.filter(item => { const d = new Date(item.date); return d >= monthStart && d <= monthEnd; });
-
-  const periodExpenseItems = selectedMonth.toString() === 'all'
-    ? yearExpenseItems
-    : yearExpenseItems.filter(item => { const d = new Date(item.date); return d >= monthStart && d <= monthEnd; });
-
-  const yearProjectIncomeMap = periodIncomeItems.reduce((acc, item) => {
+  const yearProjectIncomeMap = yearIncomeItems.reduce((acc, item) => {
     if (item.projectId) acc[item.projectId] = (acc[item.projectId] || 0) + item.amount;
     return acc;
   }, {});
 
-  const yearProjectExpenseMap = periodExpenseItems.reduce((acc, item) => {
+  const yearProjectExpenseMap = yearExpenseItems.reduce((acc, item) => {
     if (item.projectId) acc[item.projectId] = (acc[item.projectId] || 0) + item.amount;
     return acc;
   }, {});
@@ -354,7 +308,7 @@ export default function Dashboard() {
   sort((a, b) => b.profit - a.profit).
   slice(0, 5);
 
-  const hasData = yearIncomeItems.length > 0 || yearExpenseItems.length > 0;
+  const hasData = incomeItems.length > 0 || expenseItems.length > 0;
 
   const recentActivity = [...yearIncomeItems.map((item) => ({ ...item, type: 'income', title: item.notes || `Income #${item.id}` })),
   ...yearExpenseItems.map((item) => ({ ...item, type: 'expense', title: item.notes || item.vendor || `Expense #${item.id}` }))].
@@ -460,7 +414,7 @@ export default function Dashboard() {
         <div className="space-y-4 mb-8">
           {/* Month and Year selectors — always visible */}
           <div className="flex items-center gap-3">
-            <Select value={selectedMonth.toString()} onValueChange={(v) => setSelectedMonth(parseInt(v))}>
+            <Select value={selectedMonth} onValueChange={setSelectedMonth}>
               <SelectTrigger className="w-36" style={{
                 backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff',
                 border: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}`,
@@ -469,10 +423,20 @@ export default function Dashboard() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent style={{ backgroundColor: profile?.darkMode ? '#374151' : '#ffffff', border: `1px solid ${profile?.darkMode ? '#4b5563' : '#e5e7eb'}` }}>
-                <SelectItem value="all" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>Full Year</SelectItem>
-                {['January','February','March','April','May','June','July','August','September','October','November','December'].map((month, idx) => (
-                  <SelectItem key={idx} value={idx.toString()} style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>{month}</SelectItem>
-                ))}
+                <SelectItem value="all" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>All Months</SelectItem>
+                <SelectItem value="ytd" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>Year to Date</SelectItem>
+                <SelectItem value="0" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>January</SelectItem>
+                <SelectItem value="1" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>February</SelectItem>
+                <SelectItem value="2" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>March</SelectItem>
+                <SelectItem value="3" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>April</SelectItem>
+                <SelectItem value="4" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>May</SelectItem>
+                <SelectItem value="5" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>June</SelectItem>
+                <SelectItem value="6" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>July</SelectItem>
+                <SelectItem value="7" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>August</SelectItem>
+                <SelectItem value="8" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>September</SelectItem>
+                <SelectItem value="9" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>October</SelectItem>
+                <SelectItem value="10" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>November</SelectItem>
+                <SelectItem value="11" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>December</SelectItem>
               </SelectContent>
             </Select>
             <Select value={selectedYear} onValueChange={(y) => { setSelectedYear(y); setSelectedMonth('all'); }}>
@@ -490,9 +454,9 @@ export default function Dashboard() {
               </SelectContent>
             </Select>
             <span className="text-sm" style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>
-              {selectedMonth === 'all' || selectedMonth.toString() === 'all'
-                ? `All of ${selectedYear}`
-                : `${['January','February','March','April','May','June','July','August','September','October','November','December'][displayMonth]} ${selectedYear}`}
+              {selectedMonth === 'all' ? `All of ${selectedYear}`
+                : selectedMonth === 'ytd' ? `YTD ${selectedYear}`
+                : `${['January','February','March','April','May','June','July','August','September','October','November','December'][parseInt(selectedMonth)]} ${selectedYear}`}
             </span>
           </div>
 
@@ -501,17 +465,17 @@ export default function Dashboard() {
             <Card style={{ backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff', border: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}` }}>
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="text-sm font-medium" style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>
-                  {selectedMonth.toString() === 'all' ? 'Year Profit' : 'Month Profit'}
+                  Profit
                 </CardTitle>
                 <Wallet className="w-4 h-4 text-gray-400" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>
-                  {formatCurrency(selectedMonth.toString() === 'all' ? yearProfit : monthProfit)}
+                  {formatCurrency(periodProfit)}
                 </div>
-                <div className="flex items-center gap-1 text-sm mt-1" style={{ color: (selectedMonth.toString() === 'all' ? yearProfit : monthProfit) >= 0 ? '#22A699' : '#ef4444' }}>
-                  {(selectedMonth.toString() === 'all' ? yearProfit : monthProfit) >= 0 ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
-                  {(selectedMonth.toString() === 'all' ? yearProfit : monthProfit) >= 0 ? 'Positive' : 'Negative'}
+                <div className="flex items-center gap-1 text-sm mt-1" style={{ color: periodProfit >= 0 ? '#22A699' : '#ef4444' }}>
+                  {periodProfit >= 0 ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
+                  {periodProfit >= 0 ? 'Positive' : 'Negative'}
                 </div>
               </CardContent>
             </Card>
@@ -519,16 +483,16 @@ export default function Dashboard() {
             <Card style={{ backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff', border: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}` }}>
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="text-sm font-medium" style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>
-                  {selectedMonth.toString() === 'all' ? 'Year Income' : 'Month Income'}
+                  Income
                 </CardTitle>
                 <DollarSign className="w-4 h-4 text-gray-400" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>
-                  {formatCurrency(selectedMonth.toString() === 'all' ? yearIncome : monthIncome)}
+                  {formatCurrency(periodIncome)}
                 </div>
                 <p className="text-sm mt-1" style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>
-                  {selectedMonth.toString() === 'all' ? yearIncomeItems.length : yearIncomeItems.filter(item => { const d = new Date(item.date); return d >= monthStart && d <= monthEnd; }).length} transactions
+                  {yearIncomeItems.length} transactions
                 </p>
               </CardContent>
             </Card>
@@ -536,16 +500,16 @@ export default function Dashboard() {
             <Card style={{ backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff', border: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}` }}>
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="text-sm font-medium" style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>
-                  {selectedMonth.toString() === 'all' ? 'Year Expenses' : 'Month Expenses'}
+                  Expenses
                 </CardTitle>
                 <CreditCard className="w-4 h-4 text-gray-400" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>
-                  {formatCurrency(selectedMonth.toString() === 'all' ? yearExpenses : monthExpenses)}
+                  {formatCurrency(periodExpenses)}
                 </div>
                 <p className="text-sm mt-1" style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>
-                  {selectedMonth.toString() === 'all' ? yearExpenseItems.length : yearExpenseItems.filter(item => { const d = new Date(item.date); return d >= monthStart && d <= monthEnd; }).length} transactions
+                  {yearExpenseItems.length} transactions
                 </p>
               </CardContent>
             </Card>
