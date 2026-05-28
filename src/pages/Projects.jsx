@@ -24,8 +24,7 @@ export default function Projects() {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("all");
-  const { selectedYear, setSelectedYear } = useYear();
-  const [selectedMonth, setSelectedMonth] = useState("all");
+  const { selectedYear, setSelectedYear, selectedMonth, setSelectedMonth } = useYear();
   const [showNewDialog, setShowNewDialog] = useState(false);
   const [newProjectTitle, setNewProjectTitle] = useState("");
   const [newProjectStatus, setNewProjectStatus] = useState("active");

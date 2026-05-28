@@ -20,8 +20,7 @@ import { useYear } from "@/lib/YearContext";
 
 export default function Dashboard() {
   const queryClient = useQueryClient();
-  const { selectedYear, setSelectedYear } = useYear();
-  const [selectedMonth, setSelectedMonth] = React.useState('all');
+  const { selectedYear, setSelectedYear, selectedMonth, setSelectedMonth } = useYear();
   const [recentActivityOpen, setRecentActivityOpen] = React.useState(false);
 
   const handleRefresh = useCallback(async () => {

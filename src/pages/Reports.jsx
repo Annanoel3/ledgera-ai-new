@@ -30,9 +30,7 @@ import {
 
 export default function Reports() {
   const navigate = useNavigate();
-  const { selectedYear, setSelectedYear } = useYear();
-  const initialMonth = "all";
-  const [selectedMonth, setSelectedMonth] = useState(initialMonth);
+  const { selectedYear, setSelectedYear, selectedMonth, setSelectedMonth } = useYear();
   const [activeTab, setActiveTab] = useState("income");
   const [selectedProjectId, setSelectedProjectId] = useState("all");
   const [selectedCategory, setSelectedCategory] = useState(null);
@@ -377,7 +375,7 @@ export default function Reports() {
 
   const handleResetFilters = () => {
     setSelectedYear(new Date().getFullYear().toString());
-    setSelectedMonth(initialMonth);
+    setSelectedMonth("all");
     setSelectedProjectId("all");
     setActiveTab("income");
     toast.info("Report filters reset.");

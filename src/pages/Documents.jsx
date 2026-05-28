@@ -19,6 +19,7 @@ export default function Documents() {
   const [search, setSearch] = useState("");
   const { selectedYear, setSelectedYear } = useYear();
   const queryClient = useQueryClient();
+  // Note: Documents only uses year, not month—keeping for consistency with other pages
 
   const handleRefresh = useCallback(async () => {
     await queryClient.invalidateQueries(['documents']);
