@@ -398,7 +398,7 @@ export default function Dashboard() {
 
         {/* KPI Cards */}
         <div className="space-y-4 mb-8">
-          {/* Month and Year selectors — always visible */}
+          {/* Month selector — always visible */}
           <div className="flex items-center gap-3">
             <Select value={selectedMonth} onValueChange={setSelectedMonth}>
               <SelectTrigger className="w-36" style={{
@@ -423,20 +423,6 @@ export default function Dashboard() {
                 <SelectItem value="9" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>October</SelectItem>
                 <SelectItem value="10" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>November</SelectItem>
                 <SelectItem value="11" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>December</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select value={selectedYear} onValueChange={(y) => { setSelectedYear(y); setSelectedMonth('all'); }}>
-              <SelectTrigger className="w-24" style={{
-                backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff',
-                border: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}`,
-                color: profile?.darkMode ? '#ffffff' : '#111827'
-              }}>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent style={{ backgroundColor: profile?.darkMode ? '#374151' : '#ffffff', border: `1px solid ${profile?.darkMode ? '#4b5563' : '#e5e7eb'}` }}>
-                {availableYears.map(year => (
-                  <SelectItem key={year} value={year} style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>{year}</SelectItem>
-                ))}
               </SelectContent>
             </Select>
             <span className="text-sm" style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>
