@@ -107,25 +107,22 @@ Deno.serve(async (req) => {
                 body = 'Time to update your books! Any transactions to log?';
               }
 
-              // Get player IDs
-              const playerIds = user.onesignal_player_ids || [];
-
-              if (playerIds.length > 0) {
-                // Send notification via OneSignal REST API
-                const notification = {
-                  app_id: ONESIGNAL_APP_ID,
-                  include_player_ids: playerIds,
-                  headings: { en: title },
-                  contents: { en: body },
-                  data: {
-                    type: 'check_in',
-                    check_in_id: checkIn.id,
-                    screen: '/Chat'
-                  },
-                  ios_sound: 'default',
-                  android_sound: 'default',
-                  android_channel_id: 'ledgera_default'
-                };
+              // Send notification via OneSignal REST API using external ID
+              const notification = {
+                app_id: ONESIGNAL_APP_ID,
+                include_external_user_ids: [user.email],
+                headings: { en: title },
+                contents: { en: body },
+                data: {
+                  type: 'check_in',
+                  check_in_id: checkIn.id,
+                  screen: '/Chat'
+                },
+                ios_sound: 'default',
+                android_sound: 'default',
+                android_channel_id: 'ledgera_default',
+                channel_for_external_user_ids: 'push'
+              };
 
                 const response = await fetch('https://onesignal.com/api/v1/notifications', {
                   method: 'POST',
@@ -144,7 +141,7 @@ Deno.serve(async (req) => {
 
                   // Also create a conversation prompt
                   const conversationPrompt = `${title}\n\n${body}`;
-                  
+
                   await base44.asServiceRole.entities.Conversation.create({
                     userEmail: user.email,
                     name: title,
@@ -164,29 +161,6 @@ Deno.serve(async (req) => {
                   console.error(`[Ledgera Cron] Failed to send to ${user.email}:`, result);
                   errors.push(`Failed to send to ${user.email}: ${JSON.stringify(result)}`);
                 }
-              } else {
-                console.log(`[Ledgera Cron] User ${user.email} has no player IDs, skipping notification`);
-                
-                // Still create conversation and mark as sent
-                const conversationPrompt = `${title}\n\n${body}`;
-                
-                await base44.asServiceRole.entities.Conversation.create({
-                  userEmail: user.email,
-                  name: title,
-                  messages: [{
-                    role: 'assistant',
-                    content: conversationPrompt
-                  }],
-                  createdAt: new Date().toISOString()
-                });
-
-                await base44.asServiceRole.entities.ScheduledCheckIn.update(checkIn.id, {
-                  sent: true,
-                  sentAt: new Date().toISOString()
-                });
-                
-                checkInsSent++;
-              }
             } catch (error) {
               console.error(`[Ledgera Cron] Error processing check-in ${checkIn.id}:`, error);
               errors.push(`Check-in ${checkIn.id}: ${error.message}`);

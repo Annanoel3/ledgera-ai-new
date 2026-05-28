@@ -15,22 +15,6 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Missing required fields: title, body' }, { status: 400 });
     }
 
-    // Get user's OneSignal player IDs from database
-    const userRecord = await base44.entities.User.filter({ email: user.email });
-    
-    if (!userRecord || userRecord.length === 0) {
-      return Response.json({ error: 'User not found' }, { status: 404 });
-    }
-
-    const playerIds = userRecord[0].onesignal_player_ids || [];
-
-    if (playerIds.length === 0) {
-      return Response.json({ 
-        success: false, 
-        message: 'No player IDs registered for this user' 
-      });
-    }
-
     // Check notification settings
     const notificationSettings = userRecord[0].notification_settings || {};
     if (notificationSettings.check_ins === false && data?.type === 'check_in') {
@@ -50,13 +34,14 @@ Deno.serve(async (req) => {
 
     const notification = {
       app_id: ONESIGNAL_APP_ID,
-      include_player_ids: playerIds,
+      include_external_user_ids: [user.email],
       headings: { en: title },
       contents: { en: body },
       data: data || {},
       ios_sound: 'default',
       android_sound: 'default',
-      android_channel_id: android_channel_id || 'ledgera_default'
+      android_channel_id: android_channel_id || 'ledgera_default',
+      channel_for_external_user_ids: 'push'
     };
 
     const response = await fetch('https://onesignal.com/api/v1/notifications', {
