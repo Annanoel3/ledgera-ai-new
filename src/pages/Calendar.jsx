@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { toast } from "sonner";
 import EventModal from "@/components/calendar/EventModal";
+import DayTransactionsModal from "@/components/calendar/DayTransactionsModal";
 import { manageEventCheckIn } from "@/functions/manageEventCheckIn";
 import { googleCalendarSync } from "@/functions/googleCalendarSync";
 
@@ -19,6 +20,8 @@ export default function Calendar() {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [showEventModal, setShowEventModal] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
+  const [showDayModal, setShowDayModal] = useState(false);
+  const [dayModalDate, setDayModalDate] = useState(null);
   const [syncing, setSyncing] = useState(false);
   const [exporting, setExporting] = useState(false);
   const queryClient = useQueryClient();
@@ -64,6 +67,12 @@ export default function Calendar() {
     enabled: !!user,
   });
 
+  const { data: projects = [] } = useQuery({
+    queryKey: ["projects"],
+    queryFn: () => base44.entities.Project.filter({ created_by: user?.email }),
+    enabled: !!user,
+  });
+
   const { data: googleConnected = false } = useQuery({
     queryKey: ["googleCalendarConnected"],
     queryFn: async () => {
@@ -102,9 +111,17 @@ export default function Calendar() {
   }, [incomeItems, expenseItems, events]);
 
   const handleDayClick = (day) => {
-    setSelectedDate(day);
-    setSelectedEvent(null);
-    setShowEventModal(true);
+    const dateStr = format(day, "yyyy-MM-dd");
+    const data = dayData[dateStr] || {};
+    const hasFinancial = data.hasIncome || data.hasExpense;
+    if (hasFinancial) {
+      setDayModalDate(day);
+      setShowDayModal(true);
+    } else {
+      setSelectedDate(day);
+      setSelectedEvent(null);
+      setShowEventModal(true);
+    }
   };
 
   const handleEventClick = (e, ev) => {
@@ -442,6 +459,23 @@ export default function Calendar() {
           onSave={handleSaveEvent}
           onDelete={handleDeleteEvent}
           onClose={() => setShowEventModal(false)}
+        />
+      )}
+
+      {showDayModal && dayModalDate && (
+        <DayTransactionsModal
+          date={dayModalDate}
+          incomeItems={incomeItems}
+          expenseItems={expenseItems}
+          projects={projects}
+          profile={profile}
+          onClose={() => setShowDayModal(false)}
+          onAddEvent={() => {
+            setShowDayModal(false);
+            setSelectedDate(dayModalDate);
+            setSelectedEvent(null);
+            setShowEventModal(true);
+          }}
         />
       )}
     </div>
