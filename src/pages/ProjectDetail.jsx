@@ -10,6 +10,7 @@ import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { format, startOfYear, endOfYear, startOfMonth, endOfMonth } from "date-fns";
 import EventsModal from "@/components/projects/EventsModal";
+import { useProjectFilter } from "@/hooks/useProjectFilter";
 import SubscriptionsTab from "@/components/projects/SubscriptionsTab";
 import {
   Table,
@@ -37,8 +38,7 @@ export default function ProjectDetail() {
    const tabParam = urlParams.get('tab');
    const [showHistory, setShowHistory] = useState(false);
    const [showEventsModal, setShowEventsModal] = useState(false);
-   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear().toString());
-   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth().toString());
+   const { selectedYear, selectedMonth, setSelectedYear, setSelectedMonth } = useProjectFilter(projectId);
    const [defaultTab, setDefaultTab] = useState(tabParam === 'expenses' ? 'expenses' : tabParam === 'income' ? 'income' : 'overview');
    const [recurringExpense, setRecurringExpense] = useState(null);
 

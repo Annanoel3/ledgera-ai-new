@@ -27,6 +27,7 @@ import { toast } from "sonner";
 import RecurringSubscriptionModal from "@/components/projects/RecurringSubscriptionModal";
 import ExpenseRow from "@/components/projects/ExpenseRow";
 import { useWindowSize } from "@/hooks/useWindowSize";
+import { useProjectFilter } from "@/hooks/useProjectFilter";
 import { usePullToRefresh } from "@/hooks/usePullToRefresh";
 import { Loader2 as RefreshLoader } from "lucide-react";
 
@@ -36,8 +37,7 @@ export default function ProjectFinancials() {
    const urlParams = new URLSearchParams(window.location.search);
    const projectId = urlParams.get('id');
    const tabParam = urlParams.get('tab');
-   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear().toString());
-   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth().toString());
+   const { selectedYear, selectedMonth, setSelectedYear, setSelectedMonth } = useProjectFilter(projectId);
    const [showRecurringModal, setShowRecurringModal] = useState(false);
    const [selectedExpense, setSelectedExpense] = useState(null);
    const [groupingMode, setGroupingMode] = useState(false);
