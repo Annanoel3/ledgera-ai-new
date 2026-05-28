@@ -20,7 +20,7 @@ import { deleteIncomeItem } from "@/functions/deleteIncomeItem";
 export default function Dashboard() {
   const queryClient = useQueryClient();
   const [selectedYear, setSelectedYear] = React.useState(new Date().getFullYear().toString());
-  const [selectedMonth, setSelectedMonth] = React.useState(new Date().getMonth());
+  const [selectedMonth, setSelectedMonth] = React.useState(new Date().getMonth().toString());
   const [recentActivityOpen, setRecentActivityOpen] = React.useState(false);
 
   const handleRefresh = useCallback(async () => {
@@ -247,8 +247,8 @@ export default function Dashboard() {
   // Check if viewing current year
   const isCurrentYear = parseInt(selectedYear) === new Date().getFullYear();
   
-  // For current year, use current month; for past years, use selected month dropdown
-  const displayMonth = isCurrentYear ? new Date().getMonth() : selectedMonth;
+  const isMonthView = selectedMonth !== 'all';
+  const displayMonth = isMonthView ? parseInt(selectedMonth) : new Date().getMonth();
   
   // Calculate period stats
   const yearIncome = yearIncomeItems.reduce((sum, item) => sum + (item.amount || 0), 0);
@@ -367,7 +367,7 @@ export default function Dashboard() {
         <div className="max-w-6xl mx-auto">
            <div className="flex items-center justify-between mb-8">
              <h1 className="text-3xl font-bold" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>Dashboard</h1>
-             <Select value={selectedYear} onValueChange={setSelectedYear}>
+             <Select value={selectedYear} onValueChange={(y) => { setSelectedYear(y); setSelectedMonth('all'); }}>
                <SelectTrigger className="w-32" style={{
                  backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff',
                  border: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}`,
@@ -410,7 +410,7 @@ export default function Dashboard() {
       <div className="max-w-6xl mx-auto">
         <div className="flex items-center justify-between mb-8">
         <h1 className="text-3xl font-bold" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>Dashboard</h1>
-        <Select value={selectedYear} onValueChange={setSelectedYear}>
+        <Select value={selectedYear} onValueChange={(y) => { setSelectedYear(y); setSelectedMonth('all'); }}>
           <SelectTrigger className="w-32" style={{
             backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff',
             border: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}`,
@@ -464,145 +464,84 @@ export default function Dashboard() {
 
         {/* KPI Cards */}
         <div className="space-y-4 mb-8">
-          {isCurrentYear && (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <Card style={{ backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff', border: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}` }}>
-                <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-sm font-medium" style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>Profit This Month</CardTitle>
-                  <Wallet className="w-4 h-4 text-gray-400" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>{formatCurrency(mtdProfit)}</div>
-                  <div className={`flex items-center gap-1 text-sm mt-1`} style={{ color: mtdProfit >= 0 ? '#22A699' : '#ef4444' }}>
-                    {mtdProfit >= 0 ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
-                    {mtdProfit >= 0 ? 'Positive' : 'Negative'}
-                  </div>
-                </CardContent>
-              </Card>
+          {/* Month selector — always visible */}
+          <div className="flex items-center gap-3">
+            <Select value={selectedMonth.toString()} onValueChange={(v) => setSelectedMonth(parseInt(v))}>
+              <SelectTrigger className="w-36" style={{
+                backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff',
+                border: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}`,
+                color: profile?.darkMode ? '#ffffff' : '#111827'
+              }}>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent style={{ backgroundColor: profile?.darkMode ? '#374151' : '#ffffff', border: `1px solid ${profile?.darkMode ? '#4b5563' : '#e5e7eb'}` }}>
+                <SelectItem value="all" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>Full Year</SelectItem>
+                {['January','February','March','April','May','June','July','August','September','October','November','December'].map((month, idx) => (
+                  <SelectItem key={idx} value={idx.toString()} style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>{month}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <span className="text-sm" style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>
+              {selectedMonth === 'all' || selectedMonth.toString() === 'all'
+                ? `All of ${selectedYear}`
+                : `${['January','February','March','April','May','June','July','August','September','October','November','December'][displayMonth]} ${selectedYear}`}
+            </span>
+          </div>
 
-              <Card style={{ backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff', border: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}` }}>
-                <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-sm font-medium" style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>Income This Month</CardTitle>
-                  <DollarSign className="w-4 h-4 text-gray-400" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>{formatCurrency(mtdIncome)}</div>
-                  <p className="text-sm mt-1" style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>
-                    {incomeItems.filter((item) => {
-                      const itemDate = new Date(item.date);
-                      return itemDate >= currentMonthStart && itemDate <= currentMonthEnd;
-                    }).length} transactions
-                  </p>
-                </CardContent>
-              </Card>
+          {/* KPI cards using the selected period */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <Card style={{ backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff', border: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}` }}>
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <CardTitle className="text-sm font-medium" style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>
+                  {selectedMonth.toString() === 'all' ? 'Year Profit' : 'Month Profit'}
+                </CardTitle>
+                <Wallet className="w-4 h-4 text-gray-400" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>
+                  {formatCurrency(selectedMonth.toString() === 'all' ? yearProfit : monthProfit)}
+                </div>
+                <div className="flex items-center gap-1 text-sm mt-1" style={{ color: (selectedMonth.toString() === 'all' ? yearProfit : monthProfit) >= 0 ? '#22A699' : '#ef4444' }}>
+                  {(selectedMonth.toString() === 'all' ? yearProfit : monthProfit) >= 0 ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
+                  {(selectedMonth.toString() === 'all' ? yearProfit : monthProfit) >= 0 ? 'Positive' : 'Negative'}
+                </div>
+              </CardContent>
+            </Card>
 
-              <Card style={{ backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff', border: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}` }}>
-                <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-sm font-medium" style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>Expenses This Month</CardTitle>
-                  <CreditCard className="w-4 h-4 text-gray-400" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>{formatCurrency(mtdExpenses)}</div>
-                  <p className="text-sm mt-1" style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>
-                    {expenseItems.filter((item) => {
-                      const itemDate = new Date(item.date);
-                      return itemDate >= currentMonthStart && itemDate <= currentMonthEnd;
-                    }).length} transactions
-                  </p>
-                </CardContent>
-              </Card>
-            </div>
-          )}
-          
-          {!isCurrentYear && (
-            <div className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <Card style={{ backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff', border: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}` }}>
-                  <CardHeader className="flex flex-row items-center justify-between pb-2">
-                    <CardTitle className="text-sm font-medium" style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>Year Profit</CardTitle>
-                    <Wallet className="w-4 h-4 text-gray-400" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>{formatCurrency(yearProfit)}</div>
-                    <div className={`flex items-center gap-1 text-sm mt-1`} style={{ color: yearProfit >= 0 ? '#22A699' : '#ef4444' }}>
-                      {yearProfit >= 0 ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
-                      {yearProfit >= 0 ? 'Positive' : 'Negative'}
-                    </div>
-                  </CardContent>
-                </Card>
+            <Card style={{ backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff', border: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}` }}>
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <CardTitle className="text-sm font-medium" style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>
+                  {selectedMonth.toString() === 'all' ? 'Year Income' : 'Month Income'}
+                </CardTitle>
+                <DollarSign className="w-4 h-4 text-gray-400" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>
+                  {formatCurrency(selectedMonth.toString() === 'all' ? yearIncome : monthIncome)}
+                </div>
+                <p className="text-sm mt-1" style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>
+                  {selectedMonth.toString() === 'all' ? yearIncomeItems.length : yearIncomeItems.filter(item => { const d = new Date(item.date); return d >= monthStart && d <= monthEnd; }).length} transactions
+                </p>
+              </CardContent>
+            </Card>
 
-                <Card style={{ backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff', border: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}` }}>
-                  <CardHeader className="flex flex-row items-center justify-between pb-2">
-                    <CardTitle className="text-sm font-medium" style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>Year Income</CardTitle>
-                    <DollarSign className="w-4 h-4 text-gray-400" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>{formatCurrency(yearIncome)}</div>
-                    <p className="text-sm mt-1" style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>
-                      {yearIncomeItems.length} transactions
-                    </p>
-                  </CardContent>
-                </Card>
-
-                <Card style={{ backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff', border: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}` }}>
-                  <CardHeader className="flex flex-row items-center justify-between pb-2">
-                    <CardTitle className="text-sm font-medium" style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>Year Expenses</CardTitle>
-                    <CreditCard className="w-4 h-4 text-gray-400" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>{formatCurrency(yearExpenses)}</div>
-                    <p className="text-sm mt-1" style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>
-                      {yearExpenseItems.length} transactions
-                    </p>
-                  </CardContent>
-                </Card>
-              </div>
-
-              <Card style={{ backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff', border: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}` }}>
-                <CardHeader>
-                  <CardTitle style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>View Specific Month</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div>
-                    <label style={{ color: profile?.darkMode ? '#d1d5db' : '#374151' }} className="text-sm font-medium block mb-2">Select Month</label>
-                    <Select value={selectedMonth.toString()} onValueChange={(v) => setSelectedMonth(parseInt(v))}>
-                      <SelectTrigger style={{
-                        backgroundColor: profile?.darkMode ? '#374151' : '#ffffff',
-                        border: `1px solid ${profile?.darkMode ? '#4b5563' : '#e5e7eb'}`,
-                        color: profile?.darkMode ? '#ffffff' : '#111827'
-                      }}>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent style={{
-                        backgroundColor: profile?.darkMode ? '#374151' : '#ffffff',
-                        border: `1px solid ${profile?.darkMode ? '#4b5563' : '#e5e7eb'}`
-                      }}>
-                        {['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'].map((month, idx) => (
-                          <SelectItem key={idx} value={idx.toString()} style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>
-                            {month}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                      <p style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }} className="text-sm">Profit</p>
-                      <p style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }} className="text-xl font-bold">{formatCurrency(monthProfit)}</p>
-                    </div>
-                    <div>
-                      <p style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }} className="text-sm">Income</p>
-                      <p style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }} className="text-xl font-bold">{formatCurrency(monthIncome)}</p>
-                    </div>
-                    <div>
-                      <p style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }} className="text-sm">Expenses</p>
-                      <p style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }} className="text-xl font-bold">{formatCurrency(monthExpenses)}</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          )}
+            <Card style={{ backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff', border: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}` }}>
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <CardTitle className="text-sm font-medium" style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>
+                  {selectedMonth.toString() === 'all' ? 'Year Expenses' : 'Month Expenses'}
+                </CardTitle>
+                <CreditCard className="w-4 h-4 text-gray-400" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>
+                  {formatCurrency(selectedMonth.toString() === 'all' ? yearExpenses : monthExpenses)}
+                </div>
+                <p className="text-sm mt-1" style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>
+                  {selectedMonth.toString() === 'all' ? yearExpenseItems.length : yearExpenseItems.filter(item => { const d = new Date(item.date); return d >= monthStart && d <= monthEnd; }).length} transactions
+                </p>
+              </CardContent>
+            </Card>
+          </div>
         </div>
 
         {/* 6-Month Chart */}
