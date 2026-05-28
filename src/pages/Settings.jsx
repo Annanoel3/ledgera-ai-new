@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Download, Trash2, Loader2, FileText, Plus, X, Sparkles, CheckCircle2, AlertTriangle, Bell } from "lucide-react";
 import ExpenseCategoriesManager from "@/components/settings/ExpenseCategoriesManager";
+import UploadedFilesManager from "@/components/settings/UploadedFilesManager";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { format } from "date-fns";
 import { Link } from "react-router-dom";
@@ -576,6 +577,9 @@ export default function Settings() {
               </Link>
             </CardContent>
           </Card>
+
+          {/* Uploaded Files Section */}
+          <UploadedFilesManager profile={profile} user={user} />
 
           {/* Expense Categories Section */}
           <ExpenseCategoriesManager
