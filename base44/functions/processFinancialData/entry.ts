@@ -59,13 +59,13 @@ Deno.serve(async (req) => {
                 }, { status: 400 });
             }
 
-            // Check for duplicate files by name
+            // Check for duplicate files by URL (not name, since names can repeat)
             const existingDocs = await base44.entities.Document.list();
             const filesToProcess = [];
             
             for (const file of data.files) {
                 const isDuplicate = existingDocs.some(doc => 
-                    doc.fileName === file.fileName
+                    doc.fileUrl === file.fileUrl
                 );
                 
                 if (isDuplicate) {

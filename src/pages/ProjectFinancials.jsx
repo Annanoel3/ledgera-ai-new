@@ -87,14 +87,14 @@ export default function ProjectFinancials() {
 
   const { data: incomeItems } = useQuery({
     queryKey: ['incomeItems', projectId],
-    queryFn: () => base44.entities.IncomeItem.filter({ projectId, created_by: user.email }, '-date'),
+    queryFn: () => base44.entities.IncomeItem.filter({ projectId }, '-date'),
     initialData: [],
     enabled: !!projectId && !!user,
   });
 
   const { data: expenseItems } = useQuery({
     queryKey: ['expenseItems', projectId],
-    queryFn: () => base44.entities.ExpenseItem.filter({ projectId, created_by: user.email }, '-date'),
+    queryFn: () => base44.entities.ExpenseItem.filter({ projectId }, '-date'),
     initialData: [],
     enabled: !!projectId && !!user,
   });
