@@ -535,9 +535,11 @@ export default function Dashboard() {
             onClick={() => setRecentActivityOpen(!recentActivityOpen)}
           >
             <CardTitle style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>
-              Recent Activity
+              Activity
               <span className="text-sm font-normal ml-2" style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>
-                Quick edit, move, or convert any item
+                {selectedMonth === 'all' ? `All of ${selectedYear}`
+                  : selectedMonth === 'ytd' ? `YTD ${selectedYear}`
+                  : `${['January','February','March','April','May','June','July','August','September','October','November','December'][parseInt(selectedMonth)]} ${selectedYear}`}
               </span>
             </CardTitle>
             <ChevronDown 
