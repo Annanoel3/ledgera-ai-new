@@ -324,13 +324,21 @@ export default function Dashboard() {
     });
   }
 
-  // Top projects by profit (for selected year)
-  const yearProjectIncomeMap = yearIncomeItems.reduce((acc, item) => {
+  // Top projects filtered by the same period as KPI cards
+  const periodIncomeItems = selectedMonth.toString() === 'all'
+    ? yearIncomeItems
+    : yearIncomeItems.filter(item => { const d = new Date(item.date); return d >= monthStart && d <= monthEnd; });
+
+  const periodExpenseItems = selectedMonth.toString() === 'all'
+    ? yearExpenseItems
+    : yearExpenseItems.filter(item => { const d = new Date(item.date); return d >= monthStart && d <= monthEnd; });
+
+  const yearProjectIncomeMap = periodIncomeItems.reduce((acc, item) => {
     if (item.projectId) acc[item.projectId] = (acc[item.projectId] || 0) + item.amount;
     return acc;
   }, {});
 
-  const yearProjectExpenseMap = yearExpenseItems.reduce((acc, item) => {
+  const yearProjectExpenseMap = periodExpenseItems.reduce((acc, item) => {
     if (item.projectId) acc[item.projectId] = (acc[item.projectId] || 0) + item.amount;
     return acc;
   }, {});
