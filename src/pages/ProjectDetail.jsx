@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -27,6 +27,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
+import MakeRecurringDialog from "@/components/projects/MakeRecurringDialog";
 
 export default function ProjectDetail() {
    const navigate = useNavigate();
@@ -39,6 +40,7 @@ export default function ProjectDetail() {
    const [selectedYear, setSelectedYear] = useState(new Date().getFullYear().toString());
    const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth().toString());
    const [defaultTab, setDefaultTab] = useState(tabParam === 'expenses' ? 'expenses' : tabParam === 'income' ? 'income' : 'overview');
+   const [recurringExpense, setRecurringExpense] = useState(null);
 
   const { data: user, isLoading: userLoading } = useQuery({
     queryKey: ['user'],
@@ -264,29 +266,27 @@ export default function ProjectDetail() {
   });
 
   const convertToRecurringMutation = useMutation({
-    mutationFn: async (expenseId) => {
-      const expense = await base44.entities.ExpenseItem.filter({ id: expenseId });
-      if (!expense[0]) throw new Error("Expense not found");
-      
-      const exp = expense[0];
+    mutationFn: async ({ expense, frequency, endDate }) => {
       return base44.entities.RecurringSubscription.create({
-        projectId: exp.projectId,
-        name: exp.vendor || "Recurring Expense",
-        amount: exp.amount,
-        frequency: "monthly",
-        startDate: exp.date,
-        category: exp.category || "subscriptions",
-        notes: exp.notes || "",
+        projectId: expense.projectId,
+        name: expense.vendor || "Recurring Expense",
+        amount: expense.amount,
+        frequency: frequency,
+        startDate: expense.date,
+        endDate: endDate || null,
+        category: expense.category || "subscriptions",
+        notes: expense.notes || "",
         active: true,
       });
     },
     onSuccess: () => {
       queryClient.invalidateQueries(['subscriptions', projectId]);
-      toast.success("Added to recurring expenses");
+      toast.success("Recurring subscription created");
+      setRecurringExpense(null);
     },
     onError: (error) => {
       console.error('Convert error:', error);
-      toast.error("Failed to add to recurring");
+      toast.error("Failed to create recurring subscription");
     }
   });
 
@@ -294,6 +294,10 @@ export default function ProjectDetail() {
     if (window.confirm(`Are you sure you want to delete "${project.title}"? This action cannot be undone.`)) {
       deleteProjectMutation.mutate(projectId);
     }
+  };
+
+  const handleMakeRecurring = (expense) => {
+    setRecurringExpense(expense);
   };
 
   const formatCurrency = (amount) => {
@@ -655,6 +659,14 @@ export default function ProjectDetail() {
           isOpen={showEventsModal} 
           onClose={() => setShowEventsModal(false)}
           darkMode={profile?.darkMode}
+          />
+
+          {/* Make Recurring Dialog */}
+          <MakeRecurringDialog
+            expense={recurringExpense}
+            darkMode={profile?.darkMode}
+            onConfirm={(data) => convertToRecurringMutation.mutate(data)}
+            onClose={() => setRecurringExpense(null)}
           />
           </div>
           </div>

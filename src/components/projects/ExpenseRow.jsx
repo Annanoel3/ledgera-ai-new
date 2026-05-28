@@ -165,7 +165,7 @@ export default function ExpenseRow({
                 onClick={() => onMakeRecurring(item)}
                 disabled={isRecurringLoading}
                 style={{ backgroundColor: "#22A699" }}
-                className="flex-1 text-sm h-8"
+                className="flex-1 text-sm h-8 text-white"
               >
                 {isRecurringLoading ? (
                   <Loader2 className="w-3 h-3 animate-spin" />
