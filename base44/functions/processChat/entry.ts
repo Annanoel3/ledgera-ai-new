@@ -74,7 +74,7 @@ const tools = [
         type: "function",
         function: {
             name: "update_income",
-            description: "Updates an existing income item",
+            description: "Updates an existing income item. IMPORTANT: If you don't already have the incomeId, call get_income first to find the record by amount, date, or notes — never ask the user for an ID.",
             parameters: {
                 type: "object",
                 properties: {
@@ -127,7 +127,7 @@ const tools = [
         type: "function",
         function: {
             name: "update_expense",
-            description: "Updates an existing expense item. Use this to recategorize expenses or move them between projects.",
+            description: "Updates an existing expense item. Use this to recategorize expenses or move them between projects. IMPORTANT: If you don't already have the expenseId, call get_expenses first to find the record by amount, date, vendor, or notes — never ask the user for an ID.",
             parameters: {
                 type: "object",
                 properties: {
@@ -729,19 +729,59 @@ Deno.serve(async (req) => {
             console.log('Created conversation:', conversation.id);
         }
 
-        // Add user message — support vision if fileUrls provided
+        // Separate image files from spreadsheet/document files
         const fileUrlsArray = Array.isArray(fileUrls) ? fileUrls : (fileUrls ? [fileUrls] : []);
-        if (fileUrlsArray.length > 0) {
+        const fileNamesArray = Array.isArray(body.fileNames) ? body.fileNames : (body.fileNames ? [body.fileNames] : []);
+        
+        const spreadsheetExtensions = ['xlsx', 'xls', 'csv'];
+        const imageUrls = [];
+        const spreadsheetFiles = [];
+        
+        fileUrlsArray.forEach((url, i) => {
+            const fileName = fileNamesArray[i] || '';
+            const ext = fileName.split('.').pop().toLowerCase();
+            if (spreadsheetExtensions.includes(ext)) {
+                spreadsheetFiles.push({ fileUrl: url, fileName });
+            } else {
+                imageUrls.push(url);
+            }
+        });
+
+        // Pre-process spreadsheets via processFinancialData so expenses exist before the AI responds
+        let spreadsheetSummary = '';
+        if (spreadsheetFiles.length > 0) {
+            try {
+                console.log('Pre-processing spreadsheet files:', spreadsheetFiles.map(f => f.fileName));
+                const procResult = await base44.asServiceRole.functions.invoke('processFinancialData', {
+                    action: 'processFiles',
+                    files: spreadsheetFiles,
+                    userMessage: message || ''
+                });
+                console.log('Spreadsheet processing result:', procResult);
+                const r = procResult?.data || procResult;
+                spreadsheetSummary = `[System: Spreadsheet(s) were processed automatically. Created ${r.expenseCount || 0} expense(s) and ${r.incomeCount || 0} income item(s) totaling $${((r.totalExpenses || 0) + (r.totalIncome || 0)).toFixed(2)}. ${r.uncertainAssignments?.length ? `Project assignment was uncertain for ${r.uncertainAssignments.length} item(s): ${JSON.stringify(r.uncertainAssignments)}` : ''} The records now exist in the database — use get_expenses/get_income to find them by amount, date, or vendor, then update their project assignment per the user's request.]`;
+            } catch (err) {
+                console.error('Spreadsheet pre-processing error:', err);
+                spreadsheetSummary = `[System: Attempted to process spreadsheet but encountered an error: ${err.message}]`;
+            }
+        }
+
+        // Add user message — support vision if image fileUrls provided
+        if (imageUrls.length > 0) {
             const contentParts = [];
             if (message) {
                 contentParts.push({ type: 'text', text: message });
             }
-            for (const url of fileUrlsArray) {
+            if (spreadsheetSummary) {
+                contentParts.push({ type: 'text', text: spreadsheetSummary });
+            }
+            for (const url of imageUrls) {
                 contentParts.push({ type: 'image_url', image_url: { url, detail: 'high' } });
             }
             messages.push({ role: 'user', content: contentParts });
         } else {
-            messages.push({ role: 'user', content: message || '' });
+            const fullMessage = [message, spreadsheetSummary].filter(Boolean).join('\n');
+            messages.push({ role: 'user', content: fullMessage || '' });
         }
 
         // Get user profile for context

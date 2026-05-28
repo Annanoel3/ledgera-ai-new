@@ -344,6 +344,7 @@ export default function Chat() {
   const [isTranscribing, setIsTranscribing] = useState(false);
   const [pendingDuplicates, setPendingDuplicates] = useState([]);
   const [lastFileUrls, setLastFileUrls] = useState([]);
+  const [lastFileNames, setLastFileNames] = useState([]);
   const fileInputRef = useRef(null);
   const messagesEndRef = useRef(null);
   const queryClient = useQueryClient();
@@ -480,6 +481,7 @@ export default function Chat() {
         }
         toast.success(`Uploaded ${selectedFiles.length} file(s)`);
         setLastFileUrls(fileUrls); // remember for next send
+        setLastFileNames(fileNames); // remember file names for next send
       } catch (error) {
         toast.error("Failed to upload files");
         setUploadingFile(false);
@@ -603,10 +605,12 @@ export default function Chat() {
           message: finalMessage,
           conversationId: conversationId || null,
           fileUrls: fileUrls.length > 0 ? fileUrls : undefined,
+          fileNames: fileNames.length > 0 ? fileNames : undefined,
         });
         
         // Clear file URLs after use
         setLastFileUrls([]);
+        setLastFileNames([]);
 
         if (response.data.error) {
           throw new Error(response.data.error);
@@ -654,12 +658,14 @@ export default function Chat() {
         const response = await processChat({
           message: message,
           conversationId: conversationId || null,
-          fileUrls: lastFileUrls.length > 0 ? lastFileUrls : undefined
+          fileUrls: lastFileUrls.length > 0 ? lastFileUrls : undefined,
+          fileNames: lastFileNames.length > 0 ? lastFileNames : undefined,
         });
         
-        // Clear file URLs after use
+        // Clear file URLs/names after use
         if (lastFileUrls.length > 0) {
           setLastFileUrls([]);
+          setLastFileNames([]);
         }
 
         if (response.data.error) {
