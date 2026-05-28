@@ -52,6 +52,21 @@ Deno.serve(async (req) => {
 
         // If it's time to charge, create expense
         if (nextChargeString <= todayString) {
+          // Dedup check: don't create if an auto-recurring entry already exists for this sub this period
+          const existingThisPeriod = await base44.asServiceRole.entities.ExpenseItem.filter({
+            projectId: sub.projectId,
+            vendor: sub.name,
+            notes: `Auto-recurring: ${sub.name}`
+          });
+          const alreadyChargedThisPeriod = existingThisPeriod.some(e => e.date === todayString);
+          if (alreadyChargedThisPeriod) {
+            // Still update lastChargeDate so we don't keep trying
+            await base44.asServiceRole.entities.RecurringSubscription.update(sub.id, {
+              lastChargeDate: todayString
+            });
+            continue;
+          }
+
           // Create expense
           await base44.asServiceRole.entities.ExpenseItem.create({
             projectId: sub.projectId,
