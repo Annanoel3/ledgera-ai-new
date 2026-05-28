@@ -162,7 +162,7 @@ const ChatHeader = ({ profile, showChatList, setShowChatList, handleNewChat, set
   </div>;
 
 
-const ChatInputArea = memo(({ profile, selectedFiles, removeFile, fileInputRef, handleFileSelect, input, setInput, isRecording, stopRecording, startRecording, handleSend, sendingMessage, uploadingFile }) =>
+const ChatInputArea = memo(({ profile, selectedFiles, removeFile, fileInputRef, handleFileSelect, input, setInput, isRecording, stopRecording, startRecording, handleSend, sendingMessage, uploadingFile, isTranscribing }) =>
     <div className="flex-shrink-0 w-full" style={{
     borderTop: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}`,
     boxShadow: profile?.funMode ? '0 -10px 15px -3px rgba(0, 0, 0, 0.1)' : '0 -4px 6px -1px rgba(0, 0, 0, 0.1)',
@@ -257,8 +257,10 @@ const ChatInputArea = memo(({ profile, selectedFiles, removeFile, fileInputRef, 
             animation: isRecording ? 'pulse 2s infinite' : 'none'
           }}
           size="icon"
-          disabled={uploadingFile}>
-            {isRecording ?
+          disabled={uploadingFile || isTranscribing}>
+            {isTranscribing ?
+          <Loader2 className="w-5 h-5 animate-spin text-white" /> :
+          isRecording ?
           <Square className="w-5 h-5 text-white" /> :
           <Mic className="w-5 h-5" style={{ color: profile?.funMode ? '#ffffff' : profile?.darkMode ? '#d1d5db' : '#111827' }} />
           }
@@ -305,6 +307,24 @@ const ChatInputArea = memo(({ profile, selectedFiles, removeFile, fileInputRef, 
             Uploading your files...
           </p>
       }
+        {isTranscribing &&
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: '0.5rem',
+        marginTop: '0.5rem'
+      }}>
+          <Loader2 className="w-3.5 h-3.5 animate-spin" style={{ color: profile?.funMode ? '#a855f7' : '#22A699' }} />
+          <p style={{
+          fontSize: '0.75rem',
+          fontWeight: '500',
+          color: profile?.funMode ? '#a855f7' : '#22A699'
+        }}>
+              Transcribing your voice...
+            </p>
+        </div>
+      }
       </div>
     </div>
 );
@@ -321,6 +341,7 @@ export default function Chat() {
   const [backgroundProcessing, setBackgroundProcessing] = useState(false);
   const [showCapabilities, setShowCapabilities] = useState(false);
   const [sendingMessage, setSendingMessage] = useState(false);
+  const [isTranscribing, setIsTranscribing] = useState(false);
   const [pendingDuplicates, setPendingDuplicates] = useState([]);
   const [lastFileUrls, setLastFileUrls] = useState([]);
   const fileInputRef = useRef(null);
@@ -746,7 +767,7 @@ export default function Chat() {
         const blob = new Blob(audioChunksRef.current, { type: recorder.mimeType });
         audioChunksRef.current = [];
 
-        toast.info("Transcribing...");
+        setIsTranscribing(true);
 
         // Convert blob to base64
         const arrayBuffer = await blob.arrayBuffer();
@@ -757,23 +778,24 @@ export default function Chat() {
         const ext = recorder.mimeType.includes('ogg') ? 'ogg' : 'webm';
 
         const response = await speechToText({ audio_base64: base64, filename: `audio.${ext}` });
+        setIsTranscribing(false);
         if (response.data.text) {
-          toast.success("Transcription complete!");
           setInput(response.data.text);
         }
       } else {
         // Capacitor fallback path
         const result = await VoiceRecorder.stopRecording();
         const { recordDataBase64 } = result.value;
-        toast.info("Transcribing...");
+        setIsTranscribing(true);
         const response = await speechToText({ audio_base64: recordDataBase64, filename: 'audio.m4a' });
+        setIsTranscribing(false);
         if (response.data.text) {
-          toast.success("Transcription complete!");
           setInput(response.data.text);
         }
       }
     } catch (error) {
       console.error('Stop recording error:', error);
+      setIsTranscribing(false);
       toast.error("Could not process recording. Please try again.");
     }
   };
@@ -1263,7 +1285,8 @@ export default function Chat() {
         startRecording={startRecording}
         handleSend={handleSend}
         sendingMessage={sendingMessage}
-        uploadingFile={uploadingFile} />
+        uploadingFile={uploadingFile}
+        isTranscribing={isTranscribing} />
 
     </div>);
 
