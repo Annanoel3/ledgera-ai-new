@@ -10,11 +10,15 @@ export const AuthProvider = ({ children }) => {
   const [isLoadingAuth, setIsLoadingAuth] = useState(true);
   const [isLoadingPublicSettings, setIsLoadingPublicSettings] = useState(true);
   const [authError, setAuthError] = useState(null);
-  const [appPublicSettings, setAppPublicSettings] = useState(null); // Contains only { id, public_settings }
+  const [appPublicSettings, setAppPublicSettings] = useState(null);
+  const [hasCheckedAuth, setHasCheckedAuth] = useState(false);
 
   useEffect(() => {
-    checkAppState();
-  }, []);
+    if (!hasCheckedAuth) {
+      setHasCheckedAuth(true);
+      checkAppState();
+    }
+  }, [hasCheckedAuth]);
 
   const checkAppState = async () => {
     try {
