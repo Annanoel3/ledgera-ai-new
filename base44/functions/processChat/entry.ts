@@ -343,6 +343,26 @@ function cleanMessagesForOpenAI(messages) {
             cleaned.content = 'Function executed successfully';
         }
 
+        // Normalize array content — only user messages with image_url parts are valid multimodal
+        // All other array content (e.g. stale stored arrays) must be flattened to a string
+        if (Array.isArray(cleaned.content)) {
+            const hasImagePart = cleaned.content.some(p => p.type === 'image_url');
+            if (cleaned.role === 'user' && hasImagePart) {
+                // Valid vision message — leave as-is
+            } else {
+                // Flatten to plain text
+                cleaned.content = cleaned.content
+                    .filter(p => p.type === 'text')
+                    .map(p => p.text)
+                    .join('\n') || '';
+            }
+        }
+
+        // Ensure content is always a string for non-user roles
+        if (cleaned.role !== 'user' && cleaned.content !== null && cleaned.content !== undefined && typeof cleaned.content !== 'string') {
+            cleaned.content = String(cleaned.content);
+        }
+
         // Truncate large tool result payloads (e.g. get_income/get_expenses) to avoid token overflow
         if (cleaned.role === 'tool' && cleaned.content && cleaned.content.length > 3000) {
             try {
