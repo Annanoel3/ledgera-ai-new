@@ -932,22 +932,21 @@ Be conversational, ask clarifying questions, and wait for explicit user intent b
             messages.push(responseMessage);
         }
 
-        // Sanitize messages before saving — only keep user/assistant messages, drop tool call noise
+        // Sanitize messages before saving — only keep user/assistant messages, always store content as string
         const messagesForDB = messages
             .filter(msg => msg.role === 'user' || msg.role === 'assistant')
             .map(msg => {
-                // Strip tool_calls from assistant messages to keep storage lean
                 const { tool_calls, ...rest } = msg;
-                // Keep multimodal content arrays (images) intact for user messages, convert assistant to text
-                if (rest.role === 'user' && Array.isArray(rest.content)) {
-                    // Keep the full multimodal array for user messages with images
-                    return rest;
-                } else if (rest.content && typeof rest.content !== 'string') {
-                    // Convert other multimodal content to plain text
-                    const textParts = Array.isArray(rest.content)
-                        ? rest.content.filter(p => p.type === 'text').map(p => p.text).join('\n')
-                        : String(rest.content);
-                    return { ...rest, content: textParts || '[image]' };
+                // Always flatten array content to a plain string for DB storage
+                if (Array.isArray(rest.content)) {
+                    rest.content = rest.content
+                        .filter(p => p.type === 'text')
+                        .map(p => p.text)
+                        .join('\n') || '[image]';
+                }
+                // Ensure content is always a string
+                if (typeof rest.content !== 'string') {
+                    rest.content = rest.content != null ? String(rest.content) : '';
                 }
                 return rest;
             });
