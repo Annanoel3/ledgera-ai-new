@@ -81,14 +81,24 @@ export default function Dashboard() {
 
   const { data: incomeItems } = useQuery({
     queryKey: ['incomeItems'],
-    queryFn: () => base44.entities.IncomeItem.filter({ created_by: user.email }, '-date'),
+    queryFn: async () => {
+      const allProjects = await base44.entities.Project.filter({ created_by: user.email });
+      const projectIds = allProjects.map(p => p.id);
+      const items = await base44.entities.IncomeItem.list('-date', 500);
+      return items.filter(item => projectIds.includes(item.projectId));
+    },
     initialData: [],
     enabled: !!user
   });
 
   const { data: expenseItems } = useQuery({
     queryKey: ['expenseItems'],
-    queryFn: () => base44.entities.ExpenseItem.filter({ created_by: user.email }, '-date'),
+    queryFn: async () => {
+      const allProjects = await base44.entities.Project.filter({ created_by: user.email });
+      const projectIds = allProjects.map(p => p.id);
+      const items = await base44.entities.ExpenseItem.list('-date', 500);
+      return items.filter(item => projectIds.includes(item.projectId));
+    },
     initialData: [],
     enabled: !!user
   });
