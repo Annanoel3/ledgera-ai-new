@@ -356,22 +356,8 @@ export default function Dashboard() {
         </div>
       )}
       <div className="max-w-6xl mx-auto">
-        <div className="flex items-center justify-between mb-8">
+        <div className="mb-8">
         <h1 className="text-3xl font-bold" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>Dashboard</h1>
-        <Select value={selectedYear} onValueChange={(y) => { setSelectedYear(y); setSelectedMonth('all'); }}>
-          <SelectTrigger className="w-32" style={{
-            backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff',
-            border: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}`,
-            color: profile?.darkMode ? '#ffffff' : '#111827'
-          }}>
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent style={{ backgroundColor: profile?.darkMode ? '#374151' : '#ffffff', border: `1px solid ${profile?.darkMode ? '#4b5563' : '#e5e7eb'}` }}>
-            {availableYears.map(year => (
-              <SelectItem key={year} value={year} style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>{year}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
         </div>
 
         {/* Quick Navigation */}
