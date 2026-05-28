@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { MessageSquare, LayoutDashboard, FolderKanban, Settings, Menu, X, FileText, TrendingUp, LogOut, CalendarDays, ChevronDown } from "lucide-react";
+import { MessageSquare, LayoutDashboard, Settings, Menu, X, LogOut, FolderKanban, CalendarDays, TrendingUp, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
@@ -10,17 +10,7 @@ import OneSignalInit from "@/components/shared/OneSignalInit";
 
 const navItems = [
 { title: "Chat", url: createPageUrl("Chat"), icon: MessageSquare },
-{
-  title: "Dashboard",
-  url: createPageUrl("Dashboard"),
-  icon: LayoutDashboard,
-  subItems: [
-  { title: "Projects", url: createPageUrl("Projects"), icon: FolderKanban },
-  { title: "Calendar", url: "/Calendar", icon: CalendarDays },
-  { title: "Reports", url: createPageUrl("Reports"), icon: TrendingUp },
-  { title: "Documents", url: createPageUrl("Documents"), icon: FileText }]
-
-},
+{ title: "Dashboard", url: createPageUrl("Dashboard"), icon: LayoutDashboard },
 { title: "Settings", url: createPageUrl("Settings"), icon: Settings }];
 
 
@@ -29,7 +19,6 @@ export default function Layout({ children }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
   const [funMode, setFunMode] = useState(false);
-  const [dashboardExpanded, setDashboardExpanded] = useState(true);
 
   const { data: profile } = useQuery({
     queryKey: ['userProfile'],
@@ -173,106 +162,34 @@ export default function Layout({ children }) {
                 <nav className="flex-1 space-y-1 px-3">
                   {navItems.map((item) => {
                   const isActive = currentPath === item.url || currentPath.startsWith(item.url + '/');
-                  const hasSubItems = item.subItems && item.subItems.length > 0;
-                  const isSubItemActive = hasSubItems && item.subItems.some((sub) => currentPath === sub.url || currentPath.startsWith(sub.url + '/'));
 
                   return (
-                    <div key={item.title}>
-                        {hasSubItems ?
-                      <>
-                            <button
-                          onClick={() => setDashboardExpanded(!dashboardExpanded)}
-                          className="w-full group flex items-center px-3 py-3 text-sm font-medium rounded-lg transition-all justify-between"
-                          style={isActive || isSubItemActive ? {
-                            backgroundColor: primaryColor,
-                            color: '#ffffff'
-                          } : {
-                            color: darkMode ? '#d1d5db' : '#374151',
-                            backgroundColor: 'transparent'
-                          }}
-                          onMouseEnter={(e) => {
-                            if (!isActive && !isSubItemActive) {
-                              e.currentTarget.style.backgroundColor = darkMode ? '#1f2937' : '#f3f4f6';
-                            }
-                          }}
-                          onMouseLeave={(e) => {
-                            if (!isActive && !isSubItemActive) {
-                              e.currentTarget.style.backgroundColor = 'transparent';
-                            }
-                          }}>
-                          
-                              <div className="flex items-center">
-                                <item.icon className="mr-3 h-5 w-5 flex-shrink-0" />
-                                {item.title}
-                              </div>
-                              <ChevronDown
-                            className="h-4 w-4 transition-transform"
-                            style={{ transform: dashboardExpanded ? 'rotate(0deg)' : 'rotate(-90deg)' }} />
-                          
-                            </button>
-                            {dashboardExpanded &&
-                        <div className="space-y-1 mt-1">
-                                {item.subItems.map((subItem) => {
-                            const isSubActive = currentPath === subItem.url || currentPath.startsWith(subItem.url + '/');
-                            return (
-                              <Link
-                                key={subItem.title}
-                                to={subItem.url}
-                                className="group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all ml-6"
-                                style={isSubActive ? {
-                                  backgroundColor: primaryColor,
-                                  color: '#ffffff'
-                                } : {
-                                  color: darkMode ? '#9ca3af' : '#6b7280',
-                                  backgroundColor: 'transparent'
-                                }}
-                                onMouseEnter={(e) => {
-                                  if (!isSubActive) {
-                                    e.currentTarget.style.backgroundColor = darkMode ? '#1f2937' : '#f3f4f6';
-                                  }
-                                }}
-                                onMouseLeave={(e) => {
-                                  if (!isSubActive) {
-                                    e.currentTarget.style.backgroundColor = 'transparent';
-                                  }
-                                }}>
-                                
-                                      <subItem.icon className="mr-3 h-4 w-4 flex-shrink-0" />
-                                      {subItem.title}
-                                    </Link>);
-
-                          })}
-                              </div>
+                    <Link
+                      key={item.title}
+                      to={item.url}
+                      className="group flex items-center px-3 py-3 text-sm font-medium rounded-lg transition-all"
+                      style={isActive ? {
+                        backgroundColor: primaryColor,
+                        color: '#ffffff'
+                      } : {
+                        color: darkMode ? '#d1d5db' : '#374151',
+                        backgroundColor: 'transparent'
+                      }}
+                      onMouseEnter={(e) => {
+                        if (!isActive) {
+                          e.currentTarget.style.backgroundColor = darkMode ? '#1f2937' : '#f3f4f6';
                         }
-                          </> :
-
-                      <Link
-                        to={item.url}
-                        className="group flex items-center px-3 py-3 text-sm font-medium rounded-lg transition-all"
-                        style={isActive ? {
-                          backgroundColor: primaryColor,
-                          color: '#ffffff'
-                        } : {
-                          color: darkMode ? '#d1d5db' : '#374151',
-                          backgroundColor: 'transparent'
-                        }}
-                        onMouseEnter={(e) => {
-                          if (!isActive) {
-                            e.currentTarget.style.backgroundColor = darkMode ? '#1f2937' : '#f3f4f6';
-                          }
-                        }}
-                        onMouseLeave={(e) => {
-                          if (!isActive) {
-                            e.currentTarget.style.backgroundColor = 'transparent';
-                          }
-                        }}
-                        aria-current={isActive ? "page" : undefined}>
-                        
-                            <item.icon className="mr-3 h-5 w-5 flex-shrink-0" />
-                            {item.title}
-                          </Link>
-                      }
-                      </div>);
+                      }}
+                      onMouseLeave={(e) => {
+                        if (!isActive) {
+                          e.currentTarget.style.backgroundColor = 'transparent';
+                        }
+                      }}
+                      aria-current={isActive ? "page" : undefined}>
+                      
+                        <item.icon className="mr-3 h-5 w-5 flex-shrink-0" />
+                        {item.title}
+                      </Link>);
 
                 })}
                 </nav>
@@ -346,75 +263,23 @@ export default function Layout({ children }) {
                 <nav className="space-y-1 flex-1">
                   {navItems.map((item) => {
                   const isActive = currentPath === item.url;
-                  const hasSubItems = item.subItems && item.subItems.length > 0;
-                  const isSubItemActive = hasSubItems && item.subItems.some((sub) => currentPath === sub.url || currentPath.startsWith(sub.url + '/'));
 
                   return (
-                    <div key={item.title}>
-                        {hasSubItems ?
-                      <>
-                            <button
-                          onClick={() => setDashboardExpanded(!dashboardExpanded)}
-                          className="w-full group flex items-center px-3 py-3 text-sm font-medium rounded-lg transition-all justify-between"
-                          style={isActive || isSubItemActive ? {
-                            backgroundColor: primaryColor,
-                            color: '#ffffff'
-                          } : {
-                            color: darkMode ? '#d1d5db' : '#374151'
-                          }}>
-                          
-                              <div className="flex items-center">
-                                <item.icon className="mr-3 h-5 w-5" />
-                                {item.title}
-                              </div>
-                              <ChevronDown
-                            className="h-4 w-4 transition-transform"
-                            style={{ transform: dashboardExpanded ? 'rotate(0deg)' : 'rotate(-90deg)' }} />
-                          
-                            </button>
-                            {dashboardExpanded &&
-                        <div className="space-y-1 mt-1">
-                                {item.subItems.map((subItem) => {
-                            const isSubActive = currentPath === subItem.url || currentPath.startsWith(subItem.url + '/');
-                            return (
-                              <Link
-                                key={subItem.title}
-                                to={subItem.url}
-                                onClick={() => setMobileMenuOpen(false)}
-                                className="group flex items-center px-3 py-2 text-sm font-medium rounded-lg ml-6"
-                                style={isSubActive ? {
-                                  backgroundColor: primaryColor,
-                                  color: '#ffffff'
-                                } : {
-                                  color: darkMode ? '#9ca3af' : '#6b7280'
-                                }}>
-                                
-                                      <subItem.icon className="mr-3 h-4 w-4" />
-                                      {subItem.title}
-                                    </Link>);
-
-                          })}
-                              </div>
-                        }
-                          </> :
-
-                      <Link
-                        key={item.title}
-                        to={item.url}
-                        onClick={() => setMobileMenuOpen(false)}
-                        className="group flex items-center px-3 py-3 text-sm font-medium rounded-lg"
-                        style={isActive ? {
-                          backgroundColor: primaryColor,
-                          color: '#ffffff'
-                        } : {
-                          color: darkMode ? '#d1d5db' : '#374151'
-                        }}>
-                        
-                            <item.icon className="mr-3 h-5 w-5" />
-                            {item.title}
-                          </Link>
-                      }
-                      </div>);
+                    <Link
+                      key={item.title}
+                      to={item.url}
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="group flex items-center px-3 py-3 text-sm font-medium rounded-lg"
+                      style={isActive ? {
+                        backgroundColor: primaryColor,
+                        color: '#ffffff'
+                      } : {
+                        color: darkMode ? '#d1d5db' : '#374151'
+                      }}>
+                      
+                        <item.icon className="mr-3 h-5 w-5" />
+                        {item.title}
+                      </Link>);
 
                 })}
                 </nav>
