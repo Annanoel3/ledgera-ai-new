@@ -176,47 +176,36 @@ Deno.serve(async (req) => {
                     const isSpreadsheet = ['xlsx', 'xls', 'csv'].includes(ext);
 
                     if (isSpreadsheet) {
-                        // Use ExtractDataFromUploadedFile for spreadsheets
+                        // Use a flat per-row schema so ExtractDataFromUploadedFile maps each row directly
                         console.log(`📊 Using ExtractDataFromUploadedFile for spreadsheet: ${file.fileName}`);
+                        const rowSchema = {
+                            type: "object",
+                            properties: {
+                                date: { type: "string" },
+                                amount: { type: "number" },
+                                vendor: { type: "string" },
+                                description: { type: "string" }
+                            }
+                        };
                         const extractResult = await db.integrations.Core.ExtractDataFromUploadedFile({
                             file_url: file.fileUrl,
-                            json_schema: transactionSchema
+                            json_schema: rowSchema
                         });
+                        console.log(`📊 ExtractDataFromUploadedFile raw output for ${file.fileName}:`, JSON.stringify(extractResult?.output).slice(0, 500));
                         if (extractResult?.status === 'success' && extractResult?.output) {
                             const output = extractResult.output;
-                            // output can be: { transactions: [...] } OR an array of row objects
-                            if (Array.isArray(output)) {
-                                // Each element may be a row object or { transactions: [...] }
-                                const allTx = [];
-                                for (const row of output) {
-                                    if (row?.transactions && Array.isArray(row.transactions)) {
-                                        allTx.push(...row.transactions);
-                                    } else if (row?.amount != null) {
-                                        // Row itself is a transaction-like object
-                                        allTx.push(row);
-                                    }
-                                }
-                                visionResult = { transactions: allTx };
-                                console.log(`📊 Flattened ${allTx.length} transactions from array output`);
-                            } else {
-                                visionResult = output;
-                            }
+                            const rows = Array.isArray(output) ? output : [output];
+                            // Filter out summary/header rows (no numeric amount, or amount=0, or vendor=TOTAL etc.)
+                            const validRows = rows.filter(r => {
+                                const amt = parseFloat(r?.amount);
+                                return !isNaN(amt) && amt > 0 && (r?.vendor || r?.description) && 
+                                       !(r?.vendor || '').toUpperCase().includes('TOTAL');
+                            });
+                            visionResult = { transactions: validRows };
+                            console.log(`📊 Extracted ${validRows.length} valid rows from ${rows.length} total rows`);
                         } else {
                             console.warn(`⚠️ ExtractDataFromUploadedFile failed for ${file.fileName}:`, extractResult?.details);
-                        }
-                        
-                        // Fallback: if still no transactions, use InvokeLLM vision on the file
-                        if (!visionResult?.transactions || visionResult.transactions.length === 0) {
-                            console.log(`⚠️ ExtractDataFromUploadedFile returned no transactions, falling back to InvokeLLM for ${file.fileName}`);
-                            let typeHintFallback = '';
-                            if (userSaysIncome && !userSaysExpense) typeHintFallback = 'The user says this is INCOME.';
-                            else if (userSaysExpense && !userSaysIncome) typeHintFallback = 'The user says this is an EXPENSE.';
-                            visionResult = await db.integrations.Core.InvokeLLM({
-                                prompt: `Extract ALL financial transactions from this spreadsheet file. ${typeHintFallback} User context: "${userMessage}". Available projects: ${allProjects.map(p => p.title).join(', ')}. Return every row that has a dollar amount. For each: date (YYYY-MM-DD), amount (number), vendor (string), description (string), type ("income" or "expense"), projectHint (which project), confidence ("high"/"medium"/"low").`,
-                                file_urls: [file.fileUrl],
-                                response_json_schema: transactionSchema
-                            });
-                            console.log(`📊 InvokeLLM fallback result:`, visionResult);
+                            visionResult = { transactions: [] };
                         }
                     } else {
                         // Use InvokeLLM vision for images/PDFs

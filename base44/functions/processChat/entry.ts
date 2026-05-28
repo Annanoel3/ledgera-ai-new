@@ -763,10 +763,14 @@ Deno.serve(async (req) => {
                 });
                 console.log('Spreadsheet processing result:', procResult);
                 const r = procResult?.data || procResult;
-                spreadsheetSummary = `[System: Spreadsheet(s) were processed automatically. Created ${r.expenseCount || 0} expense(s) and ${r.incomeCount || 0} income item(s) totaling $${((r.totalExpenses || 0) + (r.totalIncome || 0)).toFixed(2)}. ${r.uncertainAssignments?.length ? `Project assignment was uncertain for ${r.uncertainAssignments.length} item(s): ${JSON.stringify(r.uncertainAssignments)}` : ''} The records now exist in the database — use get_expenses/get_income to find them by amount, date, or vendor, then update their project assignment per the user's request.]`;
+                if ((r.expenseCount || 0) + (r.incomeCount || 0) > 0) {
+                    spreadsheetSummary = `[System: Spreadsheet processed. Created ${r.expenseCount || 0} expense(s) and ${r.incomeCount || 0} income item(s) totaling $${((r.totalExpenses || 0) + (r.totalIncome || 0)).toFixed(2)}. ${r.uncertainAssignments?.length ? `Project assignment uncertain for: ${JSON.stringify(r.uncertainAssignments)}` : ''} IMPORTANT: These records are already saved. Do NOT call create_expense or create_income again for this file. Use get_expenses/get_income to find them, then update project/category if needed per user's request.]`;
+                } else {
+                    spreadsheetSummary = `[System: The spreadsheet was uploaded but no transactions could be extracted from it. Do NOT invent or guess any transactions. Tell the user the file could not be parsed and ask them to paste the data as text or describe what they want added.]`;
+                }
             } catch (err) {
                 console.error('Spreadsheet pre-processing error:', err);
-                spreadsheetSummary = `[System: The spreadsheet file was uploaded. Automatic extraction encountered an issue (${err.message}). The user's message contains instructions about what to do with the data. Please ask the user to clarify what specific data they want added, or ask them to paste the relevant rows as text so you can add them manually using create_expense/create_income.]`;
+                spreadsheetSummary = `[System: The spreadsheet file could not be processed (${err.message}). Do NOT invent any transactions. Ask the user to paste the data as text instead.]`;
             }
         }
 
