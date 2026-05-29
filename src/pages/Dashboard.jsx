@@ -241,7 +241,9 @@ export default function Dashboard() {
   const monthEnd = endOfMonth(new Date(parseInt(selectedYear), displayMonthNum, 1));
 
   const filterByPeriod = (items) => items.filter((item) => {
+    if (!item.date) return false;
     const itemDate = new Date(item.date);
+    if (isNaN(itemDate.getTime())) return false;
     if (selectedMonth === 'all') return itemDate >= yearStart && itemDate <= yearEnd;
     if (selectedMonth === 'ytd') return itemDate >= yearStart && itemDate <= ytdEnd;
     return itemDate >= monthStart && itemDate <= monthEnd;
@@ -255,8 +257,8 @@ export default function Dashboard() {
   const periodProfit = periodIncome - periodExpenses;
 
   // Calculate 6-month chart data (always uses all items for year context)
-  const allYearIncomeItems = incomeItems.filter(item => { const d = new Date(item.date); return d >= yearStart && d <= yearEnd; });
-  const allYearExpenseItems = expenseItems.filter(item => { const d = new Date(item.date); return d >= yearStart && d <= yearEnd; });
+  const allYearIncomeItems = incomeItems.filter(item => { if (!item.date) return false; const d = new Date(item.date); return !isNaN(d.getTime()) && d >= yearStart && d <= yearEnd; });
+  const allYearExpenseItems = expenseItems.filter(item => { if (!item.date) return false; const d = new Date(item.date); return !isNaN(d.getTime()) && d >= yearStart && d <= yearEnd; });
 
   const chartData = [];
   for (let i = 5; i >= 0; i--) {
