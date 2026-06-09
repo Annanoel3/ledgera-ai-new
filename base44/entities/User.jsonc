@@ -1,0 +1,49 @@
+{
+  "name": "User",
+  "type": "object",
+  "properties": {
+    "onesignal_player_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": [],
+      "description": "OneSignal player IDs for push notifications"
+    },
+    "notification_settings": {
+      "type": "object",
+      "properties": {
+        "check_ins": {
+          "type": "boolean",
+          "default": true
+        },
+        "financial_tips": {
+          "type": "boolean",
+          "default": true
+        },
+        "weekly_summary": {
+          "type": "boolean",
+          "default": true
+        }
+      },
+      "default": {
+        "check_ins": true,
+        "financial_tips": true,
+        "weekly_summary": true
+      }
+    },
+    "quiet_hours_enabled": {
+      "type": "boolean",
+      "default": false
+    },
+    "quiet_hours_start": {
+      "type": "string",
+      "default": "22:00"
+    },
+    "quiet_hours_end": {
+      "type": "string",
+      "default": "08:00"
+    }
+  },
+  "required": []
+}

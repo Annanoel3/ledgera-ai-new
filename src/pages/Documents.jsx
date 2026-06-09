@@ -180,36 +180,31 @@ export default function Documents() {
             </CardContent>
           </Card>
         ) : (
-          <div className="space-y-8">
+          <div className="space-y-6">
             {Object.entries(documentsByMonth).map(([month, docs]) => (
               <div key={month}>
-                <h2 className="text-lg font-semibold mb-4 flex items-center gap-2" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>
+                <h2 className="text-lg font-semibold mb-3 flex items-center gap-2" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>
                   <FolderOpen className="w-5 h-5 text-[#22A699]" />
                   {month}
                 </h2>
-                <div className="grid gap-4">
-                  {docs.map((doc) => (
+                <div className="space-y-3">
+                   {docs.map((doc) => (
                     <Card key={doc.id} className="hover:shadow-lg transition-all" style={{ backgroundColor: profile?.darkMode ? '#1f2937' : '#ffffff', border: `1px solid ${profile?.darkMode ? '#374151' : '#e5e7eb'}` }}>
-                      <CardContent className="p-6">
-                        <div className="flex items-start justify-between">
-                          <div className="flex items-start gap-4 flex-1">
-                            <div className="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0" style={{ backgroundColor: profile?.darkMode ? '#374151' : '#f3f4f6' }}>
-                              <FileText className="w-6 h-6" style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }} />
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <h3 className="font-semibold mb-1 truncate" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>{doc.fileName}</h3>
-                              <div className="flex items-center gap-2 mb-2">
-                                <Badge className={typeColors[doc.fileType]}>{doc.fileType}</Badge>
-                                <span className="text-sm" style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>
-                                  {format(new Date(doc.uploadDate), 'MMM d, yyyy')}
-                                </span>
-                              </div>
-                              {doc.notes && (
-                                <p className="text-sm" style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>{doc.notes}</p>
-                              )}
+                      <CardContent className="p-4">
+                        <div className="flex items-center justify-between gap-4">
+                          <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0" style={{ backgroundColor: profile?.darkMode ? '#374151' : '#f3f4f6' }}>
+                            <FileText className="w-5 h-5" style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }} />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <h3 className="font-semibold text-sm truncate" style={{ color: profile?.darkMode ? '#ffffff' : '#111827' }}>{doc.fileName}</h3>
+                            <div className="flex items-center gap-2 mt-1 flex-wrap">
+                              <Badge className={typeColors[doc.fileType]}>{doc.fileType}</Badge>
+                              <span className="text-xs" style={{ color: profile?.darkMode ? '#9ca3af' : '#6b7280' }}>
+                                {format(new Date(doc.uploadDate), 'MMM d, yyyy')}
+                              </span>
                             </div>
                           </div>
-                          <div className="flex gap-2">
+                          <div className="flex gap-2 flex-shrink-0">
                             <Button
                               variant="outline"
                               size="icon"

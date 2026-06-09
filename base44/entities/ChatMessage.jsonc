@@ -1,0 +1,35 @@
+{
+  "name": "ChatMessage",
+  "type": "object",
+  "properties": {
+    "projectId": {
+      "type": "string",
+      "description": "Associated project ID"
+    },
+    "sender": {
+      "type": "string",
+      "enum": [
+        "user",
+        "ai"
+      ],
+      "description": "Message sender"
+    },
+    "text": {
+      "type": "string",
+      "description": "Message content"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Message timestamp"
+    },
+    "structuredData": {
+      "type": "object",
+      "description": "Created/updated items metadata"
+    }
+  },
+  "required": [
+    "sender",
+    "text"
+  ]
+}

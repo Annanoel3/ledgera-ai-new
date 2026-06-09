@@ -1,0 +1,107 @@
+{
+  "name": "Conversation",
+  "type": "object",
+  "properties": {
+    "userEmail": {
+      "type": "string",
+      "description": "Email of the user who owns this conversation"
+    },
+    "messages": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "role": {
+            "type": "string",
+            "enum": [
+              "user",
+              "assistant",
+              "tool",
+              "system"
+            ]
+          },
+          "content": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string",
+            "description": "Optional: name of the tool called"
+          },
+          "tool_calls": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "function"
+                  ]
+                },
+                "function": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "arguments": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "tool_call_id": {
+            "type": "string",
+            "description": "The ID of the tool call this message is a response to"
+          }
+        }
+      },
+      "description": "Array of messages in the conversation history"
+    },
+    "name": {
+      "type": "string",
+      "description": "Short name for the conversation"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp of conversation creation"
+    }
+  },
+  "required": [
+    "userEmail",
+    "messages",
+    "name",
+    "createdAt"
+  ],
+  "security": {
+    "read": {
+      "$or": [
+        {
+          "userEmail": "{{user.email}}"
+        },
+        {
+          "created_by": "{{user.email}}"
+        },
+        {
+          "service_role": true
+        }
+      ]
+    },
+    "write": {
+      "$or": [
+        {
+          "userEmail": "{{user.email}}"
+        },
+        {
+          "created_by": "{{user.email}}"
+        }
+      ]
+    }
+  }
+}
