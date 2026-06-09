@@ -7,6 +7,7 @@ import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
 import OneSignalInit from "@/components/shared/OneSignalInit";
+import AdManager from './components/shared/AdManager';
 
 const navItems = [
 { title: "Chat", url: createPageUrl("Chat"), icon: MessageSquare },
@@ -91,6 +92,7 @@ export default function Layout({ children }) {
   return (
     <>
       {user && <OneSignalInit user={user} />}
+      <AdManager />
       
       <style>{`
         :root {
