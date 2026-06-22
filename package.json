@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "@base44/sdk": "^0.8.32",
-    "@base44/vite-plugin": "^1.0.21",
+    "@base44/vite-plugin": "^1.0.23",
     "@capacitor/android": "^7.0.0",
     "@capacitor/camera": "^7.0.5",
     "@capacitor/cli": "^7.0.0",
