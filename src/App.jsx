@@ -113,7 +113,6 @@ function App() {
         <QueryClientProvider client={queryClientInstance}>
           <Router>
             <Routes>
-              <Route path="/" element={<Home />} />
               <Route path="/PrivacyPolicy" element={<PrivacyPolicy />} />
               <Route path="/Terms" element={<Terms />} />
               <Route path="/GoogleDataPolicy" element={<GoogleDataPolicy />} />
@@ -123,6 +122,7 @@ function App() {
                   <>
                     <NavigationTracker />
                     <Routes>
+                      <Route path="/" element={<Home />} />
                       <Route path="/ProjectFinancials" element={<LayoutWrapper currentPageName="ProjectFinancials"><ProjectFinancials /></LayoutWrapper>} />
                       <Route path="*" element={<AuthenticatedApp />} />
                     </Routes>
