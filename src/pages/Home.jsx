@@ -31,14 +31,17 @@ export default function Home() {
             <img
               src="https://media.base44.com/images/public/68eaceb5d712c1b62b8bd4d5/5d5e471f5_CopyofNope10803.png"
               alt="Mediocre at Best Dev"
-              className="w-24 h-24 mx-auto mb-3 rounded-lg shadow-sm"
+              className="w-20 h-20 mx-auto mb-4 rounded-lg shadow-sm"
             />
-            <img
-              src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68eaceb5d712c1b62b8bd4d5/83975f5f2_Untitleddesign9.png"
-              alt="Ledgera AI"
-              className="w-16 h-16 mx-auto mb-4"
-            />
-            <h1 className="text-4xl font-bold text-slate-900 mb-2">Ledgera AI</h1>
+            <h1 className="text-5xl font-bold text-slate-900 mb-1 tracking-tight">MediocreAtBestDev</h1>
+            <div className="flex items-center justify-center gap-2 mb-2">
+              <img
+                src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68eaceb5d712c1b62b8bd4d5/83975f5f2_Untitleddesign9.png"
+                alt="Ledgera AI"
+                className="w-6 h-6"
+              />
+              <span className="text-xl font-semibold text-slate-700">Ledgera AI</span>
+            </div>
             <p className="text-lg text-slate-600">Smart bookkeeping for your business</p>
           </div>
 
