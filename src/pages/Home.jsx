@@ -45,9 +45,18 @@ export default function Home() {
             <p className="text-lg text-slate-600">Smart bookkeeping for your business</p>
           </div>
 
-          <p className="text-slate-700 leading-relaxed">
-            Manage your projects, track income and expenses, sync with Google Calendar, and get AI-powered financial insights.
-          </p>
+          <div className="text-left bg-white rounded-lg border border-slate-200 p-5 space-y-3 shadow-sm">
+            <h2 className="text-lg font-bold text-slate-900 text-center">About this app</h2>
+            <p className="text-sm text-slate-700 leading-relaxed">
+              <strong>MediocreAtBestDev</strong> is the developer and publisher of <strong>Ledgera AI</strong>, an AI-powered bookkeeping application designed for freelancers and small business owners.
+            </p>
+            <p className="text-sm text-slate-700 leading-relaxed">
+              The purpose of Ledgera AI is to help users easily track their business income and expenses, organize finances by project, generate financial reports, and get AI-powered insights into their cash flow. Users can also optionally sync their Google Calendar to receive reminders to log transactions after events.
+            </p>
+            <p className="text-sm text-slate-700 leading-relaxed">
+              Ledgera AI uses Google OAuth to securely authenticate users and, optionally, to read and write calendar events. It does not access Gmail, Google Drive, or any other Google services.
+            </p>
+          </div>
 
           <div className="bg-slate-100 rounded-lg p-4 text-left space-y-4 text-sm text-slate-700">
             <div>
