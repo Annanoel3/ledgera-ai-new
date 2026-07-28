@@ -28,9 +28,13 @@ export default function Home() {
       <div className="flex-1 flex items-center justify-center" style={{ paddingTop: 'max(2rem, env(safe-area-inset-top))' }}>
         <div className="max-w-md w-full text-center space-y-8">
           <div>
-            <p className="text-xs font-semibold tracking-[0.2em] uppercase text-slate-500 mb-2">A MediocreAtBestDev App</p>
-            <img 
-              src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68eaceb5d712c1b62b8bd4d5/83975f5f2_Untitleddesign9.png" 
+            <img
+              src="https://media.base44.com/images/public/68eaceb5d712c1b62b8bd4d5/5d5e471f5_CopyofNope10803.png"
+              alt="Mediocre at Best Dev"
+              className="w-24 h-24 mx-auto mb-3 rounded-lg shadow-sm"
+            />
+            <img
+              src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68eaceb5d712c1b62b8bd4d5/83975f5f2_Untitleddesign9.png"
               alt="Ledgera AI"
               className="w-16 h-16 mx-auto mb-4"
             />
