@@ -60,7 +60,7 @@ export default function Home() {
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-[#22A699] font-bold mt-0.5">•</span>
-                  <span><strong>Google Calendar (optional):</strong> If you choose to connect Google Calendar, we request read/write access to import your existing events into Ledgera and export Ledgera events back to your Google Calendar. This connection is entirely optional and can be disconnected at any time.</span>
+                  <span><strong>Google Calendar (optional):</strong> If you choose to connect Google Calendar, we request read/write access to import your existing events into MediocreAtBestDev and export MediocreAtBestDev events back to your Google Calendar. This connection is entirely optional and can be disconnected at any time.</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-[#22A699] font-bold mt-0.5">•</span>
@@ -68,7 +68,7 @@ export default function Home() {
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-[#22A699] font-bold mt-0.5">•</span>
-                  <span><strong>Revoke access anytime:</strong> You can disconnect Google Calendar or revoke app permissions at any time from your Google account settings or within Ledgera AI settings.</span>
+                  <span><strong>Revoke access anytime:</strong> You can disconnect Google Calendar or revoke app permissions at any time from your Google account settings or within MediocreAtBestDev settings.</span>
                 </li>
               </ul>
             </div>
