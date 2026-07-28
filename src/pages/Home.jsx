@@ -34,33 +34,25 @@ export default function Home() {
               className="w-20 h-20 mx-auto mb-4 rounded-lg shadow-sm"
             />
             <h1 className="text-5xl font-bold text-slate-900 mb-1 tracking-tight">MediocreAtBestDev</h1>
-            <div className="flex items-center justify-center gap-2 mb-2">
-              <img
-                src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68eaceb5d712c1b62b8bd4d5/83975f5f2_Untitleddesign9.png"
-                alt="Ledgera AI"
-                className="w-6 h-6"
-              />
-              <span className="text-xl font-semibold text-slate-700">Ledgera AI</span>
-            </div>
             <p className="text-lg text-slate-600">Smart bookkeeping for your business</p>
           </div>
 
           <div className="text-left bg-white rounded-lg border border-slate-200 p-5 space-y-3 shadow-sm">
             <h2 className="text-lg font-bold text-slate-900 text-center">About this app</h2>
             <p className="text-sm text-slate-700 leading-relaxed">
-              <strong>MediocreAtBestDev</strong> is the developer and publisher of <strong>Ledgera AI</strong>, an AI-powered bookkeeping application designed for freelancers and small business owners.
+              <strong>MediocreAtBestDev</strong> is an AI-powered bookkeeping application designed for freelancers and small business owners.
             </p>
             <p className="text-sm text-slate-700 leading-relaxed">
-              The purpose of Ledgera AI is to help users easily track their business income and expenses, organize finances by project, generate financial reports, and get AI-powered insights into their cash flow. Users can also optionally sync their Google Calendar to receive reminders to log transactions after events.
+              The purpose of MediocreAtBestDev is to help users easily track their business income and expenses, organize finances by project, generate financial reports, and get AI-powered insights into their cash flow. Users can also optionally sync their Google Calendar to receive reminders to log transactions after events.
             </p>
             <p className="text-sm text-slate-700 leading-relaxed">
-              Ledgera AI uses Google OAuth to securely authenticate users and, optionally, to read and write calendar events. It does not access Gmail, Google Drive, or any other Google services.
+              MediocreAtBestDev uses Google OAuth to securely authenticate users and, optionally, to read and write calendar events. It does not access Gmail, Google Drive, or any other Google services.
             </p>
           </div>
 
           <div className="bg-slate-100 rounded-lg p-4 text-left space-y-4 text-sm text-slate-700">
             <div>
-              <p className="font-semibold text-slate-900 mb-2">How Ledgera AI uses your Google account:</p>
+              <p className="font-semibold text-slate-900 mb-2">How MediocreAtBestDev uses your Google account:</p>
               <ul className="space-y-2">
                 <li className="flex items-start gap-2">
                   <span className="text-[#22A699] font-bold mt-0.5">•</span>
@@ -81,7 +73,7 @@ export default function Home() {
               </ul>
             </div>
             <p className="text-xs text-slate-500 border-t border-slate-200 pt-3">
-              Ledgera AI's use of Google user data complies with the <a href="https://developers.google.com/terms/api-services-user-data-policy" target="_blank" rel="noopener noreferrer" className="text-[#22A699] hover:underline">Google API Services User Data Policy</a>, including the Limited Use requirements.
+              MediocreAtBestDev's use of Google user data complies with the <a href="https://developers.google.com/terms/api-services-user-data-policy" target="_blank" rel="noopener noreferrer" className="text-[#22A699] hover:underline">Google API Services User Data Policy</a>, including the Limited Use requirements.
             </p>
           </div>
 
